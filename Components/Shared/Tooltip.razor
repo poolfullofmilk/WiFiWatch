@@ -1,0 +1,23 @@
+@* Tooltip *@
+@if (!string.IsNullOrEmpty(Text))
+{
+    <MudTooltip Text="@Text"
+                RootClass="@RootClass"
+                Placement="@Placement"
+                ShowOnClick="false"
+                ShowOnFocus="false"
+                Arrow>
+        @ChildContent
+    </MudTooltip>
+}
+else if (!string.IsNullOrEmpty(RootClass))
+{
+    <MudElement HtmlTag="span"
+                Class="@RootClass">
+        @ChildContent
+    </MudElement>
+}
+else
+{
+    @ChildContent
+}

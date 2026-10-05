@@ -1,0 +1,12 @@
+@* Search Field *@
+<Tooltip Text="Start Typing To Search">
+    <MudTextField T="string"
+                  Value="_value"
+                  ValueChanged="HandleValueChangedAsync"
+                  Placeholder="@PlaceHolder"
+                  Adornment="Adornment.End"
+                  AdornmentIcon="@Icons.Material.Rounded.Search"
+                  DebounceInterval="500"
+                  Style="max-width:clamp(0px, 250px, 100%)"
+                  OnDebounceIntervalElapsed="HandleDebounceIntervalElapsedAsync" />
+</Tooltip>

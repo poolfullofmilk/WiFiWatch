@@ -1,0 +1,31 @@
+@* Filter Menu *@
+<Tooltip Text="@TooltipText">
+    <MudMenu Icon="@Icons.Material.Rounded.FilterList"
+             Size="Size.Small"
+             Class="d-flex align-center overflow-hidden"
+             AnchorOrigin="Origin.BottomCenter"
+             PopoverClass="filter-menu-popover"
+             TransformOrigin="Origin.TopCenter">
+
+        @* Select All *@
+        <MudMenuItem OnClick="ToggleAllAsync"
+                     AutoClose="false"
+                     Icon="@(AllSelected ? Icons.Material.Rounded.CheckBox : Icons.Material.Rounded.CheckBoxOutlineBlank)">
+            All
+        </MudMenuItem>
+
+        <MudDivider />
+
+        @* Options *@
+        @foreach (var option in Options)
+        {
+            <MudMenuItem OnClick="@(() => ToggleFilterAsync(option.Key))"
+                         AutoClose="false"
+                         Icon="@(SelectedKeys.Contains(option.Key) ? Icons.Material.Rounded.CheckBox : Icons.Material.Rounded.CheckBoxOutlineBlank)"
+                         IconColor="option.Color">
+                @option.Label
+            </MudMenuItem>
+        }
+
+    </MudMenu>
+</Tooltip>

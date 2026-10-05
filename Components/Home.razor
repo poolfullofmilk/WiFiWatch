@@ -1,0 +1,317 @@
+@using ApexCharts
+@using Color = MudBlazor.Color
+@using Size = MudBlazor.Size
+
+@* Providers *@
+<MudThemeProvider Theme="AppTheme.Custom"
+                  IsDarkMode />
+<MudPopoverProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="4"
+               Style="background-color:color-mix(in srgb, var(--mud-palette-appbar-background) var(--glass-opacity), transparent); backdrop-filter:var(--glass-blur)">
+        <MudText Typo="Typo.h6"
+                 Class="mx-2">
+            WifiWatch
+        </MudText>
+        <MudSpacer />
+        @* Status Bar *@
+        <StatusBar />
+    </MudAppBar>
+
+    @* Main Content *@
+    <MudMainContent Class="px-7 pb-7 pt-20">
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge"
+                      Gutters="false">
+            <MudTabs @bind-ActivePanelIndex="_activePanelIndex"
+                     Elevation="4"
+                     TabHeaderClass="mb-6"
+                     AlwaysShowScrollButtons
+                     Rounded>
+
+                @* Events Tab *@
+                <MudTabPanel ToolTip="Events"
+                             Icon="@Icons.Material.Rounded.NotificationsActive"
+                             IconColor="Color.Tertiary"
+                             BadgeData="@(_eventTotal > 0 ? _eventTotal.ToString() : null)"
+                             BadgeColor="Color.Tertiary">
+                    <DataTable TItem="WifiEvent"
+                               @ref="_eventTable"
+                               ServerData="LoadEventsAsync"
+                               @bind-SearchTerm="_eventSearchTerm">
+
+                        <ToolBarExtra>
+                            @* Filter Menu *@
+                            <FilterMenu TooltipText="Filter Kinds"
+                                        Options="s_eventKindOptions"
+                                        SelectedKeys="_selectedEventKinds"
+                                        OnToggle="ReloadEventsAsync" />
+                            @* Export Menu *@
+                            <ExportMenu OnExport="ExportEventsAsync" />
+                        </ToolBarExtra>
+
+                        <HeaderContent>
+                            <MudTh>
+                                <MudTableSortLabel T="WifiEvent"
+                                                   SortLabel="@nameof(WifiEvent.OccurredAtUtc)"
+                                                   InitialDirection="SortDirection.Descending">
+                                    Time
+                                </MudTableSortLabel>
+                            </MudTh>
+                            <MudTh>Kind</MudTh>
+                            <MudTh>Message</MudTh>
+                        </HeaderContent>
+
+                        <RowTemplate>
+                            <MudTd DataLabel="Time"
+                                   Class="selectable-text">
+                                @FormatLocal(context.OccurredAtUtc, "yyyy-MM-dd HH:mm:ss")
+                            </MudTd>
+                            <MudTd DataLabel="Kind">
+                                <ActionChip Text="@context.Kind.ToLabel()"
+                                            Color="@EventKindColors.For(context.Kind)"
+                                            Target="@QuickActions.ForEvent(context.Kind, Monitor.Status.RouterAddress)" />
+                            </MudTd>
+                            <MudTd DataLabel="Message"
+                                   Class="selectable-text">
+                                <MudHighlighter Text="@context.Message"
+                                                HighlightedText="@_eventSearchTerm" />
+                            </MudTd>
+                        </RowTemplate>
+
+                    </DataTable>
+                </MudTabPanel>
+
+                @* Minutes Tab *@
+                <MudTabPanel ToolTip="Minutes"
+                             Icon="@Icons.Material.Rounded.Timeline"
+                             IconColor="Color.Tertiary">
+                    <DataTable TItem="MinuteSample"
+                               ServerData="LoadMinutesAsync"
+                               @bind-SearchTerm="_minuteSearchTerm">
+
+                        @* Export Menu *@
+                        <ToolBarExtra>
+                            <ExportMenu OnExport="ExportMinutesAsync" />
+                        </ToolBarExtra>
+
+                        <HeaderContent>
+                            <MudTh>
+                                <MudTableSortLabel T="MinuteSample"
+                                                   SortLabel="@nameof(MinuteSample.MinuteUtc)"
+                                                   InitialDirection="SortDirection.Descending">
+                                    Time
+                                </MudTableSortLabel>
+                            </MudTh>
+                            <MudTh>Link</MudTh>
+                            <MudTh>Network</MudTh>
+                            <MudTh>Channel</MudTh>
+                            <MudTh>
+                                <MudTableSortLabel T="MinuteSample"
+                                                   SortLabel="@nameof(MinuteSample.Rssi)">
+                                    Signal
+                                </MudTableSortLabel>
+                            </MudTh>
+                            <MudTh>Rate</MudTh>
+                            <MudTh>
+                                <MudTableSortLabel T="MinuteSample"
+                                                   SortLabel="@nameof(MinuteSample.RouterPingMilliseconds)">
+                                    Router
+                                </MudTableSortLabel>
+                            </MudTh>
+                            <MudTh>Jitter</MudTh>
+                            <MudTh>Loss</MudTh>
+                            <MudTh>
+                                <MudTableSortLabel T="MinuteSample"
+                                                   SortLabel="@nameof(MinuteSample.InternetPingMilliseconds)">
+                                    Internet
+                                </MudTableSortLabel>
+                            </MudTh>
+                            <MudTh>Jitter</MudTh>
+                            <MudTh>Loss</MudTh>
+                        </HeaderContent>
+
+                        <RowTemplate>
+                            <MudTd DataLabel="Time"
+                                   Class="selectable-text">
+                                @FormatLocal(context.MinuteUtc, "yyyy-MM-dd HH:mm")
+                            </MudTd>
+                            <MudTd DataLabel="Link">@context.Link</MudTd>
+                            <MudTd DataLabel="Network">@(context.Ssid ?? "-")</MudTd>
+                            <MudTd DataLabel="Channel">@FormatChannel(context.Channel)</MudTd>
+                            <MudTd DataLabel="Signal">@FormatValue(context.Rssi, "dBm")</MudTd>
+                            <MudTd DataLabel="Rate">@FormatRate(context)</MudTd>
+                            <MudTd DataLabel="Router">@FormatValue(context.RouterPingMilliseconds, "ms")</MudTd>
+                            <MudTd DataLabel="Jitter">@FormatValue(context.RouterJitterMilliseconds, "ms")</MudTd>
+                            <MudTd DataLabel="Loss">@FormatPercent(context.RouterLossPercent)</MudTd>
+                            <MudTd DataLabel="Internet">@FormatValue(context.InternetPingMilliseconds, "ms")</MudTd>
+                            <MudTd DataLabel="Jitter">@FormatValue(context.InternetJitterMilliseconds, "ms")</MudTd>
+                            <MudTd DataLabel="Loss">@FormatPercent(context.InternetLossPercent)</MudTd>
+                        </RowTemplate>
+
+                    </DataTable>
+                </MudTabPanel>
+
+                @* Stats Tab *@
+                <MudTabPanel ToolTip="Stats"
+                             Icon="@Icons.Material.Rounded.BarChart"
+                             IconColor="Color.Tertiary"
+                             OnClick="LoadStatsAsync">
+                    <MudGrid>
+
+                        @* Ping Chart *@
+                        <MudItem xs="12"
+                                 md="8">
+                            <MudPaper Elevation="4"
+                                      Class="pa-4 rounded-panel">
+                                <MudText Typo="Typo.subtitle1"
+                                         Class="mx-2 mb-3">
+                                    <b>Hourly Ping</b>
+                                </MudText>
+                                @if (_isStatsLoading)
+                                {
+                                    <MudSkeleton SkeletonType="SkeletonType.Rectangle"
+                                                 Height="280px"
+                                                 Style="border-radius:10px" />
+                                }
+                                else
+                                {
+                                    <ApexChart TItem="ChartPoint"
+                                               Options="_pingOptions"
+                                               Height="@("280")">
+                                        <ApexPointSeries TItem="ChartPoint"
+                                                         Items="_routerPingPoints"
+                                                         Name="Router"
+                                                         SeriesType="SeriesType.Line"
+                                                         XValue="@(point => point.Label)"
+                                                         YValue="@(point => point.Value)" />
+                                        <ApexPointSeries TItem="ChartPoint"
+                                                         Items="_internetPingPoints"
+                                                         Name="Internet"
+                                                         SeriesType="SeriesType.Line"
+                                                         XValue="@(point => point.Label)"
+                                                         YValue="@(point => point.Value)" />
+                                    </ApexChart>
+                                }
+                            </MudPaper>
+                        </MudItem>
+
+                        @* Eviction Chart *@
+                        <MudItem xs="12"
+                                 md="4">
+                            <MudPaper Elevation="4"
+                                      Class="pa-4 rounded-panel">
+                                <MudText Typo="Typo.subtitle1"
+                                         Class="mx-2 mb-3">
+                                    <b>Daily DFS Evictions</b>
+                                </MudText>
+                                @if (_isStatsLoading)
+                                {
+                                    <MudSkeleton SkeletonType="SkeletonType.Rectangle"
+                                                 Height="280px"
+                                                 Style="border-radius:10px" />
+                                }
+                                else
+                                {
+                                    <ApexChart TItem="ChartPoint"
+                                               Options="_evictionOptions"
+                                               Height="@("280")">
+                                        <ApexPointSeries TItem="ChartPoint"
+                                                         Items="_evictionPoints"
+                                                         Name="Evictions"
+                                                         SeriesType="SeriesType.Bar"
+                                                         XValue="@(point => point.Label)"
+                                                         YValue="@(point => point.Value)" />
+                                    </ApexChart>
+                                }
+                            </MudPaper>
+                        </MudItem>
+
+                    </MudGrid>
+                </MudTabPanel>
+
+                @* Settings Tab *@
+                <MudTabPanel ToolTip="Settings"
+                             Icon="@Icons.Material.Rounded.Settings"
+                             IconColor="Color.Tertiary">
+                    <MudPaper Elevation="4"
+                              Class="pa-4 rounded-panel">
+                        <MudStack Spacing="3">
+                            @* Start With Windows *@
+                            <SettingSwitch Title="Start With Windows"
+                                           Description="Runs Hidden In The Tray After Sign In"
+                                           Value="Monitor.Settings.StartWithWindows"
+                                           ValueChanged="value => SaveSettings(Monitor.Settings with { StartWithWindows = value })" />
+                            <MudDivider />
+                            <MudText Typo="Typo.subtitle2"
+                                     Class="mx-4">
+                                <b>Alert Thresholds</b>
+                            </MudText>
+                            @* Thresholds *@
+                            <MudGrid Class="px-4">
+
+                                @* Weak Signal *@
+                                <MudItem xs="12"
+                                         md="4">
+                                    <MudNumericField T="int"
+                                                     Label="Weak Signal Below dBm"
+                                                     Value="Monitor.Settings.WeakSignalRssi"
+                                                     ValueChanged="value => SaveSettings(Monitor.Settings with { WeakSignalRssi = value })"
+                                                     Variant="Variant.Outlined" />
+                                </MudItem>
+                                @* Slow Link *@
+                                <MudItem xs="12"
+                                         md="4">
+                                    <MudNumericField T="int"
+                                                     Label="Slow Link Below Mbps"
+                                                     Value="Monitor.Settings.SlowLinkMbps"
+                                                     ValueChanged="value => SaveSettings(Monitor.Settings with { SlowLinkMbps = value })"
+                                                     Variant="Variant.Outlined" />
+                                </MudItem>
+                                @* Packet Loss *@
+                                <MudItem xs="12"
+                                         md="4">
+                                    <MudNumericField T="int"
+                                                     Label="Packet Loss From %"
+                                                     Value="Monitor.Settings.PacketLossPercent"
+                                                     ValueChanged="value => SaveSettings(Monitor.Settings with { PacketLossPercent = value })"
+                                                     Variant="Variant.Outlined" />
+                                </MudItem>
+                                @* Router Ping *@
+                                <MudItem xs="12"
+                                         md="4">
+                                    <MudNumericField T="int"
+                                                     Label="Router Ping Above ms"
+                                                     Value="Monitor.Settings.RouterPingMilliseconds"
+                                                     ValueChanged="value => SaveSettings(Monitor.Settings with { RouterPingMilliseconds = value })"
+                                                     Variant="Variant.Outlined" />
+                                </MudItem>
+                                @* Jitter *@
+                                <MudItem xs="12"
+                                         md="4">
+                                    <MudNumericField T="int"
+                                                     Label="Router Jitter Above ms"
+                                                     Value="Monitor.Settings.JitterMilliseconds"
+                                                     ValueChanged="value => SaveSettings(Monitor.Settings with { JitterMilliseconds = value })"
+                                                     Variant="Variant.Outlined" />
+                                </MudItem>
+                                @* Internet Ping *@
+                                <MudItem xs="12"
+                                         md="4">
+                                    <MudNumericField T="int"
+                                                     Label="Internet Ping Above ms"
+                                                     Value="Monitor.Settings.InternetPingMilliseconds"
+                                                     ValueChanged="value => SaveSettings(Monitor.Settings with { InternetPingMilliseconds = value })"
+                                                     Variant="Variant.Outlined" />
+                                </MudItem>
+
+                            </MudGrid>
+                        </MudStack>
+                    </MudPaper>
+                </MudTabPanel>
+
+            </MudTabs>
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>

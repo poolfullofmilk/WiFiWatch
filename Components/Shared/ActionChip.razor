@@ -1,0 +1,12 @@
+@* Action Chip *@
+<Tooltip Text="@ActionLabel">
+    <MudChip T="string"
+             Icon="@Icon"
+             Color="@Color"
+             Size="Size.Small"
+             Variant="Variant.Text"
+             Class="@(Target is null ? null : "action-chip")"
+             OnClick="ClickCallback">
+        @Text
+    </MudChip>
+</Tooltip>

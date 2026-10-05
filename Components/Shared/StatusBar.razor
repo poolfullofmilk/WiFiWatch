@@ -1,0 +1,12 @@
+@* Status Chips *@
+<MudStack Row
+          AlignItems="AlignItems.Center"
+          Spacing="0">
+    @foreach (var chip in Chips)
+    {
+        <ActionChip Icon="@chip.Icon"
+                    Text="@chip.Text"
+                    Color="@chip.Color"
+                    Target="@chip.Target" />
+    }
+</MudStack>

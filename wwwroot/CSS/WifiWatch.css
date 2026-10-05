@@ -1,0 +1,132 @@
+/* Nunito, Self Hosted, Latin Only */
+@font-face {
+    font-family: "Nunito";
+    font-style: normal;
+    font-weight: 200 1000;
+    font-display: swap;
+    src: url("../Fonts/Nunito-Latin.woff2") format("woff2");
+}
+
+/* Shared Tokens */
+:root {
+    --radius-panel: 20px;
+    --glass-opacity: 66%;
+    --glass-blur: blur(12px);
+}
+
+/* App Bar Glass On Menus, Selects And Dropdowns */
+.mud-popover.mud-paper {
+    background-color: color-mix(in srgb, var(--mud-palette-surface) var(--glass-opacity), transparent);
+    backdrop-filter: var(--glass-blur);
+}
+
+/* Shared Panel Radius */
+.rounded-panel {
+    border-radius: var(--radius-panel) !important;
+}
+
+/* Theme Values For The Page */
+html, body {
+    margin: 0;
+    background-color: var(--mud-palette-background);
+    color: var(--mud-palette-text-primary);
+    font-family: var(--mud-typography-default-family);
+}
+
+/* Marks Values Selectable Where MudBlazor Suppresses Selection */
+.selectable-text {
+    user-select: text;
+}
+
+/* Clickable Chips Read As Links */
+.action-chip {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* Highlight */
+mark {
+    padding: 0 !important;
+}
+
+/* Blazor Shows This Only After A Crash */
+#blazor-error-ui {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 2000;
+    padding: 12px 24px;
+    background: var(--mud-palette-error);
+    color: var(--mud-palette-error-text);
+}
+
+    #blazor-error-ui .reload {
+        color: inherit;
+        margin-left: 8px;
+    }
+
+/* #region ApexCharts Overrides */
+svg.apexcharts-svg {
+    background-color: initial !important;
+}
+/* #endregion */
+
+/* #region MudBlazor Overrides */
+/* Clip Horizontally Only So Sticky Children Still Work */
+.mud-main-content {
+    min-height: 0 !important;
+    overflow-x: clip !important;
+}
+
+/* Filter Menu */
+.filter-menu-popover {
+    max-height: calc(100dvh - 220px) !important;
+    overflow-y: auto !important;
+}
+
+/* Chips Carry The Slightest Theme Shadow */
+.mud-chip {
+    box-shadow: var(--mud-elevation-1);
+}
+
+/* Filled Buttons Take The Theme Shadow Instead Of Material's Own */
+.mud-button-filled,
+.mud-button-filled:hover,
+.mud-button-filled:focus-visible,
+.mud-button-filled:active {
+    box-shadow: var(--mud-elevation-1);
+}
+
+/* Table */
+.mud-elevation-4.mud-table .mud-table-head .mud-table-cell {
+    border-radius: 0 !important;
+}
+
+/* Values Stay On One Line, Wide Tables Scroll */
+.mud-table-cell {
+    white-space: nowrap;
+}
+
+/* Tabs */
+.mud-tabs .mud-tab-active {
+    background-color: color-mix(in srgb, var(--mud-palette-background) 38%, transparent);
+}
+
+.mud-tab {
+    min-width: initial !important;
+}
+
+    .mud-tab .mud-badge-root,
+    .mud-tab .mud-badge-wrapper,
+    .mud-tab .mud-badge {
+        position: static;
+        transform: none;
+        margin-top: 1px;
+    }
+
+    .mud-tab .mud-badge-root {
+        align-self: flex-start;
+    }
+/* #endregion */

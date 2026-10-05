@@ -1,0 +1,23 @@
+@* Setting Switch *@
+<MudStack Row
+          AlignItems="AlignItems.Center"
+          Justify="Justify.SpaceBetween"
+          Wrap="Wrap.Wrap"
+          Spacing="2">
+    <MudStack Spacing="0"
+              Class="mx-4">
+        <MudText Typo="Typo.subtitle2">
+            <b>@Title</b>
+        </MudText>
+        <MudText Typo="Typo.body2"
+                 Class="mud-text-secondary">
+            @Description
+        </MudText>
+    </MudStack>
+    @* Toggle *@
+    <MudCheckBox T="bool"
+                 Value="Value"
+                 ValueChanged="ValueChanged"
+                 Class="mx-4"
+                 Disabled="Disabled" />
+</MudStack>

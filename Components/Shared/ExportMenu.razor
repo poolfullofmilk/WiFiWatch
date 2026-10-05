@@ -1,0 +1,45 @@
+@* Export *@
+<MudElement HtmlTag="div">
+    @* Export Button *@
+    <Tooltip Text="Export">
+        <MudIconButton Icon="@Icons.Material.Rounded.FileDownload"
+                       Size="Size.Small"
+                       OnClick="Open" />
+    </Tooltip>
+
+    @* Export Popover *@
+    <MudPopover Open="_isOpen"
+                AnchorOrigin="Origin.BottomRight"
+                TransformOrigin="Origin.TopRight"
+                Class="overflow-hidden">
+        @* Date Picker *@
+        <MudDatePicker PickerVariant="PickerVariant.Static"
+                       @bind-Date="_day"
+                       MaxDate="DateTime.Today"
+                       Color="Color.Info"
+                       Elevation="0">
+            <PickerActions>
+                @* All Button *@
+                <MudButton Variant="Variant.Filled"
+                           Size="Size.Small"
+                           StartIcon="@Icons.Material.Rounded.SelectAll"
+                           OnClick="ExportAllAsync">
+                    All
+                </MudButton>
+                <MudSpacer />
+                @* Day Button *@
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Info"
+                           Size="Size.Small"
+                           StartIcon="@Icons.Material.Rounded.FileDownload"
+                           OnClick="ExportDayAsync">
+                    Export Day
+                </MudButton>
+            </PickerActions>
+        </MudDatePicker>
+    </MudPopover>
+</MudElement>
+
+@* Export Overlay *@
+<MudOverlay Visible="_isOpen"
+            OnClick="Close" />
