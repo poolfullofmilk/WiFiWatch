@@ -6,14 +6,40 @@
 <MudThemeProvider Theme="AppTheme.Custom"
                   IsDarkMode />
 <MudPopoverProvider />
+<MudDialogProvider BackdropClick="false"
+                   CloseButton="true"
+                   MaxWidth="MaxWidth.False" />
 <MudSnackbarProvider />
+
+@* Close Message Box *@
+<MudMessageBox @ref="_closeMessageBox"
+               Title="@($"Close {App.DisplayName}")">
+    <MessageContent>
+        Keep Watching From The Tray Or Exit Completely
+    </MessageContent>
+    <NoButton>
+        <MudButton Variant="Variant.Filled"
+                   Size="Size.Small"
+                   StartIcon="@Icons.Material.Rounded.PowerSettingsNew">
+            Exit
+        </MudButton>
+    </NoButton>
+    <YesButton>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Info"
+                   Size="Size.Small"
+                   StartIcon="@Icons.Material.Rounded.Check">
+            Keep Running
+        </MudButton>
+    </YesButton>
+</MudMessageBox>
 
 <MudLayout>
     <MudAppBar Elevation="4"
                Style="background-color:color-mix(in srgb, var(--mud-palette-appbar-background) var(--glass-opacity), transparent); backdrop-filter:var(--glass-blur)">
         <MudText Typo="Typo.h6"
                  Class="mx-2">
-            WifiWatch
+            @App.DisplayName
         </MudText>
         <MudSpacer />
         @* Status Bar *@
@@ -158,77 +184,89 @@
                              Icon="@Icons.Material.Rounded.BarChart"
                              IconColor="Color.Tertiary"
                              OnClick="LoadStatsAsync">
-                    <MudGrid>
+                    <MudStack Spacing="6">
+                        @* Range Toggle *@
+                        <MudStack Row
+                                  Justify="Justify.Center">
+                            <SegmentedButtonGroup TValue="StatsRange"
+                                                  Options="s_statsRangeOptions"
+                                                  Value="_statsRange"
+                                                  ValueChanged="SelectStatsRangeAsync" />
+                        </MudStack>
+                        <MudGrid>
 
-                        @* Ping Chart *@
-                        <MudItem xs="12"
-                                 md="8">
-                            <MudPaper Elevation="4"
-                                      Class="pa-4 rounded-panel">
-                                <MudText Typo="Typo.subtitle1"
-                                         Class="mx-2 mb-3">
-                                    <b>Hourly Ping</b>
-                                </MudText>
-                                @if (_isStatsLoading)
-                                {
-                                    <MudSkeleton SkeletonType="SkeletonType.Rectangle"
-                                                 Height="280px"
-                                                 Style="border-radius:10px" />
-                                }
-                                else
-                                {
-                                    <ApexChart TItem="ChartPoint"
-                                               Options="_pingOptions"
-                                               Height="@("280")">
-                                        <ApexPointSeries TItem="ChartPoint"
-                                                         Items="_routerPingPoints"
-                                                         Name="Router"
-                                                         SeriesType="SeriesType.Line"
-                                                         XValue="@(point => point.Label)"
-                                                         YValue="@(point => point.Value)" />
-                                        <ApexPointSeries TItem="ChartPoint"
-                                                         Items="_internetPingPoints"
-                                                         Name="Internet"
-                                                         SeriesType="SeriesType.Line"
-                                                         XValue="@(point => point.Label)"
-                                                         YValue="@(point => point.Value)" />
-                                    </ApexChart>
-                                }
-                            </MudPaper>
-                        </MudItem>
+                            @* Ping Chart *@
+                            <MudItem xs="12"
+                                     md="8">
+                                <MudPaper Elevation="4"
+                                          Class="pa-4 rounded-panel">
+                                    <MudText Typo="Typo.subtitle1"
+                                             Class="mx-2 mb-3">
+                                        <b>Ping Per Hour</b>
+                                    </MudText>
+                                    @if (_isStatsLoading)
+                                    {
+                                        <MudSkeleton SkeletonType="SkeletonType.Rectangle"
+                                                     Height="280px"
+                                                     Style="border-radius:10px" />
+                                    }
+                                    else
+                                    {
+                                        <ApexChart @key="_statsRenderKey"
+                                                   TItem="ChartPoint"
+                                                   Options="_pingOptions"
+                                                   Height="@("280")">
+                                            <ApexPointSeries TItem="ChartPoint"
+                                                             Items="_routerPingPoints"
+                                                             Name="Router"
+                                                             SeriesType="SeriesType.Line"
+                                                             XValue="@(point => point.Label)"
+                                                             YValue="@(point => point.Value)" />
+                                            <ApexPointSeries TItem="ChartPoint"
+                                                             Items="_internetPingPoints"
+                                                             Name="Internet"
+                                                             SeriesType="SeriesType.Line"
+                                                             XValue="@(point => point.Label)"
+                                                             YValue="@(point => point.Value)" />
+                                        </ApexChart>
+                                    }
+                                </MudPaper>
+                            </MudItem>
 
-                        @* Eviction Chart *@
-                        <MudItem xs="12"
-                                 md="4">
-                            <MudPaper Elevation="4"
-                                      Class="pa-4 rounded-panel">
-                                <MudText Typo="Typo.subtitle1"
-                                         Class="mx-2 mb-3">
-                                    <b>Daily DFS Evictions</b>
-                                </MudText>
-                                @if (_isStatsLoading)
-                                {
-                                    <MudSkeleton SkeletonType="SkeletonType.Rectangle"
-                                                 Height="280px"
-                                                 Style="border-radius:10px" />
-                                }
-                                else
-                                {
-                                    <ApexChart TItem="ChartPoint"
-                                               Options="_evictionOptions"
-                                               Height="@("280")">
-                                        <ApexPointSeries TItem="ChartPoint"
-                                                         Items="_evictionPoints"
-                                                         Name="Evictions"
-                                                         SeriesType="SeriesType.Bar"
-                                                         XValue="@(point => point.Label)"
-                                                         YValue="@(point => point.Value)" />
-                                    </ApexChart>
-                                }
-                            </MudPaper>
-                        </MudItem>
+                            @* Eviction Chart *@
+                            <MudItem xs="12"
+                                     md="4">
+                                <MudPaper Elevation="4"
+                                          Class="pa-4 rounded-panel">
+                                    <MudText Typo="Typo.subtitle1"
+                                             Class="mx-2 mb-3">
+                                        <b>@EvictionTitle</b>
+                                    </MudText>
+                                    @if (_isStatsLoading)
+                                    {
+                                        <MudSkeleton SkeletonType="SkeletonType.Rectangle"
+                                                     Height="280px"
+                                                     Style="border-radius:10px" />
+                                    }
+                                    else
+                                    {
+                                        <ApexChart @key="_statsRenderKey"
+                                                   TItem="ChartPoint"
+                                                   Options="_evictionOptions"
+                                                   Height="@("280")">
+                                            <ApexPointSeries TItem="ChartPoint"
+                                                             Items="_evictionPoints"
+                                                             Name="Evictions"
+                                                             SeriesType="SeriesType.Bar"
+                                                             XValue="@(point => point.Label)"
+                                                             YValue="@(point => point.Value)" />
+                                        </ApexChart>
+                                    }
+                                </MudPaper>
+                            </MudItem>
 
-                    </MudGrid>
+                        </MudGrid>
+                    </MudStack>
                 </MudTabPanel>
 
                 @* Settings Tab *@
@@ -307,6 +345,11 @@
                                 </MudItem>
 
                             </MudGrid>
+                            <MudDivider />
+                            <MudText Typo="Typo.body2"
+                                     Class="mx-4 mud-text-secondary">
+                                Version @App.Version
+                            </MudText>
                         </MudStack>
                     </MudPaper>
                 </MudTabPanel>

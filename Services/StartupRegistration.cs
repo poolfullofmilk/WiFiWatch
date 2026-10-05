@@ -12,7 +12,7 @@ public static class StartupRegistration
     private static readonly string s_shortcutPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.Programs),
         "01 Apps",
-        "WifiWatch.lnk"
+        $"{App.DisplayName}.lnk"
     );
 
     public static void Apply(bool isEnabled)
@@ -50,7 +50,7 @@ public static class StartupRegistration
         dynamic shell = Activator.CreateInstance(Type.GetTypeFromProgID("WScript.Shell")!)!;
         var shortcut = shell.CreateShortcut(s_shortcutPath);
         shortcut.TargetPath = Environment.ProcessPath;
-        shortcut.Description = "WifiWatch";
+        shortcut.Description = App.DisplayName;
         shortcut.Save();
     }
 }

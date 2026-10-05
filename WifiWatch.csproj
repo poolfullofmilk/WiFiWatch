@@ -13,6 +13,8 @@
         <Description>Watches Wi-Fi Channel, Signal And Ping And Logs Every Change</Description>
         <Copyright>Copyright 2026</Copyright>
         <Version>1.0</Version>
+        <AssemblyTitle>Wifi Watch</AssemblyTitle>
+        <Product>Wifi Watch</Product>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <AssemblyName>WifiWatch_v$(Version)</AssemblyName>

@@ -14,7 +14,7 @@ public sealed record MonitorStatus(
 )
 {
     public string TrayText =>
-        $"WifiWatch {Link}"
+        $"{App.DisplayName} {Link}"
         + (
             Reading is { IsConnected: true } reading
                 ? $" Channel {reading.Channel}{(reading.IsDfs ? " DFS" : string.Empty)}"
@@ -84,11 +84,7 @@ public sealed class NetworkMonitor(UserSettings settings)
         var tickCount = 0;
         _quietUntilUtc = lastTickUtc + s_quietWindow;
 
-        await TryRecordAsync(
-            EventKind.Started,
-            $"Started WifiWatch {typeof(NetworkMonitor).Assembly.GetName().Version?.ToString(2)}",
-            false
-        );
+        await TryRecordAsync(EventKind.Started, "Started", false);
 
         while (await timer.WaitForNextTickAsync())
         {
@@ -439,7 +435,7 @@ public sealed class NetworkMonitor(UserSettings settings)
         }
     }
 
-    private async Task TryRecordAsync(EventKind kind, string message, bool isAlert)
+    public async Task TryRecordAsync(EventKind kind, string message, bool isAlert)
     {
         try
         {

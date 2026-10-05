@@ -20,6 +20,17 @@
     backdrop-filter: var(--glass-blur);
 }
 
+/* Dialogs Blur The Page Behind Them */
+.mud-overlay-scrim.mud-overlay-dark {
+    backdrop-filter: var(--glass-blur);
+}
+
+/* Sticky Table Headers Frost The Rows Scrolling Under Them */
+.mud-table-sticky-header .mud-table-head .mud-table-cell {
+    background-color: color-mix(in srgb, var(--mud-palette-surface) var(--glass-opacity), transparent);
+    backdrop-filter: var(--glass-blur);
+}
+
 /* Shared Panel Radius */
 .rounded-panel {
     border-radius: var(--radius-panel) !important;

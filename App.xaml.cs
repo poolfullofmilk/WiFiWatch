@@ -11,6 +11,10 @@ namespace WifiWatch;
 
 public partial class App : Application
 {
+    // Shown Name And Version
+    public const string DisplayName = "Wifi Watch";
+    public static string Version { get; } = typeof(App).Assembly.GetName().Version!.ToString(2);
+
     private const string ShowSignalName = "WifiWatch.Show";
 
     private EventWaitHandle? _showSignal;
@@ -48,13 +52,28 @@ public partial class App : Application
         StartupRegistration.Apply(settings.StartWithWindows);
 
         var monitor = new NetworkMonitor(settings);
+
+        // A Failure In The Page Is Logged, Never Fatal
+        DispatcherUnhandledException += (_, exceptionArgs) =>
+        {
+            exceptionArgs.Handled = true;
+            _ = monitor.TryRecordAsync(
+                EventKind.MonitorFailed,
+                $"App Failed {exceptionArgs.Exception.GetType().Name}",
+                true
+            );
+        };
+
+        // The Page Resolves The Window Only After It Exists
+        MainWindow? window = null;
         var services = new ServiceCollection();
         services.AddWpfBlazorWebView();
         services.AddMudServices();
         services.AddApexCharts();
         services.AddSingleton(monitor);
+        services.AddSingleton(_ => window!);
 
-        var window = new MainWindow(services.BuildServiceProvider(), monitor);
+        window = new MainWindow(services.BuildServiceProvider(), monitor);
         ThreadPool.RegisterWaitForSingleObject(
             _showSignal,
             (_, _) => Dispatcher.InvokeAsync(window.ShowFromTray),

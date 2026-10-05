@@ -21,9 +21,13 @@
         {
             <MudMenuItem OnClick="@(() => ToggleFilterAsync(option.Key))"
                          AutoClose="false"
-                         Icon="@(SelectedKeys.Contains(option.Key) ? Icons.Material.Rounded.CheckBox : Icons.Material.Rounded.CheckBoxOutlineBlank)"
-                         IconColor="option.Color">
-                @option.Label
+                         Icon="@(SelectedKeys.Contains(option.Key) ? Icons.Material.Rounded.CheckBox : Icons.Material.Rounded.CheckBoxOutlineBlank)">
+                <MudChip T="string"
+                         Color="option.Color"
+                         Size="Size.Small"
+                         Variant="Variant.Text">
+                    @option.Label
+                </MudChip>
             </MudMenuItem>
         }
 

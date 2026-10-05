@@ -11,10 +11,13 @@ namespace WifiWatch.Components;
 
 public partial class Home : IDisposable
 {
-    // Chart Ranges
-    private const int ChartHours = 48;
-    private const int ChartDays = 30;
     private const int EventsPanelIndex = 0;
+
+    private static readonly List<SegmentedButtonOption<StatsRange>> s_statsRangeOptions =
+    [
+        new(StatsRange.Daily, "Daily"),
+        new(StatsRange.Weekly, "Weekly"),
+    ];
 
     private static readonly List<FilterMenu.FilterOption> s_eventKindOptions =
     [
@@ -29,12 +32,16 @@ public partial class Home : IDisposable
     [Inject]
     public required NetworkMonitor Monitor { get; set; }
 
+    [Inject]
+    public required MainWindow Window { get; set; }
+
     // Events Table State
     private readonly HashSet<string> _selectedEventKinds = [.. Enum.GetNames<EventKind>()];
     private DataTable<WifiEvent>? _eventTable;
     private string _eventSearchTerm = string.Empty;
     private int _eventTotal;
     private int _activePanelIndex;
+    private MudMessageBox? _closeMessageBox;
 
     // Minutes Table State
     private string _minuteSearchTerm = string.Empty;
@@ -42,12 +49,37 @@ public partial class Home : IDisposable
     // Stats State
     private readonly ApexChartOptions<ChartPoint> _pingOptions = BuildPingOptions();
     private readonly ApexChartOptions<ChartPoint> _evictionOptions = BuildEvictionOptions();
+    private StatsRange _statsRange = StatsRange.Daily;
     private bool _isStatsLoading = true;
+    private int _statsRenderKey;
     private List<ChartPoint> _routerPingPoints = [];
     private List<ChartPoint> _internetPingPoints = [];
     private List<ChartPoint> _evictionPoints = [];
 
-    protected override void OnInitialized() => Monitor.EventRecorded += OnEventRecorded;
+    protected override void OnInitialized()
+    {
+        Monitor.EventRecorded += OnEventRecorded;
+        Window.CloseRequested += OnCloseRequested;
+    }
+
+    private Task OnCloseRequested() => InvokeAsync(AskBeforeClosingAsync);
+
+    private async Task AskBeforeClosingAsync()
+    {
+        // Dismissing The Dialog Keeps Everything As It Was
+        var keepRunning = await _closeMessageBox!.ShowAsync(
+            new DialogOptions { CloseButton = false, BackdropClick = true }
+        );
+
+        if (keepRunning == true)
+        {
+            Window.Hide();
+        }
+        else if (keepRunning == false)
+        {
+            Window.Exit();
+        }
+    }
 
     #region Event Methods
     private void OnEventRecorded() => InvokeAsync(RefreshEventsAsync);
@@ -170,27 +202,34 @@ public partial class Home : IDisposable
     #endregion
 
     #region Stats Methods
+    private async Task SelectStatsRangeAsync(StatsRange range)
+    {
+        _statsRange = range;
+        await LoadStatsAsync();
+    }
+
     private async Task LoadStatsAsync()
     {
         _isStatsLoading = true;
 
+        // Ping Is Hourly, Evictions Hourly Or Daily
+        var isWeekly = _statsRange == StatsRange.Weekly;
         var nowUtc = DateTime.UtcNow;
-        var firstHourUtc = new DateTime(
-            nowUtc.Year,
-            nowUtc.Month,
-            nowUtc.Day,
-            nowUtc.Hour,
-            0,
-            0,
+        var pingHourCount = isWeekly ? 7 * 24 : 24;
+        var pingStartUtc = new DateTime(
+            nowUtc.Ticks - (nowUtc.Ticks % TimeSpan.TicksPerHour),
             DateTimeKind.Utc
-        ).AddHours(1 - ChartHours);
-        var firstDay = DateTime.Today.AddDays(1 - ChartDays);
-        var firstDayUtc = firstDay.ToUniversalTime();
+        ).AddHours(1 - pingHourCount);
+        var pingLabelFormat = isWeekly ? "ddd HH'h'" : "HH'h'";
+        var (evictionBucket, evictionBucketCount, evictionStartUtc, evictionLabelFormat) = isWeekly
+            ? (TimeSpan.FromDays(1), 7, DateTime.Today.AddDays(-6).ToUniversalTime(), "ddd")
+            : (TimeSpan.FromHours(1), 24, pingStartUtc, "HH'h'");
+        _pingOptions.Xaxis.TickAmount = isWeekly ? 14 : 12;
 
         await using var context = new WifiDbContext();
         var samples = await context
             .MinuteSamples.AsNoTracking()
-            .Where(sample => sample.MinuteUtc >= firstHourUtc)
+            .Where(sample => sample.MinuteUtc >= pingStartUtc)
             .Select(sample => new
             {
                 sample.MinuteUtc,
@@ -201,55 +240,61 @@ public partial class Home : IDisposable
         var evictionTimes = await context
             .Events.AsNoTracking()
             .Where(wifiEvent =>
-                wifiEvent.Kind == EventKind.DfsEviction && wifiEvent.OccurredAtUtc >= firstDayUtc
+                wifiEvent.Kind == EventKind.DfsEviction
+                && wifiEvent.OccurredAtUtc >= evictionStartUtc
             )
             .Select(wifiEvent => wifiEvent.OccurredAtUtc)
             .ToListAsync();
 
-        // Every Hour And Day Shows, Empty Ones Included
+        // Every Bucket Shows, Empty Ones Included
         var samplesByHour = samples.ToLookup(sample =>
-            sample.MinuteUtc.AddTicks(-(sample.MinuteUtc.Ticks % TimeSpan.TicksPerHour))
+            BucketIndex(sample.MinuteUtc, pingStartUtc, TimeSpan.FromHours(1))
         );
-        var hours = Enumerable
-            .Range(0, ChartHours)
-            .Select(offset => firstHourUtc.AddHours(offset))
-            .ToList();
         _routerPingPoints =
         [
-            .. hours.Select(hour => new ChartPoint(
-                FormatLocal(hour, "ddd HH'h'"),
-                (decimal?)samplesByHour[hour].Average(sample => sample.RouterPingMilliseconds)
-            )),
+            .. Enumerable
+                .Range(0, pingHourCount)
+                .Select(hour => new ChartPoint(
+                    FormatLocal(pingStartUtc.AddHours(hour), pingLabelFormat),
+                    (decimal?)samplesByHour[hour].Average(sample => sample.RouterPingMilliseconds)
+                )),
         ];
         _internetPingPoints =
         [
-            .. hours.Select(hour => new ChartPoint(
-                FormatLocal(hour, "ddd HH'h'"),
-                (decimal?)samplesByHour[hour].Average(sample => sample.InternetPingMilliseconds)
-            )),
+            .. Enumerable
+                .Range(0, pingHourCount)
+                .Select(hour => new ChartPoint(
+                    FormatLocal(pingStartUtc.AddHours(hour), pingLabelFormat),
+                    (decimal?)samplesByHour[hour].Average(sample => sample.InternetPingMilliseconds)
+                )),
         ];
 
-        var evictionsByDay = evictionTimes
-            .CountBy(evictionTime => evictionTime.ToLocalTime().Date)
+        var evictionsByBucket = evictionTimes
+            .CountBy(evictionTime => BucketIndex(evictionTime, evictionStartUtc, evictionBucket))
             .ToDictionary();
         _evictionPoints =
         [
             .. Enumerable
-                .Range(0, ChartDays)
-                .Select(offset => firstDay.AddDays(offset))
-                .Select(day => new ChartPoint(
-                    day.ToString("dd MMM"),
-                    evictionsByDay.GetValueOrDefault(day)
+                .Range(0, evictionBucketCount)
+                .Select(bucket => new ChartPoint(
+                    FormatLocal(evictionStartUtc + (bucket * evictionBucket), evictionLabelFormat),
+                    evictionsByBucket.GetValueOrDefault(bucket)
                 )),
         ];
 
+        // A New Key Rebuilds The Charts With The New Range
+        _statsRenderKey++;
         _isStatsLoading = false;
     }
+
+    private static int BucketIndex(DateTime utcTime, DateTime startUtc, TimeSpan bucketSize) =>
+        (int)((utcTime - startUtc) / bucketSize);
 
     private static ApexChartOptions<ChartPoint> BuildPingOptions()
     {
         var options = ChartTheme.BuildBaseOptions<ChartPoint>();
         options.Stroke = new Stroke { Curve = Curve.Smooth, Width = 3 };
+        options.Markers = new Markers { Size = 3 };
         options.Xaxis = new XAxis { TickAmount = 12 };
         options.Yaxis =
         [
@@ -383,5 +428,18 @@ public partial class Home : IDisposable
         settings.Save();
     }
 
-    public void Dispose() => Monitor.EventRecorded -= OnEventRecorded;
+    private string EvictionTitle =>
+        _statsRange == StatsRange.Weekly ? "DFS Evictions Per Day" : "DFS Evictions Per Hour";
+
+    public void Dispose()
+    {
+        Monitor.EventRecorded -= OnEventRecorded;
+        Window.CloseRequested -= OnCloseRequested;
+    }
+
+    public enum StatsRange
+    {
+        Daily,
+        Weekly,
+    }
 }
