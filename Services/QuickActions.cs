@@ -23,8 +23,12 @@ public static class QuickActions
         {
             EventKind.LocationBlocked => LocationSettings,
             EventKind.Disconnect or EventKind.Reconnect or EventKind.LinkChange => WifiSettings,
-            EventKind.WanDown or EventKind.WanBack => NetworkStatus,
-            EventKind.Started or EventKind.Resumed or EventKind.MonitorFailed => null,
+            EventKind.WanDown or EventKind.WanBack or EventKind.FaultTrace => NetworkStatus,
+            EventKind.UpdateAvailable => UpdateChecker.LatestReleaseUrl,
+            EventKind.Started
+            or EventKind.Resumed
+            or EventKind.MonitorFailed
+            or EventKind.Recovered => null,
             _ => RouterSettings(routerAddress),
         };
 
@@ -35,6 +39,7 @@ public static class QuickActions
             WifiSettings => "Open Wi-Fi Settings",
             EthernetSettings => "Open Ethernet Settings",
             NetworkStatus => "Open Network Status",
+            UpdateChecker.LatestReleaseUrl => "Open Release Page",
             _ => "Open Router Settings",
         };
 

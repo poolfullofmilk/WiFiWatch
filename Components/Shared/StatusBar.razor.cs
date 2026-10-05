@@ -104,7 +104,11 @@ public partial class StatusBar : IDisposable
     private static string FormatRoundTrip(long? roundTrip) =>
         roundTrip is null ? "Lost" : $"{roundTrip} ms";
 
-    public void Dispose() => Monitor.StatusChanged -= OnStatusChanged;
+    public void Dispose()
+    {
+        Monitor.StatusChanged -= OnStatusChanged;
+        GC.SuppressFinalize(this);
+    }
 
     private sealed record StatusChip(string Icon, string Text, Color Color, string? Target);
 }

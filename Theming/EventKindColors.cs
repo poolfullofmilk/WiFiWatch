@@ -23,7 +23,7 @@ public static class EventKindColors
             or EventKind.Reconnect
             or EventKind.WanBack
             or EventKind.Recovered => Color.Success,
-            EventKind.LinkChange => Color.Info,
+            EventKind.LinkChange or EventKind.FaultTrace or EventKind.UpdateAvailable => Color.Info,
             _ => Color.Default,
         };
 }

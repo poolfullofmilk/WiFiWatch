@@ -34,11 +34,14 @@ public sealed class NetworkMonitor(UserSettings settings)
     private const int PingTimeoutMilliseconds = 1000;
     private const int WifiReadEverySeconds = 5;
     private const int WanDownAfterFailures = 5;
+    private const int NeighborScanEverySeconds = 300;
+    private const int TraceMaxHops = 30;
     private const string FiveGigahertz = "5 GHz";
 
     private static readonly IPAddress s_internetAddress = IPAddress.Parse("76.76.2.2");
     private static readonly TimeSpan s_sleepGap = TimeSpan.FromSeconds(30);
     private static readonly TimeSpan s_quietWindow = TimeSpan.FromSeconds(60);
+    private static readonly TimeSpan s_updateCheckInterval = TimeSpan.FromDays(1);
 
     // Ping State
     private readonly Ping _routerPing = new();
@@ -61,11 +64,14 @@ public sealed class NetworkMonitor(UserSettings settings)
 
     // Loop State
     private DateTime _quietUntilUtc;
+    private DateTime _nextUpdateCheckUtc;
     private bool _isFailing;
 
     public UserSettings Settings { get; set; } = settings;
 
     public MonitorStatus Status { get; private set; } = new(OfflineLink, null, null, null, null);
+
+    public Version? AvailableUpdate { get; private set; }
 
     public event Action<string, string>? Alerted;
 
@@ -83,6 +89,7 @@ public sealed class NetworkMonitor(UserSettings settings)
         var minuteUtc = TruncateToMinute(lastTickUtc);
         var tickCount = 0;
         _quietUntilUtc = lastTickUtc + s_quietWindow;
+        _nextUpdateCheckUtc = _quietUntilUtc;
 
         await TryRecordAsync(EventKind.Started, "Started", false);
 
@@ -111,10 +118,19 @@ public sealed class NetworkMonitor(UserSettings settings)
                     minuteUtc = TruncateToMinute(nowUtc);
                 }
 
+                // Daily Check Off The Loop
+                if (nowUtc >= _nextUpdateCheckUtc)
+                {
+                    _nextUpdateCheckUtc = nowUtc + s_updateCheckInterval;
+                    _ = CheckForUpdateAsync();
+                }
+
+                var tick = tickCount++;
                 await TrackLinkAsync();
                 await Task.WhenAll(
                     PingAsync(),
-                    tickCount++ % WifiReadEverySeconds == 0 ? ReadWifiAsync() : Task.CompletedTask
+                    tick % WifiReadEverySeconds == 0 ? ReadWifiAsync() : Task.CompletedTask,
+                    tick % NeighborScanEverySeconds == 0 ? ScanNeighborsAsync() : Task.CompletedTask
                 );
 
                 Status = new(
@@ -146,8 +162,8 @@ public sealed class NetworkMonitor(UserSettings settings)
     private async Task CloseMinuteAsync(DateTime minuteUtc)
     {
         var lastReading = _minuteReadings.LastOrDefault();
-        var router = Summarize(_routerRoundTrips);
-        var internet = Summarize(_internetRoundTrips);
+        var (routerPing, routerJitter, routerLoss) = Summarize(_routerRoundTrips);
+        var (internetPing, internetJitter, internetLoss) = Summarize(_internetRoundTrips);
         var sample = new MinuteSample
         {
             MinuteUtc = minuteUtc,
@@ -158,12 +174,12 @@ public sealed class NetworkMonitor(UserSettings settings)
             Rssi = AverageReading(reading => reading.Rssi),
             ReceiveRateMbps = AverageReading(reading => reading.ReceiveRateMbps),
             TransmitRateMbps = AverageReading(reading => reading.TransmitRateMbps),
-            RouterPingMilliseconds = router.Average,
-            RouterJitterMilliseconds = router.Jitter,
-            RouterLossPercent = router.LossPercent,
-            InternetPingMilliseconds = internet.Average,
-            InternetJitterMilliseconds = internet.Jitter,
-            InternetLossPercent = internet.LossPercent,
+            RouterPingMilliseconds = routerPing,
+            RouterJitterMilliseconds = routerJitter,
+            RouterLossPercent = routerLoss,
+            InternetPingMilliseconds = internetPing,
+            InternetJitterMilliseconds = internetJitter,
+            InternetLossPercent = internetLoss,
         };
         _minuteReadings.Clear();
         _routerRoundTrips.Clear();
@@ -290,6 +306,7 @@ public sealed class NetworkMonitor(UserSettings settings)
             // Router Answering While Internet Fails Points At The Line
             _wanDownSinceUtc = DateTime.UtcNow.AddSeconds(-WanDownAfterFailures);
             await RecordAsync(EventKind.WanDown, "Internet Down While Router Answers", true);
+            _ = TraceFaultAsync(_routerAddress);
         }
     }
 
@@ -304,6 +321,93 @@ public sealed class NetworkMonitor(UserSettings settings)
         {
             return null;
         }
+    }
+    #endregion
+
+    #region Diagnosis Methods
+    private async Task ScanNeighborsAsync()
+    {
+        var neighbors = await WifiReader.ReadNeighborsAsync();
+        if (neighbors.Count == 0)
+            return;
+
+        var scanUtc = DateTime.UtcNow;
+        var ownSsid = _lastConnected?.Ssid;
+        await using var context = new WifiDbContext();
+        context.NeighborSamples.AddRange(
+            neighbors.Select(neighbor => new NeighborSample
+            {
+                ScanUtc = scanUtc,
+                Ssid = neighbor.Ssid,
+                Bssid = neighbor.Bssid,
+                Channel = neighbor.Channel,
+                SignalPercent = neighbor.SignalPercent,
+                ChannelUtilizationPercent = neighbor.ChannelUtilizationPercent,
+                IsOwn = neighbor.Ssid == ownSsid,
+            })
+        );
+        await context.SaveChangesAsync();
+    }
+
+    private async Task TraceFaultAsync(IPAddress? routerAddress)
+    {
+        try
+        {
+            await RecordAsync(
+                EventKind.FaultTrace,
+                await TraceAsync(s_internetAddress, routerAddress),
+                false
+            );
+        }
+        catch
+        {
+            // A Failed Trace Only Means Less Detail
+        }
+    }
+
+    public static async Task<string> TraceAsync(IPAddress target, IPAddress? routerAddress)
+    {
+        using var ping = new Ping();
+        IPAddress? lastAddress = null;
+        var lastHop = 0;
+
+        // Each Hop Answers Once Its Time To Live Runs Out
+        for (var hop = 1; hop <= TraceMaxHops; hop++)
+        {
+            var reply = await ping.SendPingAsync(
+                target,
+                PingTimeoutMilliseconds,
+                new byte[32],
+                new PingOptions(hop, true)
+            );
+            if (reply.Status == IPStatus.Success)
+                return "Trace Reached The Internet Again";
+
+            if (reply.Status == IPStatus.TtlExpired)
+            {
+                lastHop = hop;
+                lastAddress = reply.Address;
+            }
+        }
+
+        return lastAddress is null ? "Trace Got No Answer From Any Hop"
+            : lastAddress.Equals(routerAddress)
+                ? "Trace Stops At Your Router, The Line Or Fiber Box Is Down"
+            : $"Trace Stops After {lastAddress} At Hop {lastHop}, Inside The Provider Network";
+    }
+
+    private async Task CheckForUpdateAsync()
+    {
+        // Announce Each New Version Once
+        if (await UpdateChecker.CheckAsync() is not { } latest || latest == AvailableUpdate)
+            return;
+
+        AvailableUpdate = latest;
+        await TryRecordAsync(
+            EventKind.UpdateAvailable,
+            $"Version {latest.ToString(2)} Is Available",
+            true
+        );
     }
     #endregion
 

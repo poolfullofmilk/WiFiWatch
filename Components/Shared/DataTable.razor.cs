@@ -30,6 +30,9 @@ public partial class DataTable<TItem>
     // Persisted Rows Per Page
     private int _rowsPerPage = 50;
 
+    // Last Good Page, Shown Again When A Load Is Cancelled
+    private TableData<TItem> _lastPage = new() { Items = [], TotalItems = 0 };
+
     private MudTable<TItem>? _mudTable;
 
     private async Task<TableData<TItem>> ServerDataWrapper(
@@ -38,7 +41,17 @@ public partial class DataTable<TItem>
     )
     {
         _rowsPerPage = state.PageSize;
-        return await ServerData(state, cancellationToken);
+
+        try
+        {
+            _lastPage = await ServerData(state, cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            // A Newer Load Replaced This One, MudTable Never Catches It
+        }
+
+        return _lastPage;
     }
 
     public Task ReloadAsync() => _mudTable?.ReloadServerData() ?? Task.CompletedTask;

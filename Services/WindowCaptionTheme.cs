@@ -4,7 +4,7 @@ using System.Windows.Interop;
 
 namespace WifiWatch.Services;
 
-public static class WindowCaptionTheme
+public static partial class WindowCaptionTheme
 {
     private const int UseImmersiveDarkMode = 20;
     private const int CaptionColor = 35;
@@ -26,8 +26,8 @@ public static class WindowCaptionTheme
         _ = DwmSetWindowAttribute(handle, CaptionColor, ref color, sizeof(int));
     }
 
-    [DllImport("dwmapi.dll")]
-    private static extern int DwmSetWindowAttribute(
+    [LibraryImport("dwmapi.dll")]
+    private static partial int DwmSetWindowAttribute(
         nint window,
         int attribute,
         ref int value,

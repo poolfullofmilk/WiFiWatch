@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace WifiWatch.Services;
 
-public static class TrayMenu
+public static partial class TrayMenu
 {
     // Win32 Menu Flags
     private const uint ItemFlag = 0x0;
@@ -56,14 +56,15 @@ public static class TrayMenu
         public int Y;
     }
 
-    [DllImport("user32.dll")]
-    private static extern nint CreatePopupMenu();
+    [LibraryImport("user32.dll")]
+    private static partial nint CreatePopupMenu();
 
-    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-    private static extern bool AppendMenuW(nint menu, uint flags, nuint itemId, string? text);
+    [LibraryImport("user32.dll", StringMarshalling = StringMarshalling.Utf16)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool AppendMenuW(nint menu, uint flags, nuint itemId, string? text);
 
-    [DllImport("user32.dll")]
-    private static extern int TrackPopupMenuEx(
+    [LibraryImport("user32.dll")]
+    private static partial int TrackPopupMenuEx(
         nint menu,
         uint flags,
         int x,
@@ -72,21 +73,25 @@ public static class TrayMenu
         nint parameters
     );
 
-    [DllImport("user32.dll")]
-    private static extern bool DestroyMenu(nint menu);
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool DestroyMenu(nint menu);
 
-    [DllImport("user32.dll")]
-    private static extern bool GetCursorPos(out Point point);
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool GetCursorPos(out Point point);
 
-    [DllImport("user32.dll")]
-    private static extern bool SetForegroundWindow(nint window);
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool SetForegroundWindow(nint window);
 
-    [DllImport("user32.dll")]
-    private static extern bool PostMessageW(nint window, uint message, nint wParam, nint lParam);
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool PostMessageW(nint window, uint message, nint wParam, nint lParam);
 
-    [DllImport("uxtheme.dll", EntryPoint = "#135")]
-    private static extern int SetPreferredAppMode(int mode);
+    [LibraryImport("uxtheme.dll", EntryPoint = "#135")]
+    private static partial int SetPreferredAppMode(int mode);
 
-    [DllImport("uxtheme.dll", EntryPoint = "#136")]
-    private static extern void FlushMenuThemes();
+    [LibraryImport("uxtheme.dll", EntryPoint = "#136")]
+    private static partial void FlushMenuThemes();
 }

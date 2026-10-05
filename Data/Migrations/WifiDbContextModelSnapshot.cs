@@ -60,6 +60,34 @@ namespace WifiWatch.Data.Migrations
             );
 
             modelBuilder.Entity(
+                "WifiWatch.Data.NeighborSample",
+                b =>
+                {
+                    b.Property<int>("Id").ValueGeneratedOnAdd().HasColumnType("INTEGER");
+
+                    b.Property<string>("Bssid").IsRequired().HasColumnType("TEXT");
+
+                    b.Property<int>("Channel").HasColumnType("INTEGER");
+
+                    b.Property<int?>("ChannelUtilizationPercent").HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsOwn").HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("ScanUtc").HasColumnType("TEXT");
+
+                    b.Property<int>("SignalPercent").HasColumnType("INTEGER");
+
+                    b.Property<string>("Ssid").IsRequired().HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScanUtc");
+
+                    b.ToTable("NeighborSamples");
+                }
+            );
+
+            modelBuilder.Entity(
                 "WifiWatch.Data.WifiEvent",
                 b =>
                 {

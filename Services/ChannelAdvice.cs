@@ -1,0 +1,93 @@
+using System.Diagnostics;
+
+namespace WifiWatch.Services;
+
+public sealed record ChannelBlock(int First, int Last)
+{
+    public string Label =>
+        $"{First} To {Last}{(WifiReader.IsDfsChannel(First) ? " DFS" : string.Empty)}";
+
+    public bool Contains(int? channel) => channel >= First && channel <= Last;
+}
+
+public static class ChannelAdvice
+{
+    // Neighbors Below This Barely Reach Us
+    private const int AudibleSignalPercent = 30;
+    private const int FrequentEvictions = 2;
+
+    // Ponytail: EU 80 MHz Blocks, 132 Upward Has No 80 MHz Here
+    public static readonly ChannelBlock[] Blocks =
+    [
+        new(36, 48),
+        new(52, 64),
+        new(100, 112),
+        new(116, 128),
+    ];
+
+    static ChannelAdvice() => Debug.Assert(SelfTestPasses());
+
+    public static Dictionary<ChannelBlock, int> CountNeighbors(
+        IEnumerable<(string Bssid, int Channel, int SignalPercent)> neighbors
+    )
+    {
+        var audibleNeighbors = neighbors
+            .Where(neighbor => neighbor.SignalPercent >= AudibleSignalPercent)
+            .ToList();
+
+        return Blocks.ToDictionary(
+            block => block,
+            block =>
+                audibleNeighbors
+                    .Where(neighbor => block.Contains(neighbor.Channel))
+                    .Select(neighbor => neighbor.Bssid)
+                    .Distinct()
+                    .Count()
+        );
+    }
+
+    public static string Advise(
+        int? currentChannel,
+        Dictionary<ChannelBlock, int> neighborsPerBlock,
+        int evictionCount
+    )
+    {
+        var currentBlock = Blocks.FirstOrDefault(block => block.Contains(currentChannel));
+        if (currentBlock is null)
+            return "Not On A 5 GHz 80 MHz Channel";
+
+        // Radar Beats Congestion When Stability Matters Most
+        if (WifiReader.IsDfsChannel(currentChannel) && evictionCount >= FrequentEvictions)
+            return $"Radar Moved You {evictionCount} Times, 36 To 48 Never Sees Radar";
+
+        // Ties Keep The Current Block, Then Prefer No Radar
+        var quietestBlock = Blocks
+            .OrderBy(block => neighborsPerBlock[block])
+            .ThenByDescending(block => block == currentBlock)
+            .ThenBy(block => WifiReader.IsDfsChannel(block.First))
+            .First();
+
+        return quietestBlock == currentBlock
+            ? $"Channel {currentChannel} Sits On The Quietest Block, Stay"
+            : $"{quietestBlock.Label} Has {neighborsPerBlock[quietestBlock]} Neighbors, Yours Has {neighborsPerBlock[currentBlock]}";
+    }
+
+    private static bool SelfTestPasses()
+    {
+        var neighborsPerBlock = CountNeighbors([
+            ("a", 36, 80),
+            ("b", 40, 50),
+            ("b", 44, 50),
+            ("c", 100, 10),
+            ("d", 116, 90),
+        ]);
+
+        return neighborsPerBlock[Blocks[0]] == 2
+            && neighborsPerBlock[Blocks[2]] == 0
+            && neighborsPerBlock[Blocks[3]] == 1
+            && Advise(100, neighborsPerBlock, 0).Contains("Quietest")
+            && Advise(100, neighborsPerBlock, 3).StartsWith("Radar Moved You 3")
+            && Advise(36, neighborsPerBlock, 3).StartsWith("52 To 64 DFS Has 0")
+            && Advise(6, neighborsPerBlock, 0).StartsWith("Not On");
+    }
+}

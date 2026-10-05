@@ -15,6 +15,8 @@ public sealed class WifiDbContext : DbContext
 
     public DbSet<MinuteSample> MinuteSamples => Set<MinuteSample>();
 
+    public DbSet<NeighborSample> NeighborSamples => Set<NeighborSample>();
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
         optionsBuilder.UseSqlite($"Data Source={Path.Combine(DataDirectory, "WifiWatch.db")}");
 

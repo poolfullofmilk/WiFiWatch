@@ -12,6 +12,7 @@ namespace WifiWatch.Components;
 public partial class Home : IDisposable
 {
     private const int EventsPanelIndex = 0;
+    private const int BusyAirtimePercent = 50;
 
     private static readonly List<SegmentedButtonOption<StatsRange>> s_statsRangeOptions =
     [
@@ -48,13 +49,18 @@ public partial class Home : IDisposable
 
     // Stats State
     private readonly ApexChartOptions<ChartPoint> _pingOptions = BuildPingOptions();
-    private readonly ApexChartOptions<ChartPoint> _evictionOptions = BuildEvictionOptions();
+    private readonly ApexChartOptions<ChartPoint> _evictionOptions = BuildCountOptions();
+    private readonly ApexChartOptions<ChartPoint> _neighborOptions = BuildCountOptions();
     private StatsRange _statsRange = StatsRange.Daily;
     private bool _isStatsLoading = true;
     private int _statsRenderKey;
     private List<ChartPoint> _routerPingPoints = [];
     private List<ChartPoint> _internetPingPoints = [];
     private List<ChartPoint> _evictionPoints = [];
+    private List<ChartPoint> _neighborPoints = [];
+    private string _channelAdvice = string.Empty;
+    private int _evictionCount;
+    private int? _ownAirtimePercent;
 
     protected override void OnInitialized()
     {
@@ -107,7 +113,7 @@ public partial class Home : IDisposable
     {
         await using var context = new WifiDbContext();
         var query = FilterEvents(context);
-        _eventTotal = await query.CountAsync();
+        _eventTotal = await query.CountAsync(cancellationToken);
         var items = await query
             .OrderByColumn(
                 wifiEvent => wifiEvent.OccurredAtUtc,
@@ -115,7 +121,7 @@ public partial class Home : IDisposable
             )
             .Skip(state.Page * state.PageSize)
             .Take(state.PageSize)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         // Refresh The Tab Badge
         StateHasChanged();
@@ -171,11 +177,11 @@ public partial class Home : IDisposable
 
         return new()
         {
-            TotalItems = await query.CountAsync(),
+            TotalItems = await query.CountAsync(cancellationToken),
             Items = await sortedQuery
                 .Skip(state.Page * state.PageSize)
                 .Take(state.PageSize)
-                .ToListAsync(),
+                .ToListAsync(cancellationToken),
         };
     }
 
@@ -269,6 +275,40 @@ public partial class Home : IDisposable
                 )),
         ];
 
+        // Neighbors Over The Same Range, Our Own Network Left Out
+        var neighbors = await context
+            .NeighborSamples.AsNoTracking()
+            .Where(sample => sample.ScanUtc >= pingStartUtc && !sample.IsOwn)
+            .Select(sample => new
+            {
+                sample.Bssid,
+                sample.Channel,
+                sample.SignalPercent,
+            })
+            .ToListAsync();
+        _ownAirtimePercent = await context
+            .NeighborSamples.AsNoTracking()
+            .Where(sample => sample.IsOwn && sample.ChannelUtilizationPercent != null)
+            .OrderByDescending(sample => sample.ScanUtc)
+            .Select(sample => sample.ChannelUtilizationPercent)
+            .FirstOrDefaultAsync();
+        var neighborsPerBlock = ChannelAdvice.CountNeighbors(
+            neighbors.Select(neighbor => (neighbor.Bssid, neighbor.Channel, neighbor.SignalPercent))
+        );
+        _neighborPoints =
+        [
+            .. ChannelAdvice.Blocks.Select(block => new ChartPoint(
+                block.Label,
+                neighborsPerBlock[block]
+            )),
+        ];
+        _evictionCount = evictionTimes.Count;
+        _channelAdvice = ChannelAdvice.Advise(
+            Monitor.Status.Reading?.Channel,
+            neighborsPerBlock,
+            _evictionCount
+        );
+
         var evictionsByBucket = evictionTimes
             .CountBy(evictionTime => BucketIndex(evictionTime, evictionStartUtc, evictionBucket))
             .ToDictionary();
@@ -310,7 +350,7 @@ public partial class Home : IDisposable
         return options;
     }
 
-    private static ApexChartOptions<ChartPoint> BuildEvictionOptions()
+    private static ApexChartOptions<ChartPoint> BuildCountOptions()
     {
         var options = ChartTheme.BuildBaseOptions<ChartPoint>();
         options.PlotOptions = new PlotOptions { Bar = new PlotOptionsBar { BorderRadius = 4 } };
@@ -330,7 +370,7 @@ public partial class Home : IDisposable
     #endregion
 
     #region Export Methods
-    private async Task ExportEventsAsync(DateTime? day)
+    private static async Task ExportEventsAsync(DateTime? day)
     {
         await using var context = new WifiDbContext();
         var (startUtc, endUtc) = DayRangeUtc(day);
@@ -360,7 +400,7 @@ public partial class Home : IDisposable
         );
     }
 
-    private async Task ExportMinutesAsync(DateTime? day)
+    private static async Task ExportMinutesAsync(DateTime? day)
     {
         await using var context = new WifiDbContext();
         var (startUtc, endUtc) = DayRangeUtc(day);
@@ -435,6 +475,7 @@ public partial class Home : IDisposable
     {
         Monitor.EventRecorded -= OnEventRecorded;
         Window.CloseRequested -= OnCloseRequested;
+        GC.SuppressFinalize(this);
     }
 
     public enum StatsRange

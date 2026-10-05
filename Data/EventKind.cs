@@ -19,9 +19,11 @@ public enum EventKind
     PacketLoss,
     WanDown,
     WanBack,
+    FaultTrace,
     Recovered,
     LocationBlocked,
     MonitorFailed,
+    UpdateAvailable,
 }
 
 public static partial class EventKindExtensions
