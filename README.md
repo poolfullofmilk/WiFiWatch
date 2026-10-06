@@ -1,6 +1,6 @@
 # Wifi Watch
 
-Watches your Wi-Fi channel, signal and ping and logs every change
+Watches Your Wi-Fi Channel, Signal And Ping And Logs Every Change
 
 ![Wifi Watch Minutes](Screenshot-Minutes.png)
 
