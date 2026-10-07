@@ -1,0 +1,32 @@
+namespace WifiWatch.Data.Enums;
+
+public enum EventKind
+{
+    Started,
+    Resumed,
+    DfsEviction,
+    DfsReturn,
+    ChannelChange,
+    BandChange,
+    Disconnect,
+    Reconnect,
+    ConnectFailed,
+    LinkChange,
+    WeakSignal,
+    SlowLink,
+    PingSpike,
+    JitterSpike,
+    PacketLoss,
+    SlowDns,
+    WanDown,
+    WanBack,
+    FaultTrace,
+    Recovered,
+    LocationBlocked,
+    DriverCheck,
+    SpeedTest,
+    DailySummary,
+    WeeklySummary,
+    MonitorFailed,
+    UpdateAvailable,
+}

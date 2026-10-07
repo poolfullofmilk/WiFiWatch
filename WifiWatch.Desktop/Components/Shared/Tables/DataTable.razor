@@ -1,0 +1,65 @@
+@typeparam TItem
+
+<MudTable @ref="_mudTable"
+          T="TItem"
+          ServerData="ServerDataWrapper"
+          SortLabel="Sort By"
+          Dense
+          Hover
+          Bordered
+          Striped
+          AllowUnsorted="false"
+          Elevation="4"
+          RowsPerPage="@_rowsPerPage"
+          FixedHeader
+          ContainerStyle="max-height:calc(100vh - 300px)"
+          Class="rounded-panel"
+          OnRowClick="OnRowClick"
+          RowClass="@(OnRowClick.HasDelegate ? "cursor-pointer" : null)">
+
+    @* ToolBar *@
+    <ToolBarContent>
+        @* Search *@
+        <SearchTextField Value="@SearchTerm"
+                         ValueChanged="OnSearchTermChangedAsync"
+                         PlaceHolder="Search"
+                         OnDebounceIntervalElapsed="ReloadAsync" />
+
+        <MudSpacer />
+
+        <MudStack Row
+                  Spacing="3"
+                  AlignItems="AlignItems.Center"
+                  Class="px-4">
+            @* Extra *@
+            @if (ToolBarExtra is not null)
+            {
+                @ToolBarExtra
+            }
+            @* Refresh *@
+            <Tooltip Text="Refresh">
+                <MudIconButton Icon="@Icons.Material.Rounded.Refresh"
+                               Size="Size.Small"
+                               OnClick="ReloadAsync" />
+            </Tooltip>
+        </MudStack>
+    </ToolBarContent>
+
+    @* Header *@
+    <HeaderContent>
+        @HeaderContent
+    </HeaderContent>
+
+    @* Row *@
+    <RowTemplate>
+        @RowTemplate(context)
+    </RowTemplate>
+
+    @* Pager *@
+    <PagerContent>
+        <MudTablePager HorizontalAlignment="HorizontalAlignment.Center"
+                       PageSizeOptions="new int[] { 50, 100, int.MaxValue }"
+                       RowsPerPageString="Rows Per Page" />
+    </PagerContent>
+
+</MudTable>

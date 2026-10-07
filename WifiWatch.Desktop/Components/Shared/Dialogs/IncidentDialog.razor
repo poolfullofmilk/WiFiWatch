@@ -1,0 +1,74 @@
+@* Incident Dialog *@
+<MudDialog>
+
+    <TitleContent>
+        <MudStack Row
+                  AlignItems="AlignItems.Center"
+                  Spacing="2">
+            <ActionChip Text="@Event.Kind.ToLabel()"
+                        Color="@EventKindColors.For(Event.Kind, Event.Severity)"
+                        Target="@QuickActions.ForEvent(Event.Kind, Monitor.Status.RouterAdminUrl)" />
+            <MudText Typo="Typo.h6">@(Event.Scope ?? "Details")</MudText>
+        </MudStack>
+    </TitleContent>
+    <DialogContent>
+        <MudStack Spacing="3"
+                  Style="max-width:720px">
+            <MudText Typo="Typo.body1"
+                     Class="selectable-text">
+                @Event.Message
+            </MudText>
+            <MudText Typo="Typo.body2"
+                     Class="mud-text-secondary">
+                @TimeRange
+            </MudText>
+            @foreach (var (label, value) in DetailLines)
+            {
+                <MudText Typo="Typo.body2"
+                         Class="selectable-text">
+                    <b>@label</b> @value
+                </MudText>
+            }
+            @if (Details.Trace is { Count: > 0 } hops)
+            {
+                @* Trace Table *@
+                <MudSimpleTable Dense
+                                Striped
+                                Bordered
+                                Elevation="0">
+                    <thead>
+                        <tr>
+                            <th>Hop</th>
+                            <th>Address</th>
+                            <th>Name</th>
+                            <th>Loss</th>
+                            <th>Average</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var hop in hops)
+                        {
+                            <tr>
+                                <td>@hop.Number</td>
+                                <td>@(hop.Address ?? "No Answer")</td>
+                                <td>@(hop.Name ?? "-")</td>
+                                <td>@($"{hop.LossPercent:0}%")</td>
+                                <td>@Formatter.FormatNumber(hop.AverageMilliseconds, "ms")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </MudSimpleTable>
+            }
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        @* Close Button *@
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Info"
+                   Size="Size.Small"
+                   OnClick="Close">
+            Close
+        </MudButton>
+    </DialogActions>
+
+</MudDialog>

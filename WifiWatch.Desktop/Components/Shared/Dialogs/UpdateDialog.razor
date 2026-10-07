@@ -1,0 +1,48 @@
+@using Color = MudBlazor.Color
+@using Size = MudBlazor.Size
+
+@* Update Dialog *@
+<MudDialog>
+
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            @($"Version {Version.ToString(2)} Available")
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.body1">
+                @($"Installed Version Is {AppInfo.Version.ToString(2)}, Updating Restarts {AppInfo.DisplayName}")
+            </MudText>
+            @* Hide Checkbox *@
+            <MudCheckBox T="bool"
+                         Value="!Monitor.Settings.ShowUpdatePopup"
+                         ValueChanged="SetHidden"
+                         Label="Don't Show Again"
+                         Color="Color.Info" />
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudStack Row
+                  Justify="Justify.SpaceBetween"
+                  Spacing="4"
+                  Class="px-3 py-2 mud-width-full">
+            @* Later Button *@
+            <MudButton Variant="Variant.Filled"
+                       Size="Size.Small"
+                       OnClick="Close">
+                Later
+            </MudButton>
+            @* Update Button *@
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Info"
+                       Size="Size.Small"
+                       StartIcon="@Icons.Material.Rounded.SystemUpdateAlt"
+                       Disabled="_isInstalling"
+                       OnClick="InstallAsync">
+                @(_isInstalling ? "Downloading" : "Update Now")
+            </MudButton>
+        </MudStack>
+    </DialogActions>
+
+</MudDialog>

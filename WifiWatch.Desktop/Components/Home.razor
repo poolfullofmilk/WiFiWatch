@@ -1,0 +1,96 @@
+@using Color = MudBlazor.Color
+@using Size = MudBlazor.Size
+
+@* Providers *@
+<MudThemeProvider Theme="AppTheme.Custom"
+                  IsDarkMode />
+<MudPopoverProvider />
+<MudDialogProvider BackdropClick="false"
+                   CloseButton="true"
+                   MaxWidth="MaxWidth.False" />
+<MudSnackbarProvider />
+
+@* Close Message Box *@
+<MudMessageBox @ref="_closeMessageBox"
+               Title="@($"Close {AppInfo.DisplayName}")">
+    <MessageContent>
+        Keep Watching From The Tray Or Exit Completely
+    </MessageContent>
+    <NoButton>
+        <MudButton Variant="Variant.Filled"
+                   Size="Size.Small"
+                   StartIcon="@Icons.Material.Rounded.PowerSettingsNew">
+            Exit
+        </MudButton>
+    </NoButton>
+    <YesButton>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Info"
+                   Size="Size.Small"
+                   StartIcon="@Icons.Material.Rounded.Check">
+            Keep Running
+        </MudButton>
+    </YesButton>
+</MudMessageBox>
+
+<MudLayout>
+    <MudAppBar Elevation="4"
+               Style="background-color:color-mix(in srgb, var(--mud-palette-appbar-background) var(--glass-opacity), transparent); backdrop-filter:var(--glass-blur)">
+        <MudText Typo="Typo.h6"
+                 Class="mx-2">
+            @AppInfo.DisplayName
+        </MudText>
+        <MudSpacer />
+        @* Status Bar *@
+        <StatusBar />
+    </MudAppBar>
+
+    @* Main Content *@
+    <MudMainContent Class="px-7 pb-7 pt-20">
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge"
+                      Gutters="false">
+            <MudTabs @bind-ActivePanelIndex="_activePanelIndex"
+                     Elevation="4"
+                     TabHeaderClass="mb-6"
+                     AlwaysShowScrollButtons
+                     KeepPanelsAlive
+                     Rounded>
+
+                @* Events Tab *@
+                <MudTabPanel ToolTip="Events"
+                             Icon="@Icons.Material.Rounded.NotificationsActive"
+                             IconColor="Color.Tertiary"
+                             BadgeData="@(_eventTotal > 0 ? _eventTotal.ToString() : null)"
+                             BadgeColor="Color.Tertiary">
+                    <EventsTab @ref="_eventsTab"
+                               TotalChanged="SetEventTotal" />
+                </MudTabPanel>
+
+                @* Minutes Tab *@
+                <MudTabPanel ToolTip="Minutes"
+                             Icon="@Icons.Material.Rounded.Timeline"
+                             IconColor="Color.Tertiary">
+                    <MinutesTab @ref="_minutesTab" />
+                </MudTabPanel>
+
+                @* Stats Tab *@
+                <MudTabPanel ToolTip="Stats"
+                             Icon="@Icons.Material.Rounded.BarChart"
+                             IconColor="Color.Tertiary"
+                             OnClick="OpenStatsAsync">
+                    <StatsTab @ref="_statsTab"
+                              MinutesRequested="ShowMinutesAsync" />
+                </MudTabPanel>
+
+                @* Settings Tab *@
+                <MudTabPanel ToolTip="Settings"
+                             Icon="@Icons.Material.Rounded.Settings"
+                             IconColor="Color.Tertiary"
+                             OnClick="() => _settingsTab?.Refresh()">
+                    <SettingsTab @ref="_settingsTab" />
+                </MudTabPanel>
+
+            </MudTabs>
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
