@@ -12,7 +12,9 @@ public sealed class EventJournal
 {
     // Sign In And Wake Flap, Alerts Wait Out This Window
     private static readonly TimeSpan s_quietWindow = TimeSpan.FromSeconds(60);
-    private static readonly TimeSpan s_warningAlertAfter = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan s_warningAlertAfter = TimeSpan.FromMinutes(
+        Problems.WarningMinutes
+    );
 
     // One Writer At A Time, Several Tasks Report
     private readonly SemaphoreSlim _gate = new(1, 1);
@@ -92,6 +94,25 @@ public sealed class EventJournal
         return await context.Events.AnyAsync(wifiEvent =>
             wifiEvent.Kind == kind && wifiEvent.Message.StartsWith(prefix)
         );
+    }
+
+    public static async Task<List<WifiEvent>> OpenProblemsAsync()
+    {
+        await using var context = new WifiDbContext();
+        var problems = await context
+            .Events.AsNoTracking()
+            .Where(wifiEvent =>
+                wifiEvent.EndedAtUtc == null && wifiEvent.Severity != EventSeverity.Info
+            )
+            .ToListAsync();
+
+        // Severity Is Stored As Text, So Rank It Here
+        return
+        [
+            .. problems
+                .OrderByDescending(wifiEvent => wifiEvent.Severity)
+                .ThenByDescending(wifiEvent => wifiEvent.OccurredAtUtc),
+        ];
     }
     #endregion
 

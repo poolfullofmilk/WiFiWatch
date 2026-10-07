@@ -1,0 +1,83 @@
+@using Color = MudBlazor.Color
+@using Size = MudBlazor.Size
+
+@* Now Panel *@
+<MudPaper Elevation="4"
+          Class="pa-6 rounded-panel">
+    <MudStack Spacing="6">
+        @* Verdict *@
+        <MudStack Row
+                  AlignItems="AlignItems.Center"
+                  Wrap="Wrap.Wrap"
+                  Spacing="4">
+            <MudAvatar Color="@Verdict.Color"
+                       Size="Size.Large">
+                <MudIcon Icon="@Verdict.Icon" />
+            </MudAvatar>
+            <MudStack Spacing="0"
+                      Style="flex:1 1 300px; min-width:0">
+                <MudText Typo="Typo.h4">@Verdict.Title</MudText>
+                <MudText Typo="Typo.body1"
+                         Class="mud-text-secondary selectable-text">
+                    @Verdict.Detail
+                </MudText>
+            </MudStack>
+            @if (Verdict.FixTarget is { } fixTarget)
+            {
+                @* Fix Button *@
+                <MudButton Variant="Variant.Filled"
+                           Size="Size.Small"
+                           StartIcon="@Icons.Material.Rounded.Build"
+                           OnClick="() => QuickActions.Open(fixTarget)">
+                    @QuickActions.Describe(fixTarget)
+                </MudButton>
+            }
+            @if (Monitor.Status.RouterAdminUrl is { } routerAdminUrl)
+            {
+                @* Router Button *@
+                <Tooltip Text="Open Router Settings">
+                    <MudIconButton Icon="@Icons.Material.Rounded.Router"
+                                   Variant="Variant.Filled"
+                                   Size="Size.Small"
+                                   OnClick="() => QuickActions.Open(routerAdminUrl)" />
+                </Tooltip>
+            }
+            @* Speed Test Button *@
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Info"
+                       Size="Size.Small"
+                       StartIcon="@Icons.Material.Rounded.Speed"
+                       Disabled="Monitor.Status.IsSpeedTesting"
+                       OnClick="RunSpeedTestAsync">
+                @(Monitor.Status.IsSpeedTesting ? "Testing Speed" : "Speed Test")
+            </MudButton>
+        </MudStack>
+
+        @* Live Readings *@
+        <MudGrid Spacing="4">
+
+            @foreach (var reading in Readings)
+            {
+                <MudItem xs="6"
+                         md="@(12 / Readings.Count)">
+                    <MudStack Spacing="0"
+                              Class="mx-2">
+                        <MudText Typo="Typo.caption"
+                                 Class="mud-text-secondary">
+                            @reading.Label
+                        </MudText>
+                        <MudText Typo="Typo.h5"
+                                 Color="@reading.Color">
+                            @reading.Value
+                        </MudText>
+                        <MudText Typo="Typo.caption"
+                                 Class="mud-text-secondary">
+                            @reading.Hint
+                        </MudText>
+                    </MudStack>
+                </MudItem>
+            }
+
+        </MudGrid>
+    </MudStack>
+</MudPaper>

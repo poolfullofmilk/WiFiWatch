@@ -2,29 +2,23 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using WifiWatch.Data;
-using WifiWatch.Data.Enums;
 using WifiWatch.Data.Helpers;
 using WifiWatch.Data.Models;
 using WifiWatch.Data.ViewModels;
+using WifiWatch.Desktop.Components.Shared.Common;
 using WifiWatch.Desktop.Components.Shared.Dialogs;
-using WifiWatch.Desktop.Components.Shared.Menus;
 using WifiWatch.Desktop.Components.Shared.Tables;
-using WifiWatch.Desktop.Theming;
 using WifiWatch.Services.Monitoring;
 using WifiWatch.Services.Storage;
 
-namespace WifiWatch.Desktop.Components.Tabs;
+namespace WifiWatch.Desktop.Components.Pages;
 
-public partial class EventsTab
+public partial class IncidentsPage : IDisposable
 {
-    private static readonly List<FilterMenu.FilterOption> s_kindOptions =
+    private static readonly List<SegmentedButtonOption<bool>> s_scopeOptions =
     [
-        .. Enum.GetValues<EventKind>()
-            .Select(kind => new FilterMenu.FilterOption(
-                kind.ToString(),
-                kind.ToLabel(),
-                EventKindColors.For(kind)
-            )),
+        new(false, "Problems"),
+        new(true, "Everything"),
     ];
 
     [Inject]
@@ -33,26 +27,37 @@ public partial class EventsTab
     [Inject]
     public required IDialogService DialogService { get; set; }
 
-    [Parameter]
-    public EventCallback<int> TotalChanged { get; set; }
-
     // Table State
-    private readonly HashSet<string> _selectedKinds = [.. Enum.GetNames<EventKind>()];
-    private DataTable<WifiEvent>? _eventTable;
+    private DataTable<WifiEvent>? _incidentTable;
     private string _searchTerm = string.Empty;
+    private bool _isEverything;
 
-    public Task ReloadAsync() => _eventTable?.ReloadAsync() ?? Task.CompletedTask;
+    protected override void OnInitialized() => Monitor.EventRecorded += OnEventRecorded;
 
-    private async Task<TableData<WifiEvent>> LoadEventsAsync(
+    private void OnEventRecorded() => InvokeAsync(ReloadAsync);
+
+    private Task ReloadAsync() => _incidentTable?.ReloadAsync() ?? Task.CompletedTask;
+
+    private async Task SelectScopeAsync(bool isEverything)
+    {
+        _isEverything = isEverything;
+        await ReloadAsync();
+    }
+
+    private async Task<TableData<WifiEvent>> LoadIncidentsAsync(
         TableState state,
         CancellationToken cancellationToken
     )
     {
         await using var context = new WifiDbContext();
-        var selectedKinds = _selectedKinds.Select(Enum.Parse<EventKind>).ToList();
-        var query = context
-            .Events.AsNoTracking()
-            .Where(wifiEvent => selectedKinds.Contains(wifiEvent.Kind));
+        var query = context.Events.AsNoTracking();
+
+        // Problems Hide Notes And Warnings Too Short To Notify
+        if (!_isEverything)
+        {
+            query = query.Where(Problems.IsProblem);
+        }
+
         if (!string.IsNullOrWhiteSpace(_searchTerm))
         {
             var pattern = $"%{_searchTerm}%";
@@ -71,7 +76,6 @@ public partial class EventsTab
             .Skip(state.Page * state.PageSize)
             .Take(state.PageSize)
             .ToListAsync(cancellationToken);
-        await TotalChanged.InvokeAsync(total);
 
         return new() { Items = items, TotalItems = total };
     }
@@ -82,14 +86,6 @@ public partial class EventsTab
         {
             await IncidentDialog.ShowAsync(DialogService, wifiEvent);
         }
-    }
-
-    private static string FormatDuration(WifiEvent wifiEvent)
-    {
-        // Instants End Where They Start, Open Incidents Have No End
-        return wifiEvent.EndedAtUtc is not { } endedAtUtc ? "Ongoing"
-            : endedAtUtc == wifiEvent.OccurredAtUtc ? "-"
-            : Formatter.FormatDuration(endedAtUtc - wifiEvent.OccurredAtUtc);
     }
 
     private static async Task ExportAsync(DateTime? day)
@@ -129,7 +125,10 @@ public partial class EventsTab
                         wifiEvent.EndedAtUtc is { } endedAtUtc
                             ? Formatter.FormatLocal(endedAtUtc, "yyyy-MM-dd HH:mm:ss")
                             : null,
-                        FormatDuration(wifiEvent),
+                        Formatter.FormatIncidentLength(
+                            wifiEvent.OccurredAtUtc,
+                            wifiEvent.EndedAtUtc
+                        ),
                         wifiEvent.Kind.ToLabel(),
                         wifiEvent.Severity,
                         wifiEvent.Scope,
@@ -141,5 +140,11 @@ public partial class EventsTab
                 }),
             ]
         );
+    }
+
+    public void Dispose()
+    {
+        Monitor.EventRecorded -= OnEventRecorded;
+        GC.SuppressFinalize(this);
     }
 }

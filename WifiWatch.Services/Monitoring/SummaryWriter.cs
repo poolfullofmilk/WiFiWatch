@@ -31,11 +31,16 @@ public static class SummaryWriter
             .Select(wifiEvent => new
             {
                 wifiEvent.Kind,
-                wifiEvent.Severity,
                 wifiEvent.OccurredAtUtc,
                 wifiEvent.EndedAtUtc,
             })
             .ToListAsync();
+        var problemCount = await context
+            .Events.Where(wifiEvent =>
+                wifiEvent.OccurredAtUtc >= startUtc && wifiEvent.OccurredAtUtc < endUtc
+            )
+            .Where(Problems.IsProblem)
+            .CountAsync();
 
         var onlineMinutes = minutes.Count(minute =>
             minute.Link != NetworkMonitor.OfflineLink && minute.InternetLossPercent < 100
@@ -56,7 +61,7 @@ public static class SummaryWriter
         return new(
             minutes.Count,
             minutes.Count == 0 ? 0 : Math.Round(100.0 * onlineMinutes / minutes.Count, 1),
-            events.Count(wifiEvent => wifiEvent.Severity != EventSeverity.Info),
+            problemCount,
             events
                 .Where(wifiEvent =>
                     wifiEvent.Kind is EventKind.WanDown or EventKind.Disconnect
@@ -83,7 +88,7 @@ public static class SummaryWriter
         List<string> parts =
         [
             $"{summary.OnlinePercent:0.#}% Online",
-            $"{summary.IncidentCount} Incidents",
+            $"{summary.ProblemCount} Problems",
             summary.LongestOutage > TimeSpan.Zero
                 ? $"Longest Outage {Formatter.FormatDuration(summary.LongestOutage)}"
                 : "No Outages",

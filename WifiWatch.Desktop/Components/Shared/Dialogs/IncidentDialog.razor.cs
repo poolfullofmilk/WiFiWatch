@@ -3,6 +3,7 @@ using MudBlazor;
 using WifiWatch.Data.Helpers;
 using WifiWatch.Data.Models;
 using WifiWatch.Data.ViewModels;
+using WifiWatch.Services.Integration;
 using WifiWatch.Services.Monitoring;
 
 namespace WifiWatch.Desktop.Components.Shared.Dialogs;
@@ -22,27 +23,45 @@ public partial class IncidentDialog
 
     private EventDetails Details => EventDetails.Parse(Event.Details);
 
+    private string? FixTarget => QuickActions.ForEvent(Event.Kind, Monitor.Status.RouterAdminUrl);
+
     private string TimeRange =>
         Event.EndedAtUtc is not { } endedAtUtc
             ? $"{Formatter.FormatLocal(Event.OccurredAtUtc, TimeFormat)}, Still Going"
         : endedAtUtc == Event.OccurredAtUtc ? Formatter.FormatLocal(Event.OccurredAtUtc, TimeFormat)
         : $"{Formatter.FormatLocal(Event.OccurredAtUtc, TimeFormat)} To {Formatter.FormatLocal(endedAtUtc, "HH:mm:ss")}, {Formatter.FormatDuration(endedAtUtc - Event.OccurredAtUtc)}";
 
-    private IEnumerable<(string Label, string Value)> DetailLines
+    private List<(string Label, string Value)> DetailLines
     {
         get
         {
             var details = Details;
+            List<(string Label, string Value)> lines = [];
+            if (Event.Scope is { } scope)
+                lines.Add(("Where", DescribeScope(scope)));
+
             if (details.Reason is { } reason)
-                yield return ("Windows Reason", reason);
+                lines.Add(("Windows Reason", reason));
 
             if (details.Context is { } context)
-                yield return ("At That Moment", context);
+                lines.Add(("At That Moment", context));
 
             if (details.TraceSummary is { } traceSummary)
-                yield return ("Trace", traceSummary);
+                lines.Add(("Trace", traceSummary));
+
+            return lines;
         }
     }
+
+    private static string DescribeScope(string scope) =>
+        scope switch
+        {
+            NetworkMonitor.WifiScope => "Wi-Fi, Between This PC And Your Router",
+            NetworkMonitor.HomeNetworkScope => "Home Network, Your Router Or Cables",
+            NetworkMonitor.ProviderScope => "Internet Provider, Past Your Router",
+            NetworkMonitor.DnsScope => "DNS, Looking Up Names, Not The Line Itself",
+            _ => scope,
+        };
 
     public static Task ShowAsync(IDialogService dialogService, WifiEvent wifiEvent) =>
         dialogService.ShowAsync<IncidentDialog>(

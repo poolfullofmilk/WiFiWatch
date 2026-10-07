@@ -14,7 +14,7 @@ The global `~/.claude/CLAUDE.md` holds every shared convention (git, releases, c
 | `WifiWatch.Data` | `net10.0`, no Windows dependencies. EF context, models, migrations, view models, enums, small helpers |
 | `WifiWatch.Services` | `net10.0-windows`. Everything that watches, measures, stores or talks to Windows |
 | `WifiWatch.Desktop` | WPF exe, `Microsoft.NET.Sdk.Razor`, `net10.0-windows10.0.17763.0`. Window, tray, Blazor UI, theming |
-| `Screenshots/` | `Stats.png`, `Incidents.png` and `Minutes.png` for the README |
+| `Screenshots/` | `Overview.png`, `Incidents.png`, `History.png` and `Settings.png` for the README |
 
 ### WifiWatch.Data
 
@@ -22,9 +22,9 @@ The global `~/.claude/CLAUDE.md` holds every shared convention (git, releases, c
 |---|---|
 | `WifiDbContext.cs` | `%AppData%\WifiWatch\WifiWatch.db`, `DataDirectory`, the `DbSet`s, enums stored as strings |
 | `Models/` | `WifiEvent`, `MinuteSample`, `NeighborSample`, `SpeedTest` (the tables) |
-| `ViewModels/` | Records that are never tables: `MonitorStatus`, `WifiReading`, `NeighborReading`, `AdapterInfo`, `EventDetails` (JSON in `WifiEvent.Details`), `TraceHop`, `PeriodSummary`, `WlanNotice`, `ChartPoint`, `TimelineBar`, `ChannelBlock` |
-| `Enums/` | `EventKind`, `EventSeverity` |
-| `Helpers/` | `AppInfo` (display name, version), `WifiChannels` (DFS and weather radar ranges, timers), `Formatter` (durations, local times, numbers with units), `EventKindExtensions.ToLabel`, `QueryableExtensions.OrderByColumn` |
+| `ViewModels/` | Records that are never tables: `MonitorStatus`, `WifiReading`, `NeighborReading`, `AdapterInfo`, `EventDetails` (JSON in `WifiEvent.Details`), `TraceHop`, `PeriodSummary`, `WlanNotice`, `ChartPoint`, `HealthBucket`, `ChannelBlock` |
+| `Enums/` | `EventKind`, `EventSeverity`, `HealthState` |
+| `Helpers/` | `AppInfo` (display name, version), `WifiChannels` (DFS and weather radar ranges, timers), `Formatter` (durations, local times, numbers with units), `EventKindExtensions.ToLabel`, `QueryableExtensions.OrderByColumn`, `HealthBuckets` (worst state per hour or day, self-test), `Problems.IsProblem` |
 | `Migrations/` | `Initial`, `AddNeighborSamples`, `AddIncidentsSpeedTestsAndDns` |
 
 ### WifiWatch.Services
@@ -57,12 +57,11 @@ The global `~/.claude/CLAUDE.md` holds every shared convention (git, releases, c
 | `App.xaml.cs` | Finishes a previous update, single instance, migrations, settings, DI, starts the monitor |
 | `MainWindow.xaml(.cs)` | `BlazorWebView`, tray icon, balloon notifications, minimise to tray, `CloseRequested`, `Exit` |
 | `Interop/` | `TrayMenu` (native dark Win32 menu), `WindowCaptionTheme` (dark title bar) |
-| `Theming/` | `AppTheme`, `ChartTheme` (LetsWatch, plus palette hex values for charts), `EventKindColors` |
-| `Components/Home.razor(.cs)` | Providers, close dialog, app bar with `StatusBar`, the four tabs, update popup |
-| `Components/Tabs/` | `EventsTab`, `MinutesTab`, `StatsTab`, `SettingsTab` |
-| `Components/Shared/Common/` | `ActionChip`, `SettingSwitch`, `StatusBar`, `Tooltip` |
+| `Theming/` | `AppTheme`, `ChartTheme` (LetsWatch, plus palette hex values for charts), `EventKindColors` (colour and icon per kind and severity) |
+| `Components/Home.razor(.cs)` | Providers, close dialog, app bar with the page buttons, the page switch, update popup |
+| `Components/Pages/` | `OverviewPage`, `IncidentsPage`, `HistoryPage`, `SettingsPage` |
+| `Components/Shared/Common/` | `ActionChip`, `ExportMenu`, `Header`, `HealthStrip`, `NowPanel`, `SegmentedButtonGroup`, `SettingSwitch`, `Tooltip` |
 | `Components/Shared/Dialogs/` | `IncidentDialog`, `UpdateDialog` |
-| `Components/Shared/Menus/` | `ExportMenu`, `FilterMenu` |
 | `Components/Shared/Tables/` | `DataTable`, `SearchTextField` |
 | `wwwroot/` | `index.html`, `CSS/WifiWatch.css`, Nunito with `OFL.txt` |
 
@@ -76,7 +75,7 @@ dotnet build WifiWatch.slnx
 dotnet publish WifiWatch.Desktop -c Release
 ```
 
-Publish writes one file, `WifiWatch.Desktop\bin\Release\net10.0-windows10.0.17763.0\win-x64\publish\WifiWatch_v1.1.exe`, about 80 MB. `<Version>` lives in `WifiWatch.Desktop.csproj` only.
+Publish writes one file, `WifiWatch.Desktop\bin\Release\net10.0-windows10.0.17763.0\win-x64\publish\WifiWatch_v1.2.exe`, about 80 MB. `<Version>` lives in `WifiWatch.Desktop.csproj` only.
 
 Installing is copying that exe to `%LocalAppData%\Programs\WifiWatch` and running it once. Every Release launch rewrites the `Run` value (with `--tray`) and `Start Menu\Programs\01 Apps\Wifi Watch.lnk` to point at itself. A release on GitHub carries exactly one asset named `WifiWatch_v<version>.exe` under the tag `v<version>`, because the updater builds that URL.
 
@@ -114,6 +113,8 @@ One `PeriodicTimer` at 1 s in `NetworkMonitor.RunAsync`. Each tick detects the l
 
 **Notifications.** Critical toasts at once. A warning toasts only if it is still open after 5 minutes (`AlertLongWarnings`), once. Info never toasts, unless forced (`isAlwaysAlerted`: the driver check, and the summaries when Daily Summary Notification is on). Nothing toasts in the 60 s quiet window after start or resume, because sign in and wake flap the link; forced alerts and `LocationBlocked` ignore the window.
 
+**What counts as a problem.** `Problems.IsProblem`: Critical, or a Warning that lasted, or is still open, at least `Problems.WarningMinutes` (5), the same wait a warning toast has. Overview, the Problems view of Incidents, History, the health strip, the summaries and the report all use it, so a warning too short to notify never counts. Old v1.0 rows are Warning instants and so never count; Everything still shows them.
+
 **Per-minute checks** go through `ConditionTracker`. A check opens an incident after 2 bad minutes in a row (or 1 severe minute) and closes after 2 good ones, so a lone bad minute is Wi-Fi being Wi-Fi. For higher-is-worse values the limit is the larger of the setting and a baseline: median plus 3 × 1.4826 × MAD over the last 60 good minutes, used once 10 minutes are in. Severe (Critical) is 3× the setting, or 10% loss.
 
 | Check | Value | Scope |
@@ -134,7 +135,7 @@ Speed test minutes and the minute after are skipped, because a speed test loads 
 
 - Channels 52 to 144 are DFS. Leaving one logs `DfsEviction` (Critical, so it toasts), with "Router May Return From HH:mm": the EU non-occupancy period is 30 minutes. Entering one logs `DfsReturn` with the time away.
 - Returning to a DFS channel means a 60 s channel check, 10 minutes on the weather radar channels 120 to 128; a weather radar channel is warned about once per run.
-- `MonitorStatus.DfsFreeAtUtc` drives the "DFS Free At" chip in the status bar and Stats.
+- `MonitorStatus.DfsFreeAtUtc` adds "DFS Free At" to the connection line on Overview.
 - Channel advice counts distinct neighbors at 30% signal or more per EU 80 MHz block (36 to 48, 52 to 64, 100 to 112, 116 to 128). Two or more evictions in the range while on DFS advises 36 to 48; otherwise the quietest block, ties keep the current block, then prefer no radar.
 
 ### Daily Jobs
@@ -168,12 +169,16 @@ Update Now: `Updater.DownloadAsync` saves `WifiWatch_v<new>.exe` beside the runn
 
 ## UI
 
-- **Tabs use `KeepPanelsAlive`**, so `Home` can call into them: `EventsTab.ReloadAsync` on every recorded event, `StatsTab.OpenAsync` on every visit (the range resets to today), `SettingsTab.Refresh` on every visit (it shows monitor state that changes elsewhere), `MinutesTab.FocusAsync` from a chart click.
-- **Events**: rows are incidents with Duration ("Ongoing" while open, "-" for instants) and Where. A row click opens `IncidentDialog`: message, time range, Windows reason, the context at that moment, the trace and its hops. The Kind chip is an `ActionChip` opening the fix from `QuickActions.ForEvent`.
-- **Stats**: a centred `MudDateRangePicker` (date only, today by default, presets Today, 7 Days, 30 Days in `PickerActions`), Speed Test and Report buttons. Up to 3 days charts per hour, longer ranges per day; every bucket shows, empty ones included. Ping (router, internet, DNS), jitter and loss charts zoom with the toolbar (zoom in, out, reset) and a click on a point focuses Minutes on that bucket. Then the DFS evictions bar, the incident timeline (horizontal range bars on a datetime axis over the whole range, amber warnings and red criticals through `DataPointMutator`), the weekday by hour heatmap (amber shades, empty cells in the page colour), speed tests, nearby networks per block and channel advice.
-- **Charts** take `@key="_renderKey"`, bumped on every load, because `ApexChart` does not redraw when only its items change. Local times go to the datetime axis as if they were UTC, so labels show wall clock time. Monochrome is turned off only where colour means state; hex values come from `ChartTheme`, which reads them from `AppTheme`'s palette.
-- **Status bar** is its own component, refreshed by `StatusChanged` every second: link, SSID, channel with DFS marker (opens the router admin), signal, rate, DFS Free At, Testing Speed, router and internet ping.
-- **Settings**: Start With Windows, Daily Summary Notification, Nightly Speed Test, Update Popup; seven thresholds; the Wi-Fi adapter as chips (an old driver opens Windows Update, the adapter opens Device Manager); version and updates.
+The look follows LetsWatch: navigation in the app bar, section titles above panels, cards that darken on hover. Every page answers one question.
+
+- **App bar**: the name, then four labelled page buttons (Overview, Incidents, History, Settings), the open one filled blue. A dot on Overview, amber or red, while a problem is still open. `Home` swaps pages with a plain `switch`, so every page loads fresh when opened and owns its own event subscriptions.
+- **Overview** (is it fine now, and what went wrong lately): `NowPanel` with the verdict (the worst open problem from `EventJournal.OpenProblemsAsync`, else Offline, else All Good), its fix button, the router button, Speed Test, and live Signal, Wi-Fi Speed, Router and Internet. Values stay plain and turn amber or red only past a setting. Then the last 24 hours as a `HealthStrip`, and the six newest problems as cards that open `IncidentDialog`.
+- **Incidents** (what happened): one `DataTable` of When, What, Where, Length and Details. Problems (by `Problems.IsProblem`) by default, Everything on the segmented toggle. Reloads on every recorded event. A row opens `IncidentDialog`: time range, message, where in plain words, Windows reason, context, trace hops, and one fix button from `QuickActions.ForEvent`.
+- **History** (how was it over a period): Today, 7 Days and 30 Days as a `SegmentedButtonGroup` beside a `MudDateRangePicker` for any range; the minutes CSV export and Report on the right. Four tiles from `SummaryWriter.SummarizeAsync` (Online, Problems, Longest Outage, Fastest Download), the `HealthStrip` per hour up to 3 days and per day beyond, one ping chart (Router grey, Internet blue, DNS dashed), the speed tests in range, and the channel advice with its radar eviction count.
+- **`HealthStrip`** is one cell per bucket from `HealthBuckets.Build`: red for any Critical problem touching it, amber for a Warning, green when watched and fine, an outlined empty cell when the app was not running. Open problems run until now.
+- **Settings** is four sections: General switches, Problem Limits, Wi-Fi Adapter chips, About with version and updates.
+- **Raw minutes** have no page; the History export holds every column.
+- **Charts** take `@key="_renderKey"`, bumped on every load, because `ApexChart` does not redraw when only its items change. Hex values come from `ChartTheme`, which reads them from the `AppTheme` palette.
 - **No Bootstrap**, MudBlazor utilities only (`mb-6` is the 24 px gap). `DataTable` catches the `OperationCanceledException` a superseded `ServerData` call throws and returns the last good page.
 
 ## Things That Look Wrong But Are Not
@@ -182,11 +187,11 @@ Update Now: `Updater.DownloadAsync` saves `WifiWatch_v<new>.exe` beside the runn
 - `ProviderPing` is skipped while the router ping is bad, and `ProviderLoss` while the router loses packets or the internet is down: the problem is then local, and counting it twice would blame the provider.
 - Old `PingSpike` rows mentioning jitter were moved to `JitterSpike` by the migration, and old rows are instants with a severity from `IsAlert`.
 - `ConditionTracker` uses `Math.Max(setting, baseline)`: the baseline only raises the bar on a naturally noisy link, never lowers it below the user's setting.
-- `EventJournal.HasMessageStartingWithAsync` and `CloseLeftoversAsync` are static; they only touch the database.
+- `EventJournal.HasMessageStartingWithAsync`, `OpenProblemsAsync` and `CloseLeftoversAsync` are static; they only touch the database. Severity is stored as text, so `OpenProblemsAsync` ranks it in memory.
 
 ## Verifying
 
-- **Self-tests** run from static constructors with `Debug.Assert`: `WifiReader`, `ChannelAdvice`, `ConditionTracker`, `DnsProbe`. A failing one kills a Debug launch with `FailFast` and the message `SelfTestPasses()` in the Application event log. To run them all headless, a file-based app with `#:project` pointing at `WifiWatch.Services.csproj` and `#:property TargetFramework=net10.0-windows` can invoke every `SelfTestPasses` through reflection.
+- **Self-tests** run from static constructors with `Debug.Assert`: `WifiReader`, `ChannelAdvice`, `ConditionTracker`, `DnsProbe`, `HealthBuckets`. A failing one kills a Debug launch with `FailFast` and the message `SelfTestPasses()` in the Application event log. To run them all headless, a file-based app with `#:project` pointing at `WifiWatch.Services.csproj` and `#:property TargetFramework=net10.0-windows` can invoke every `SelfTestPasses` through reflection.
 - **Analyzers** per project: `dotnet format analyzers <project>.csproj --verify-no-changes --severity info` and the same with `style`, for all three projects.
 - **Look at the UI** by launching with `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=9333` and driving it over the Chrome DevTools Protocol from Node (`/json`, `Page.captureScreenshot`, `Runtime.evaluate`, `Input.dispatchMouseEvent`). The page runs at a device pixel ratio of 1.25, so CSS coordinates are screenshot pixels divided by 1.25.
 - **The update popup** can be seen by building with `-p:Version=0.9` and waiting about 70 s for the daily jobs.

@@ -10,6 +10,8 @@
 /* Shared Tokens */
 :root {
     --radius-panel: 20px;
+    --radius-cell: 6px;
+    --row-hover: color-mix(in srgb, var(--mud-palette-black) 12%, var(--mud-palette-surface));
     --glass-opacity: 66%;
     --glass-blur: blur(12px);
 }
@@ -91,12 +93,6 @@ svg.apexcharts-svg {
     overflow-x: clip !important;
 }
 
-/* Filter Menu */
-.filter-menu-popover {
-    max-height: calc(100dvh - 220px) !important;
-    overflow-y: auto !important;
-}
-
 /* Chips Carry The Slightest Theme Shadow */
 .mud-chip {
     box-shadow: var(--mud-elevation-1);
@@ -119,25 +115,53 @@ svg.apexcharts-svg {
 .mud-table-cell {
     white-space: nowrap;
 }
+/* #endregion */
 
-/* Tabs */
-.mud-tabs .mud-tab-active {
-    background-color: color-mix(in srgb, var(--mud-palette-background) 38%, transparent);
+/* #region Health Strip */
+/* One Cell Per Hour Or Day, Coloured By The Worst Problem In It */
+.health-strip {
+    display: flex;
+    gap: 3px;
 }
 
-.mud-tab {
-    min-width: initial !important;
+.health-slot {
+    flex: 1 1 0;
+    min-width: 0;
 }
 
-    .mud-tab .mud-badge-root,
-    .mud-tab .mud-badge-wrapper,
-    .mud-tab .mud-badge {
-        position: static;
-        transform: none;
-        margin-top: 1px;
-    }
+.health-cell {
+    display: block;
+    height: 36px;
+    border-radius: var(--radius-cell);
+}
 
-    .mud-tab .mud-badge-root {
-        align-self: flex-start;
-    }
+.health-healthy {
+    background-color: color-mix(in srgb, var(--mud-palette-success) 70%, transparent);
+}
+
+.health-warning {
+    background-color: var(--mud-palette-warning);
+}
+
+.health-critical {
+    background-color: var(--mud-palette-error);
+}
+
+.health-nodata {
+    background-color: var(--mud-palette-background);
+    box-shadow: inset 0 0 0 1px var(--mud-palette-lines-default);
+}
+
+/* Labels Spill Over Their Empty Neighbours */
+.health-label {
+    white-space: nowrap;
+    overflow: visible;
+}
+/* #endregion */
+
+/* #region Cards */
+/* Cards Darken On Hover And Never Move */
+.hover-card:hover {
+    background-color: var(--row-hover);
+}
 /* #endregion */

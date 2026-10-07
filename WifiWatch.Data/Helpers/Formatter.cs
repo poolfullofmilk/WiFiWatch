@@ -13,8 +13,28 @@ public static class Formatter
             : $"{Math.Max(0, duration.Seconds)}s";
     }
 
+    public static string? FormatIncidentLength(DateTime occurredAtUtc, DateTime? endedAtUtc)
+    {
+        // Instants End Where They Start, Open Incidents Have No End
+        return endedAtUtc is not { } endUtc
+                ? $"Ongoing {FormatDuration(DateTime.UtcNow - occurredAtUtc)}"
+            : endUtc == occurredAtUtc ? null
+            : FormatDuration(endUtc - occurredAtUtc);
+    }
+
     public static string FormatLocal(DateTime utcTime, string format) =>
         utcTime.ToLocalTime().ToString(format, CultureInfo.CurrentCulture);
+
+    public static string FormatWhen(DateTime utcTime)
+    {
+        // Recent Days Read As Words
+        var localTime = utcTime.ToLocalTime();
+        var dayLabel =
+            localTime.Date == DateTime.Today ? "Today"
+            : localTime.Date == DateTime.Today.AddDays(-1) ? "Yesterday"
+            : localTime.ToString("yyyy-MM-dd", CultureInfo.CurrentCulture);
+        return $"{dayLabel} {localTime:HH:mm}";
+    }
 
     public static string FormatNumber(double? value, string unit) =>
         value is null ? "-" : $"{value:0.#} {unit}";

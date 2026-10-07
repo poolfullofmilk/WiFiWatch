@@ -1,0 +1,24 @@
+@* Health Cells *@
+<MudStack Spacing="1">
+    <MudElement HtmlTag="div"
+                Class="health-strip">
+        @foreach (var bucket in Buckets)
+        {
+            <Tooltip Text="@Describe(bucket)"
+                     RootClass="health-slot">
+                <MudElement HtmlTag="span"
+                            Class="@CellClass(bucket.State)" />
+            </Tooltip>
+        }
+    </MudElement>
+    <MudElement HtmlTag="div"
+                Class="health-strip">
+        @foreach (var bucket in Buckets)
+        {
+            <MudText Typo="Typo.caption"
+                     Class="health-slot health-label mud-text-secondary">
+                @Label(bucket)
+            </MudText>
+        }
+    </MudElement>
+</MudStack>

@@ -1,0 +1,119 @@
+@using Color = MudBlazor.Color
+@using Size = MudBlazor.Size
+
+<MudStack Spacing="6">
+    @if (_isLoading)
+    {
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle"
+                     Animation="Animation.Wave"
+                     Height="220px"
+                     Class="rounded-panel" />
+    }
+    else
+    {
+        @* Now Panel *@
+        <NowPanel Problems="_problems" />
+    }
+
+    @* Day Strip *@
+    <Header Title="Last 24 Hours">
+        <TitleContent>
+            <MudText Typo="Typo.body2"
+                     Class="mx-2 mud-text-secondary">
+                @DaySummary
+            </MudText>
+        </TitleContent>
+        <ChildContent>
+            <MudPaper Elevation="4"
+                      Class="pa-4 rounded-panel">
+                @if (_isLoading)
+                {
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle"
+                                 Animation="Animation.Wave"
+                                 Height="56px"
+                                 Style="border-radius:10px" />
+                }
+                else
+                {
+                    <HealthStrip Buckets="_buckets" />
+                }
+            </MudPaper>
+        </ChildContent>
+    </Header>
+
+    @* Recent Problems *@
+    <Header Title="Recent Problems">
+        <TitleContent>
+            @* All Incidents Button *@
+            <MudButton Variant="Variant.Text"
+                       Size="Size.Small"
+                       EndIcon="@Icons.Material.Rounded.ChevronRight"
+                       OnClick="IncidentsRequested">
+                All Incidents
+            </MudButton>
+        </TitleContent>
+        <ChildContent>
+            @if (!_isLoading && _recent.Count == 0)
+            {
+                <MudPaper Elevation="4"
+                          Class="pa-6 rounded-panel">
+                    <MudStack Row
+                              AlignItems="AlignItems.Center"
+                              Spacing="3">
+                        <MudIcon Icon="@Icons.Material.Rounded.Check"
+                                 Color="Color.Success" />
+                        <MudText Typo="Typo.body1">No Problems Recorded</MudText>
+                    </MudStack>
+                </MudPaper>
+            }
+            @foreach (var incident in _recent)
+            {
+                @* Problem Card *@
+                <MudPaper Elevation="4"
+                          Class="pa-4 rounded-panel cursor-pointer hover-card"
+                          @onclick="() => OpenDetailsAsync(incident)">
+                    <MudStack Row
+                              AlignItems="AlignItems.Center"
+                              Spacing="3">
+                        <MudIcon Icon="@EventKindColors.IconFor(incident.Severity)"
+                                 Color="@EventKindColors.For(incident.Kind, incident.Severity)" />
+                        <MudStack Spacing="0"
+                                  Style="flex:1 1 auto; min-width:0">
+                            <MudText Typo="Typo.subtitle2">@incident.Kind.ToLabel()</MudText>
+                            <MudText Typo="Typo.body2"
+                                     Class="mud-text-secondary">
+                                @incident.Message
+                            </MudText>
+                        </MudStack>
+                        <MudStack Row
+                                  AlignItems="AlignItems.Center"
+                                  Spacing="1">
+                            @if (incident.Scope is { } scope)
+                            {
+                                <MudChip T="string"
+                                         Size="Size.Small"
+                                         Variant="Variant.Text">
+                                    @scope
+                                </MudChip>
+                            }
+                            @if (Formatter.FormatIncidentLength(incident.OccurredAtUtc, incident.EndedAtUtc) is { } duration)
+                            {
+                                <MudChip T="string"
+                                         Size="Size.Small"
+                                         Variant="Variant.Text"
+                                         Color="@(incident.EndedAtUtc is null ? Color.Warning : Color.Default)">
+                                    @duration
+                                </MudChip>
+                            }
+                            <MudChip T="string"
+                                     Size="Size.Small"
+                                     Variant="Variant.Text">
+                                @Formatter.FormatWhen(incident.OccurredAtUtc)
+                            </MudChip>
+                        </MudStack>
+                    </MudStack>
+                </MudPaper>
+            }
+        </ChildContent>
+    </Header>
+</MudStack>

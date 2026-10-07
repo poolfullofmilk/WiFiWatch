@@ -4,7 +4,6 @@ using System.Net;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using WifiWatch.Data;
-using WifiWatch.Data.Enums;
 using WifiWatch.Data.Helpers;
 using WifiWatch.Data.ViewModels;
 using WifiWatch.Services.Monitoring;
@@ -43,10 +42,9 @@ public static class ReportWriter
         var incidents = await context
             .Events.AsNoTracking()
             .Where(wifiEvent =>
-                wifiEvent.OccurredAtUtc >= startUtc
-                && wifiEvent.OccurredAtUtc < endUtc
-                && wifiEvent.Severity != EventSeverity.Info
+                wifiEvent.OccurredAtUtc >= startUtc && wifiEvent.OccurredAtUtc < endUtc
             )
+            .Where(Problems.IsProblem)
             .OrderBy(wifiEvent => wifiEvent.OccurredAtUtc)
             .ToListAsync();
         var speedTests = await context
@@ -71,7 +69,7 @@ public static class ReportWriter
             Formatter.FormatDuration(TimeSpan.FromMinutes(summary.MonitoredMinutes))
         );
         AppendRow(html, "Online", $"{summary.OnlinePercent:0.#}%");
-        AppendRow(html, "Incidents", summary.IncidentCount.ToString());
+        AppendRow(html, "Problems", summary.ProblemCount.ToString());
         AppendRow(
             html,
             "Longest Outage",

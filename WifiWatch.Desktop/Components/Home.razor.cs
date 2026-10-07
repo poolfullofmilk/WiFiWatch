@@ -1,14 +1,20 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using WifiWatch.Data.Enums;
 using WifiWatch.Desktop.Components.Shared.Dialogs;
-using WifiWatch.Desktop.Components.Tabs;
 using WifiWatch.Services.Monitoring;
 
 namespace WifiWatch.Desktop.Components;
 
 public partial class Home : IDisposable
 {
-    private const int MinutesPanelIndex = 1;
+    private static readonly PageLink[] s_pages =
+    [
+        new(Page.Overview, "Overview", Icons.Material.Rounded.SpaceDashboard),
+        new(Page.Incidents, "Incidents", Icons.Material.Rounded.NotificationsActive),
+        new(Page.History, "History", Icons.Material.Rounded.Insights),
+        new(Page.Settings, "Settings", Icons.Material.Rounded.Settings),
+    ];
 
     [Inject]
     public required NetworkMonitor Monitor { get; set; }
@@ -19,32 +25,43 @@ public partial class Home : IDisposable
     [Inject]
     public required IDialogService DialogService { get; set; }
 
-    // Tab State
-    private EventsTab? _eventsTab;
-    private MinutesTab? _minutesTab;
-    private StatsTab? _statsTab;
-    private SettingsTab? _settingsTab;
+    // Page State
     private MudMessageBox? _closeMessageBox;
-    private int _activePanelIndex;
-    private int _eventTotal;
+    private Page _page = Page.Overview;
+    private Color? _problemColor;
     private bool _hasOfferedUpdate;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         Monitor.EventRecorded += OnEventRecorded;
         Monitor.UpdateFound += OnUpdateFound;
         Window.CloseRequested += OnCloseRequested;
+        await LoadProblemColorAsync();
     }
 
     protected override Task OnAfterRenderAsync(bool firstRender) =>
         firstRender ? OfferUpdateAsync() : Task.CompletedTask;
 
-    private void OnEventRecorded() =>
-        InvokeAsync(() => _eventsTab?.ReloadAsync() ?? Task.CompletedTask);
+    private void OnEventRecorded() => InvokeAsync(LoadProblemColorAsync);
 
     private void OnUpdateFound() => InvokeAsync(OfferUpdateAsync);
 
     private Task OnCloseRequested() => InvokeAsync(AskBeforeClosingAsync);
+
+    private void ShowPage(Page page) => _page = page;
+
+    private async Task LoadProblemColorAsync()
+    {
+        // A Dot On Overview While Something Is Still Wrong
+        var problems = await EventJournal.OpenProblemsAsync();
+        _problemColor = problems.FirstOrDefault()?.Severity switch
+        {
+            EventSeverity.Critical => Color.Error,
+            EventSeverity.Warning => Color.Warning,
+            _ => null,
+        };
+        StateHasChanged();
+    }
 
     private async Task OfferUpdateAsync()
     {
@@ -77,24 +94,6 @@ public partial class Home : IDisposable
         }
     }
 
-    private void SetEventTotal(int total)
-    {
-        _eventTotal = total;
-        StateHasChanged();
-    }
-
-    private Task OpenStatsAsync() => _statsTab?.OpenAsync() ?? Task.CompletedTask;
-
-    private async Task ShowMinutesAsync((DateTime StartUtc, DateTime EndUtc) range)
-    {
-        _activePanelIndex = MinutesPanelIndex;
-        StateHasChanged();
-        if (_minutesTab is not null)
-        {
-            await _minutesTab.FocusAsync(range.StartUtc, range.EndUtc);
-        }
-    }
-
     public void Dispose()
     {
         Monitor.EventRecorded -= OnEventRecorded;
@@ -102,4 +101,14 @@ public partial class Home : IDisposable
         Window.CloseRequested -= OnCloseRequested;
         GC.SuppressFinalize(this);
     }
+
+    private enum Page
+    {
+        Overview,
+        Incidents,
+        History,
+        Settings,
+    }
+
+    private sealed record PageLink(Page Page, string Label, string Icon);
 }

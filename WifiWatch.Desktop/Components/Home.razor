@@ -41,56 +41,48 @@
             @AppInfo.DisplayName
         </MudText>
         <MudSpacer />
-        @* Status Bar *@
-        <StatusBar />
+        @* Page Menu *@
+        <MudStack Row
+                  AlignItems="AlignItems.Center"
+                  Spacing="1">
+            @foreach (var link in s_pages)
+            {
+                @* Page Button *@
+                <MudBadge Dot
+                          Overlap
+                          Visible="@(link.Page == Page.Overview && _problemColor is not null)"
+                          Color="@(_problemColor ?? Color.Default)">
+                    <MudButton StartIcon="@link.Icon"
+                               Color="@(link.Page == _page ? Color.Secondary : Color.Default)"
+                               Variant="@(link.Page == _page ? Variant.Filled : Variant.Text)"
+                               Size="Size.Small"
+                               OnClick="() => ShowPage(link.Page)">
+                        @link.Label
+                    </MudButton>
+                </MudBadge>
+            }
+        </MudStack>
     </MudAppBar>
 
     @* Main Content *@
     <MudMainContent Class="px-7 pb-7 pt-20">
-        <MudContainer MaxWidth="MaxWidth.ExtraLarge"
+        <MudContainer MaxWidth="MaxWidth.Large"
                       Gutters="false">
-            <MudTabs @bind-ActivePanelIndex="_activePanelIndex"
-                     Elevation="4"
-                     TabHeaderClass="mb-6"
-                     AlwaysShowScrollButtons
-                     KeepPanelsAlive
-                     Rounded>
-
-                @* Events Tab *@
-                <MudTabPanel ToolTip="Events"
-                             Icon="@Icons.Material.Rounded.NotificationsActive"
-                             IconColor="Color.Tertiary"
-                             BadgeData="@(_eventTotal > 0 ? _eventTotal.ToString() : null)"
-                             BadgeColor="Color.Tertiary">
-                    <EventsTab @ref="_eventsTab"
-                               TotalChanged="SetEventTotal" />
-                </MudTabPanel>
-
-                @* Minutes Tab *@
-                <MudTabPanel ToolTip="Minutes"
-                             Icon="@Icons.Material.Rounded.Timeline"
-                             IconColor="Color.Tertiary">
-                    <MinutesTab @ref="_minutesTab" />
-                </MudTabPanel>
-
-                @* Stats Tab *@
-                <MudTabPanel ToolTip="Stats"
-                             Icon="@Icons.Material.Rounded.BarChart"
-                             IconColor="Color.Tertiary"
-                             OnClick="OpenStatsAsync">
-                    <StatsTab @ref="_statsTab"
-                              MinutesRequested="ShowMinutesAsync" />
-                </MudTabPanel>
-
-                @* Settings Tab *@
-                <MudTabPanel ToolTip="Settings"
-                             Icon="@Icons.Material.Rounded.Settings"
-                             IconColor="Color.Tertiary"
-                             OnClick="() => _settingsTab?.Refresh()">
-                    <SettingsTab @ref="_settingsTab" />
-                </MudTabPanel>
-
-            </MudTabs>
+            @switch (_page)
+            {
+                case Page.Overview:
+                    <OverviewPage IncidentsRequested="() => ShowPage(Page.Incidents)" />
+                    break;
+                case Page.Incidents:
+                    <IncidentsPage />
+                    break;
+                case Page.History:
+                    <HistoryPage />
+                    break;
+                default:
+                    <SettingsPage />
+                    break;
+            }
         </MudContainer>
     </MudMainContent>
 </MudLayout>

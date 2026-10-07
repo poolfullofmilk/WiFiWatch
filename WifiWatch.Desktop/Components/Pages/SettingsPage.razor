@@ -1,0 +1,215 @@
+@using Color = MudBlazor.Color
+@using Size = MudBlazor.Size
+
+<MudStack Spacing="6">
+    @* General Section *@
+    <Header Title="General">
+        <MudPaper Elevation="4"
+                  Class="py-4 rounded-panel">
+            <MudStack Spacing="3">
+                @* Start Switch *@
+                <SettingSwitch Title="Start With Windows"
+                               Description="Runs Hidden In The Tray After Sign In"
+                               Value="Monitor.Settings.StartWithWindows"
+                               ValueChanged="SaveStartWithWindows" />
+                <MudDivider />
+                @* Summary Switch *@
+                <SettingSwitch Title="Daily Summary Notification"
+                               Description="Sums Up Yesterday In A Notification Each Morning"
+                               Value="Monitor.Settings.DailySummaryNotification"
+                               ValueChanged="value => SaveSettings(Monitor.Settings with { DailySummaryNotification = value })" />
+                <MudDivider />
+                @* Speed Test Switch *@
+                <SettingSwitch Title="Nightly Speed Test"
+                               Description="Measures Speed And Lag Under Load At 03:00"
+                               Value="Monitor.Settings.NightlySpeedTest"
+                               ValueChanged="value => SaveSettings(Monitor.Settings with { NightlySpeedTest = value })" />
+                <MudDivider />
+                @* Update Popup Switch *@
+                <SettingSwitch Title="Update Popup"
+                               Description="Asks To Update When A New Version Is Out"
+                               Value="Monitor.Settings.ShowUpdatePopup"
+                               ValueChanged="value => SaveSettings(Monitor.Settings with { ShowUpdatePopup = value })" />
+            </MudStack>
+        </MudPaper>
+    </Header>
+
+    @* Limits Section *@
+    <Header Title="Problem Limits">
+        <TitleContent>
+            <MudText Typo="Typo.body2"
+                     Class="mx-2 mud-text-secondary">
+                A Problem Opens After 2 Minutes Past A Limit
+            </MudText>
+        </TitleContent>
+        <ChildContent>
+            <MudPaper Elevation="4"
+                      Class="pa-4 rounded-panel">
+                <MudGrid>
+
+                    @* Weak Signal *@
+                    <MudItem xs="12"
+                             md="4">
+                        <MudNumericField T="int"
+                                         Label="Weak Signal Below dBm"
+                                         Value="Monitor.Settings.WeakSignalRssi"
+                                         ValueChanged="value => SaveSettings(Monitor.Settings with { WeakSignalRssi = value })"
+                                         Min="-100"
+                                         Max="-30"
+                                         Variant="Variant.Outlined" />
+                    </MudItem>
+                    @* Slow Link *@
+                    <MudItem xs="12"
+                             md="4">
+                        <MudNumericField T="int"
+                                         Label="Slow Wi-Fi Below Mbps"
+                                         Value="Monitor.Settings.SlowLinkMbps"
+                                         ValueChanged="value => SaveSettings(Monitor.Settings with { SlowLinkMbps = value })"
+                                         Min="1"
+                                         Max="5000"
+                                         Variant="Variant.Outlined" />
+                    </MudItem>
+                    @* Packet Loss *@
+                    <MudItem xs="12"
+                             md="4">
+                        <MudNumericField T="int"
+                                         Label="Packet Loss From %"
+                                         Value="Monitor.Settings.PacketLossPercent"
+                                         ValueChanged="value => SaveSettings(Monitor.Settings with { PacketLossPercent = value })"
+                                         Min="1"
+                                         Max="100"
+                                         Variant="Variant.Outlined" />
+                    </MudItem>
+                    @* Router Ping *@
+                    <MudItem xs="12"
+                             md="4">
+                        <MudNumericField T="int"
+                                         Label="Router Ping Above ms"
+                                         Value="Monitor.Settings.RouterPingMilliseconds"
+                                         ValueChanged="value => SaveSettings(Monitor.Settings with { RouterPingMilliseconds = value })"
+                                         Min="1"
+                                         Max="1000"
+                                         Variant="Variant.Outlined" />
+                    </MudItem>
+                    @* Jitter *@
+                    <MudItem xs="12"
+                             md="4">
+                        <MudNumericField T="int"
+                                         Label="Router Jitter Above ms"
+                                         Value="Monitor.Settings.JitterMilliseconds"
+                                         ValueChanged="value => SaveSettings(Monitor.Settings with { JitterMilliseconds = value })"
+                                         Min="1"
+                                         Max="1000"
+                                         Variant="Variant.Outlined" />
+                    </MudItem>
+                    @* Internet Ping *@
+                    <MudItem xs="12"
+                             md="4">
+                        <MudNumericField T="int"
+                                         Label="Internet Ping Above ms"
+                                         Value="Monitor.Settings.InternetPingMilliseconds"
+                                         ValueChanged="value => SaveSettings(Monitor.Settings with { InternetPingMilliseconds = value })"
+                                         Min="1"
+                                         Max="2000"
+                                         Variant="Variant.Outlined" />
+                    </MudItem>
+                    @* Slow DNS *@
+                    <MudItem xs="12"
+                             md="4">
+                        <MudNumericField T="int"
+                                         Label="DNS Lookup Above ms"
+                                         Value="Monitor.Settings.SlowDnsMilliseconds"
+                                         ValueChanged="value => SaveSettings(Monitor.Settings with { SlowDnsMilliseconds = value })"
+                                         Min="1"
+                                         Max="5000"
+                                         Variant="Variant.Outlined" />
+                    </MudItem>
+
+                </MudGrid>
+            </MudPaper>
+        </ChildContent>
+    </Header>
+
+    @* Adapter Section *@
+    <Header Title="Wi-Fi Adapter">
+        <MudPaper Elevation="4"
+                  Class="pa-4 rounded-panel">
+            @if (Monitor.Adapter is { } adapter)
+            {
+                @* Adapter Chips *@
+                <MudStack Row
+                          Wrap="Wrap.Wrap"
+                          Spacing="1">
+                    <ActionChip Icon="@Icons.Material.Rounded.Memory"
+                                Text="@adapter.Name"
+                                Target="@QuickActions.DeviceManager" />
+                    <ActionChip Icon="@Icons.Material.Rounded.Update"
+                                Text="@DriverText(adapter)"
+                                Color="@DriverColor(adapter)"
+                                Target="@(adapter.IsDriverOld ? QuickActions.WindowsUpdate : null)" />
+                    <ActionChip Icon="@Icons.Material.Rounded.Power"
+                                Text="@($"Plugged In {adapter.PowerSavingOnPower ?? "-"}")"
+                                Color="@PowerColor(adapter.PowerSavingOnPower)" />
+                    <ActionChip Icon="@Icons.Material.Rounded.BatteryStd"
+                                Text="@($"On Battery {adapter.PowerSavingOnBattery ?? "-"}")" />
+                    @if (adapter.Roaming is { } roaming)
+                    {
+                        <ActionChip Icon="@Icons.Material.Rounded.SettingsInputAntenna"
+                                    Text="@($"Roaming {roaming}")" />
+                    }
+                </MudStack>
+            }
+            else
+            {
+                <MudSkeleton SkeletonType="SkeletonType.Text"
+                             Animation="Animation.Wave"
+                             Width="60%" />
+            }
+        </MudPaper>
+    </Header>
+
+    @* About Section *@
+    <Header Title="About">
+        <MudPaper Elevation="4"
+                  Class="pa-4 rounded-panel">
+            @* Version Row *@
+            <MudStack Row
+                      AlignItems="AlignItems.Center"
+                      Spacing="2">
+                <MudText Typo="Typo.body2"
+                         Class="mud-text-secondary">
+                    @AppInfo.DisplayName @AppInfo.Version.ToString(2)
+                </MudText>
+                @if (Monitor.AvailableUpdate is { } availableUpdate)
+                {
+                    <ActionChip Icon="@Icons.Material.Rounded.NewReleases"
+                                Text="@($"Version {availableUpdate.ToString(2)} Available")"
+                                Color="Color.Info"
+                                Target="@UpdateChecker.LatestReleaseUrl" />
+                    <MudSpacer />
+                    @* Update Button *@
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Info"
+                               Size="Size.Small"
+                               StartIcon="@Icons.Material.Rounded.SystemUpdateAlt"
+                               Disabled="_isInstalling"
+                               OnClick="() => InstallAsync(availableUpdate)">
+                        @(_isInstalling ? "Downloading" : "Update Now")
+                    </MudButton>
+                }
+                else
+                {
+                    <MudSpacer />
+                    @* Check Button *@
+                    <MudButton Variant="Variant.Filled"
+                               Size="Size.Small"
+                               StartIcon="@Icons.Material.Rounded.Refresh"
+                               Disabled="_isChecking"
+                               OnClick="CheckForUpdateAsync">
+                        Check For Updates
+                    </MudButton>
+                }
+            </MudStack>
+        </MudPaper>
+    </Header>
+</MudStack>

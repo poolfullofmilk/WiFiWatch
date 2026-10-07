@@ -13,7 +13,7 @@
         <DebugType>embedded</DebugType>
         <Description>Watches Wi-Fi Channel, Signal And Ping And Logs Every Change</Description>
         <Copyright>Copyright 2026</Copyright>
-        <Version>1.1</Version>
+        <Version>1.2</Version>
         <AssemblyTitle>Wifi Watch</AssemblyTitle>
         <Product>Wifi Watch</Product>
     </PropertyGroup>

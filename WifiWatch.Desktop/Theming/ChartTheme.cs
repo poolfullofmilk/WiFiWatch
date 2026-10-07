@@ -6,16 +6,14 @@ namespace WifiWatch.Desktop.Theming;
 public static class ChartTheme
 {
     // The Lightest Grey, Shaded Down Per Bar From Here
-    private const string MonochromeBaseColor = "#BDBDBD";
+    public const string LightGreyColor = "#BDBDBD";
+    public const string DarkGreyColor = "#757575";
 
     // Ten Bars Still Clear The Dark Panel At This Spread
     private const double MonochromeShadeIntensity = 0.45;
 
-    // State And Surface Colors From The App Palette
-    public static readonly string WarningColor = Hex(AppTheme.Custom.PaletteDark.Warning);
-    public static readonly string ErrorColor = Hex(AppTheme.Custom.PaletteDark.Error);
-    public static readonly string EmptyColor = Hex(AppTheme.Custom.PaletteDark.Background);
-    public static readonly string PanelColor = Hex(AppTheme.Custom.PaletteDark.Surface);
+    // The One Accent From The App Palette
+    public static readonly string AccentColor = Hex(AppTheme.Custom.PaletteDark.Info);
 
     public static XAxisLabels FlatLabels() => new() { Rotate = 0, HideOverlappingLabels = true };
 
@@ -32,7 +30,7 @@ public static class ChartTheme
                 Monochrome = new ThemeMonochrome
                 {
                     Enabled = true,
-                    Color = MonochromeBaseColor,
+                    Color = LightGreyColor,
                     ShadeTo = Mode.Dark,
                     ShadeIntensity = MonochromeShadeIntensity,
                 },

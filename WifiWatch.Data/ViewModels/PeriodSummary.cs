@@ -3,7 +3,7 @@ namespace WifiWatch.Data.ViewModels;
 public sealed record PeriodSummary(
     int MonitoredMinutes,
     double OnlinePercent,
-    int IncidentCount,
+    int ProblemCount,
     TimeSpan LongestOutage,
     int EvictionCount,
     double? DfsPercent,

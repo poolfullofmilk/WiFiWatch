@@ -7,9 +7,9 @@ using WifiWatch.Services.Integration;
 using WifiWatch.Services.Monitoring;
 using WifiWatch.Services.Storage;
 
-namespace WifiWatch.Desktop.Components.Tabs;
+namespace WifiWatch.Desktop.Components.Pages;
 
-public partial class SettingsTab
+public partial class SettingsPage
 {
     private const string MaximumPerformance = "Maximum Performance";
 
@@ -34,13 +34,16 @@ public partial class SettingsTab
         }
     }
 
-    public void Refresh() => StateHasChanged();
-
     private void SaveSettings(UserSettings settings)
     {
-        StartupRegistration.Apply(settings.StartWithWindows);
         Monitor.Settings = settings;
         settings.Save();
+    }
+
+    private void SaveStartWithWindows(bool isStarted)
+    {
+        StartupRegistration.Apply(isStarted);
+        SaveSettings(Monitor.Settings with { StartWithWindows = isStarted });
     }
 
     private async Task CheckForUpdateAsync()

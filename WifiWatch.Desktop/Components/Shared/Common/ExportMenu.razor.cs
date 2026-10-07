@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
 
-namespace WifiWatch.Desktop.Components.Shared.Menus;
+namespace WifiWatch.Desktop.Components.Shared.Common;
 
 public partial class ExportMenu
 {

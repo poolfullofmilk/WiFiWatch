@@ -36,6 +36,14 @@ public static class EventKindColors
             _ => Color.Default,
         };
 
+    public static string IconFor(EventSeverity severity) =>
+        severity switch
+        {
+            EventSeverity.Critical => Icons.Material.Rounded.ErrorOutline,
+            EventSeverity.Warning => Icons.Material.Rounded.WarningAmber,
+            _ => Icons.Material.Rounded.Info,
+        };
+
     public static Color For(EventKind kind, EventSeverity severity)
     {
         // Rows Show Severity, Harmless Ones Stay Calm

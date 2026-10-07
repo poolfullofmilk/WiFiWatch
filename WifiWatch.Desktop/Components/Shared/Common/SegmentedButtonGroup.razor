@@ -1,0 +1,17 @@
+@typeparam TValue
+
+@* Button Group *@
+<MudButtonGroup Size="Size.Small"
+                Style="border-radius:var(--mud-default-borderradius)"
+                OverrideStyles="false">
+    @foreach (var option in Options)
+    {
+        @* Option Button *@
+        <MudButton Variant="@(IsSelected(option.Value) ? Variant.Filled : Variant.Outlined)"
+                   Color="Color.Info"
+                   Size="Size.Small"
+                   OnClick="@(() => SelectAsync(option.Value))">
+            @option.Label
+        </MudButton>
+    }
+</MudButtonGroup>
