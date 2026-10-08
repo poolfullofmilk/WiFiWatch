@@ -37,9 +37,15 @@
             <MudButton Variant="Variant.Filled"
                        Color="Color.Info"
                        Size="Size.Small"
-                       StartIcon="@Icons.Material.Rounded.SystemUpdateAlt"
-                       Disabled="_isInstalling"
+                       StartIcon="@(_isInstalling ? null : Icons.Material.Rounded.SystemUpdateAlt)"
                        OnClick="InstallAsync">
+                @if (_isInstalling)
+                {
+                    <MudProgressCircular Color="Color.Inherit"
+                                         Indeterminate
+                                         Class="mr-2"
+                                         Style="width:16px; height:16px" />
+                }
                 @(_isInstalling ? "Downloading" : "Update Now")
             </MudButton>
         </MudStack>

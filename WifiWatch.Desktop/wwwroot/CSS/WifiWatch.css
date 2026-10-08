@@ -159,6 +159,11 @@ svg.apexcharts-svg {
 }
 /* #endregion */
 
+/* Tooltips Keep The Line Breaks Their Text Carries */
+.mud-tooltip {
+    white-space: pre-line;
+}
+
 /* #region Channel Strip */
 /* Groups Of Channels Per 80 MHz Block, Every Cell The Same Width */
 .channel-groups {

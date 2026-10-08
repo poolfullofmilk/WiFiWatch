@@ -1,29 +1,26 @@
 # Wifi Watch
 
-Tells you if your connection is fine, and when it wasn't, where it went wrong and what to do.
+A Windows tray app that tells you when your connection drops, where it went wrong and what to do about it.
 
 ![Overview](Screenshots/Overview.png)
 
-![Incidents](Screenshots/Incidents.png)
-
-![History](Screenshots/History.png)
-
-![Settings](Screenshots/Settings.png)
+| Incidents | History | Settings |
+|---|---|---|
+| ![Incidents](Screenshots/Incidents.png) | ![History](Screenshots/History.png) | ![Settings](Screenshots/Settings.png) |
 
 ## Features
-- Live status of your Wi-Fi, router and internet, and a tray icon that turns amber or red when something is wrong
-- Logs every problem with where it was (Wi-Fi, home network, provider or DNS) and what to do about it
-- Notifies you only when something serious happens or lasts
-- History per hour or day, every Wi-Fi channel and who else is on it, and radar warnings for DFS channels
-- A speed test with live progress and lag under load
+- Live status of your Wi-Fi, router and internet
+- Every problem logged with where it happened and what to do
+- Notifications only for problems that matter
+- History, speed tests and a view of every Wi-Fi channel
 
 ## Quick start
 1. Download the exe from the [latest release](https://github.com/poolfullofmilk/WifiWatch/releases/latest)
-2. Run it and turn on location services if asked
+2. Run it, it keeps watching from the tray
 
 ## ⚠️ Important
 - Needs Windows 11 with location services on
-- On Windows in another language than English, turn on Read Wi-Fi Natively in Settings
+- Windows in another language than English: turn on Read Wi-Fi Natively in Settings
 
 ## Technical details
-- .NET 10, WPF with Blazor, MudBlazor and SQLite
+- .NET 10, WPF, Blazor, MudBlazor and SQLite

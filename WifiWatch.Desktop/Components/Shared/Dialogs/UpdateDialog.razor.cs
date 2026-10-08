@@ -64,6 +64,10 @@ public partial class UpdateDialog
 
     private async Task InstallAsync()
     {
+        // The Button Stays Blue, So Ignore A Second Click
+        if (_isInstalling)
+            return;
+
         _isInstalling = true;
         await InstallAsync(Version, Snackbar, Window);
         _isInstalling = false;

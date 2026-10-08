@@ -46,13 +46,20 @@ public partial class ChannelStrip
         var name = $"Channel {channel}{(WifiChannels.IsDfs(channel) ? " DFS" : string.Empty)}";
         var networks = On(channel)
             .OrderByDescending(neighbor => neighbor.SignalPercent)
-            .Select(neighbor =>
-                $"{(string.IsNullOrEmpty(neighbor.Ssid) ? "Hidden" : neighbor.Ssid)} {(neighbor.SignalPercent / 2) - 100} dBm"
+            .SelectMany(neighbor =>
+                new[]
+                {
+                    string.IsNullOrEmpty(neighbor.Ssid) ? "Hidden" : neighbor.Ssid,
+                    $"{(neighbor.SignalPercent / 2) - 100} dBm",
+                }
             )
             .ToList();
-        var yours = channel == CurrentChannel ? ", Yours" : string.Empty;
-        return networks.Count == 0
-            ? $"{name}{yours}, No Other Networks"
-            : $"{name}{yours}, {string.Join(", ", networks)}";
+        // One Line Each, The Tooltip Keeps Line Breaks
+        List<string> lines = [name];
+        if (channel == CurrentChannel)
+            lines.Add("Yours");
+
+        lines.AddRange(networks.Count == 0 ? ["No Other Networks"] : networks);
+        return string.Join("\n", lines);
     }
 }

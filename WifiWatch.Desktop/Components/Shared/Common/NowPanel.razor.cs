@@ -83,12 +83,12 @@ public partial class NowPanel : IDisposable
     private static string DescribeConnection(MonitorStatus status)
     {
         var connection = status.Reading is { IsConnected: true } reading
-            ? $"Connected To {reading.Ssid ?? "Wi-Fi"}, Channel {reading.Channel}{(reading.IsDfs ? " DFS" : string.Empty)} And {reading.Band ?? "-"}"
-            : $"Connected Over {status.Link}";
+            ? $"Connected to {reading.Ssid ?? "Wi-Fi"}, Channel {reading.Channel}{(reading.IsDfs ? " DFS" : string.Empty)} and {reading.Band ?? "-"}"
+            : $"Connected over {status.Link}";
 
         // A Radar Eviction Keeps The Router Off DFS For A While
         return status.DfsFreeAtUtc is { } freeAtUtc
-            ? $"{connection}, DFS Free At {Formatter.FormatLocal(freeAtUtc, "HH:mm")}"
+            ? $"{connection}, DFS free at {Formatter.FormatLocal(freeAtUtc, "HH:mm")}"
             : connection;
     }
 

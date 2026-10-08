@@ -14,7 +14,7 @@ The global `~/.claude/CLAUDE.md` holds every shared convention (git, releases, c
 | `WifiWatch.Data` | `net10.0`, no Windows dependencies. EF context, models, migrations, view models, enums, small helpers |
 | `WifiWatch.Services` | `net10.0-windows`. Everything that watches, measures, stores or talks to Windows |
 | `WifiWatch.Desktop` | WPF exe, `Microsoft.NET.Sdk.Razor`, `net10.0-windows10.0.17763.0`. Window, tray, Blazor UI, theming |
-| `Screenshots/` | `Overview.png`, `Incidents.png`, `History.png` and `Settings.png` for the README |
+| `Screenshots/` | `Overview.png`, `Incidents.png`, `History.png` and `Settings.png` for the README, taken maximized on a generated sample week (History on 7 Days) with default settings, never on real data |
 
 ### WifiWatch.Data
 
@@ -76,7 +76,7 @@ dotnet build WifiWatch.slnx
 dotnet publish WifiWatch.Desktop -c Release
 ```
 
-Publish writes one file, `WifiWatch.Desktop\bin\Release\net10.0-windows10.0.17763.0\win-x64\publish\WifiWatch_v1.3.exe`, about 80 MB. `<Version>` lives in `WifiWatch.Desktop.csproj` only.
+Publish writes one file, `WifiWatch.Desktop\bin\Release\net10.0-windows10.0.17763.0\win-x64\publish\WifiWatch_v1.4.exe`, about 80 MB. `<Version>` lives in `WifiWatch.Desktop.csproj` only.
 
 Installing is copying that exe to `%LocalAppData%\Programs\WifiWatch` and running it once. Every Release launch rewrites the `Run` value (with `--tray`) and `Start Menu\Programs\01 Apps\Wifi Watch.lnk` to point at itself. A release on GitHub carries exactly one asset named `WifiWatch_v<version>.exe` under the tag `v<version>`, because the updater builds that URL.
 
@@ -158,7 +158,7 @@ After 60 ticks on each new day: write yesterday's summary if missing ("yyyy-MM-d
 
 `UpdateChecker` reads the redirect of `releases/latest` (no API token, no rate limit) and compares the tag with `AppInfo.Version`. `NetworkMonitor.CheckForUpdateAsync` records one `UpdateAvailable` per new version and raises `UpdateFound`.
 
-`Home` shows `UpdateDialog` once per run when an update is known and `ShowUpdatePopup` is on, on first render and on `UpdateFound`. The dialog has a "Don't Show Again" checkbox that turns the setting off; Settings has the same switch, the version, and Check For Updates or Update Now.
+`Home` shows `UpdateDialog` once per run when an update is known and `ShowUpdatePopup` is on, on first render and on `UpdateFound`. The dialog has a "Don't Show Again" checkbox that turns the setting off; Settings has the same switch, the version, and Check For Updates or Update Now. While downloading, both Update Now buttons stay blue and swap their icon for a spinner beside "Downloading"; a second click is ignored.
 
 Update Now: `Updater.DownloadAsync` saves `WifiWatch_v<new>.exe` beside the running exe (through a `.download` file), `Updater.Launch` starts it with `--after-update <pid>`, the window exits. The new exe calls `Updater.FinishPreviousVersion` first in `OnStartup`: it waits up to 15 s for the old process and deletes the other `WifiWatch_v*.exe` files beside it (replaced builds, not data). A Debug build or a renamed exe (`Updater.CanInstall` false) opens the release page instead.
 
@@ -177,7 +177,7 @@ The look follows LetsWatch: navigation in the app bar, section titles above pane
 - **App bar**: the name, then four labelled page buttons (Overview, Incidents, History, Settings), the open one filled blue. A dot on Overview, amber or red, while a problem is still open. `Home` swaps pages with a plain `switch`, so every page loads fresh when opened and owns its own event subscriptions.
 - **Overview** (is it fine now, and what went wrong lately): `NowPanel` with the verdict (the worst open problem from `EventJournal.OpenProblemsAsync`, else Offline, else All Good), a What To Do line from `QuickActions.AdviceFor`, its fix button, the router button, Speed Test, and live Signal, Wi-Fi Speed, Router and Internet. Values stay plain and turn amber or red only past a setting. Then the last 24 hours as a `HealthStrip`, and the six newest problems as cards that open `IncidentDialog`.
 - **Incidents** (what happened): one `DataTable` of When, What, Where, Length and Details. Problems (by `Problems.IsProblem`) by default, Everything on the segmented toggle. Reloads on every recorded event. A row opens `IncidentDialog`: time range, message, What To Do, where in plain words, Windows reason, context, trace hops, and one fix button from `QuickActions.ForEvent`.
-- **History** (how was it over a period): a `MudDateRangePicker` with Today, 7 Days and 30 Days on the left of its action bar (they apply at once) and Cancel and OK on the right, so picking days loads nothing until OK; the minutes CSV export on the right. Four tiles from `SummaryWriter.SummarizeAsync` (Online, Problems, Longest Outage, Fastest Download), the `HealthStrip` per hour up to 3 days and per day beyond, one ping chart (Router grey, Internet blue, DNS dashed violet), the Wi-Fi Channel panel, and the speed tests in range. The channel panel is a `ChannelStrip`: one cell per EU channel grouped by 80 MHz block (36 to 140, or 1 to 13 when on 2.4 GHz), yours blue, a block neighbour at 30% or more amber (it shares your airtime), audible ones elsewhere grey, the network count in each cell and names with dBm in the tooltip, from one DISTINCT query (the strongest reading per network and channel is taken in memory) plus an average for airtime. Radar evictions, airtime busy from your access point's BSS Load, and the advice line sit with it.
+- **History** (how was it over a period): a `MudDateRangePicker` with Today, 7 Days and 30 Days on the left of its action bar (they apply at once) and Cancel and OK on the right, so picking days loads nothing until OK; the minutes CSV export on the right. Four tiles from `SummaryWriter.SummarizeAsync` (Online, Problems, Longest Outage, Fastest Download), the `HealthStrip` per hour up to 3 days and per day beyond, one ping chart (Router grey, Internet blue, DNS dashed violet), the Wi-Fi Channel panel, and the speed tests in range. The channel panel is a `ChannelStrip`: one cell per EU channel grouped by 80 MHz block (36 to 140, or 1 to 13 when on 2.4 GHz), yours blue, a block neighbour at 30% or more amber (it shares your airtime), audible ones elsewhere grey, the network count in each cell and, in the tooltip, one line per item (the channel, Yours, each network name and its dBm; `.mud-tooltip` keeps line breaks), from one DISTINCT query (the strongest reading per network and channel is taken in memory) plus an average for airtime. Radar evictions, airtime busy from your access point's BSS Load, and the advice line sit with it.
 - **`HealthStrip`** is one cell per bucket from `HealthBuckets.Build`: red for any Critical problem touching it, amber for a Warning, green when watched and fine, an outlined empty cell when the app was not running. Open problems run until now.
 - **Settings** is four sections: General switches, Problem Limits (three fields, each with a helper line), Wi-Fi Adapter chips, About with version and updates.
 - **Raw minutes** have no page; the History export holds every column.

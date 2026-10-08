@@ -59,6 +59,10 @@ public partial class SettingsPage
 
     private async Task InstallAsync(Version version)
     {
+        // The Button Stays Blue, So Ignore A Second Click
+        if (_isInstalling)
+            return;
+
         _isInstalling = true;
         await UpdateDialog.InstallAsync(version, Snackbar, Window);
         _isInstalling = false;
