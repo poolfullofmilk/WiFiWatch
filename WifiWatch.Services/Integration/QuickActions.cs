@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using WifiWatch.Data.Enums;
+using WifiWatch.Services.Monitoring;
 
 namespace WifiWatch.Services.Integration;
 
@@ -33,6 +34,28 @@ public static class QuickActions
             or EventKind.DailySummary
             or EventKind.WeeklySummary => null,
             _ => routerAdminUrl,
+        };
+
+    public static string? AdviceFor(EventKind kind, string? scope) =>
+        kind switch
+        {
+            EventKind.WeakSignal or EventKind.SlowLink =>
+                "Move Closer To The Router Or Use A Cable",
+            EventKind.PingSpike or EventKind.JitterSpike or EventKind.PacketLoss => scope switch
+            {
+                NetworkMonitor.ProviderScope =>
+                    "Restart The Router, Call Your Provider If It Repeats",
+                NetworkMonitor.HomeNetworkScope => "Check The Cable And Restart The Router",
+                _ => "Move Closer, Or Test With A Cable To Rule Out Wi-Fi",
+            },
+            EventKind.WanDown => "Restart The Router, Call Your Provider If It Stays Down",
+            EventKind.SlowDns => "Set The DNS Server To 1.1.1.1 In The Router",
+            EventKind.Disconnect or EventKind.ConnectFailed =>
+                "Update The Wi-Fi Driver If This Keeps Happening",
+            EventKind.DfsEviction => "Set The Router To Channels 36 To 48 If This Repeats",
+            EventKind.LocationBlocked => "Turn On Location For Desktop Apps",
+            EventKind.DriverCheck => "Update The Wi-Fi Driver",
+            _ => null,
         };
 
     public static string Describe(string target) =>

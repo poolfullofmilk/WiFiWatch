@@ -1,0 +1,39 @@
+@* Channel Blocks *@
+<MudElement HtmlTag="div"
+            Class="channel-groups">
+    @foreach (var block in Blocks)
+    {
+        <MudStack Spacing="1"
+                  Style="@($"flex:{block.Channels.Count()} 1 0; min-width:0")">
+            <MudElement HtmlTag="div"
+                        Class="health-strip">
+                @foreach (var channel in block.Channels)
+                {
+                    <Tooltip Text="@Describe(channel)"
+                             RootClass="health-slot">
+                        <MudElement HtmlTag="span"
+                                    Class="@CellClass(channel)">
+                            @CountText(channel)
+                        </MudElement>
+                    </Tooltip>
+                }
+            </MudElement>
+            <MudElement HtmlTag="div"
+                        Class="health-strip">
+                @foreach (var channel in block.Channels)
+                {
+                    <MudText Typo="Typo.caption"
+                             Align="Align.Center"
+                             Class="health-slot mud-text-secondary">
+                        @channel
+                    </MudText>
+                }
+            </MudElement>
+            <MudText Typo="Typo.caption"
+                     Align="Align.Center"
+                     Class="mud-text-secondary">
+                @block.Label
+            </MudText>
+        </MudStack>
+    }
+</MudElement>

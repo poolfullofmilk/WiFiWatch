@@ -1,0 +1,102 @@
+@using Color = MudBlazor.Color
+@using Size = MudBlazor.Size
+
+@* Speed Test Dialog *@
+<MudDialog>
+
+    <TitleContent>
+        <MudText Typo="Typo.h6">Speed Test</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudStack Spacing="6"
+                  Style="width:min(520px, 80vw)">
+            <MudStack AlignItems="AlignItems.Center"
+                      Spacing="0">
+                <MudText Typo="Typo.subtitle2"
+                         Class="mud-text-secondary">
+                    @HeadlineLabel
+                </MudText>
+                <MudText Typo="Typo.h2">@HeadlineValue</MudText>
+                <MudText Typo="Typo.body2"
+                         Class="mud-text-secondary">
+                    Mbps
+                </MudText>
+            </MudStack>
+            <MudProgressLinear Color="@(_error is null ? Color.Info : Color.Warning)"
+                               Value="@OverallPercent"
+                               Rounded
+                               Size="Size.Medium" />
+            <MudGrid Spacing="4">
+
+                @foreach (var (label, value) in Results)
+                {
+                    <MudItem xs="4">
+                        <MudStack AlignItems="AlignItems.Center"
+                                  Spacing="0">
+                            <MudText Typo="Typo.caption"
+                                     Class="mud-text-secondary">
+                                @label
+                            </MudText>
+                            <MudText Typo="Typo.h6">@value</MudText>
+                        </MudStack>
+                    </MudItem>
+                }
+
+            </MudGrid>
+            @if (_result is { } result)
+            {
+                <MudStack Row
+                          Justify="Justify.Center"
+                          AlignItems="AlignItems.Center"
+                          Spacing="2">
+                    <MudChip T="string"
+                             Size="Size.Small"
+                             Variant="Variant.Text"
+                             Color="@GradeColors.For(result.Grade)">
+                        @($"Grade {result.Grade}")
+                    </MudChip>
+                    <MudText Typo="Typo.body2"
+                             Class="mud-text-secondary">
+                        @($"Lag Under Load {Formatter.FormatLagUnderLoad(result)}")
+                    </MudText>
+                </MudStack>
+            }
+            <MudText Typo="Typo.caption"
+                     Align="Align.Center"
+                     Class="mud-text-secondary">
+                Measured Against Cloudflare, About 850 MB Per Test
+            </MudText>
+            @if (_error is { } error)
+            {
+                <MudText Typo="Typo.body2"
+                         Align="Align.Center"
+                         Color="Color.Warning">
+                    @error
+                </MudText>
+            }
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudStack Row
+                  Justify="Justify.SpaceBetween"
+                  Spacing="4"
+                  Class="px-3 py-2 mud-width-full">
+            @* Close Button *@
+            <MudButton Variant="Variant.Filled"
+                       Size="Size.Small"
+                       OnClick="Close">
+                @(IsRunning ? "Cancel" : "Close")
+            </MudButton>
+            @* Again Button *@
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Info"
+                       Size="Size.Small"
+                       StartIcon="@Icons.Material.Rounded.Refresh"
+                       Disabled="IsRunning"
+                       OnClick="RunAsync">
+                Test Again
+            </MudButton>
+        </MudStack>
+    </DialogActions>
+
+</MudDialog>

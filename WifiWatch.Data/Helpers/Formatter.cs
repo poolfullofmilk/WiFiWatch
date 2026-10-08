@@ -1,4 +1,5 @@
 using System.Globalization;
+using WifiWatch.Data.Models;
 
 namespace WifiWatch.Data.Helpers;
 
@@ -20,6 +21,18 @@ public static class Formatter
                 ? $"Ongoing {FormatDuration(DateTime.UtcNow - occurredAtUtc)}"
             : endUtc == occurredAtUtc ? null
             : FormatDuration(endUtc - occurredAtUtc);
+    }
+
+    public static string FormatLagUnderLoad(SpeedTest test)
+    {
+        // The Worse Direction Shows How Much A Busy Line Lags
+        var loadedPing = Math.Max(
+            test.DownloadPingMilliseconds ?? 0,
+            test.UploadPingMilliseconds ?? 0
+        );
+        return test.IdlePingMilliseconds is { } idlePing
+            ? $"+{Math.Max(0, loadedPing - idlePing):0} ms"
+            : "-";
     }
 
     public static string FormatLocal(DateTime utcTime, string format) =>

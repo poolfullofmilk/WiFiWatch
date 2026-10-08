@@ -159,6 +159,35 @@ svg.apexcharts-svg {
 }
 /* #endregion */
 
+/* #region Channel Strip */
+/* Groups Of Channels Per 80 MHz Block, Every Cell The Same Width */
+.channel-groups {
+    display: flex;
+    gap: 12px;
+}
+
+.channel-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+}
+
+.channel-yours {
+    background-color: var(--mud-palette-info);
+    color: var(--mud-palette-info-text);
+}
+
+.channel-shares {
+    background-color: var(--mud-palette-warning);
+    color: var(--mud-palette-warning-text);
+}
+
+.channel-used {
+    background-color: var(--mud-palette-lines-default);
+}
+/* #endregion */
+
 /* #region Cards */
 /* Cards Darken On Hover And Never Move */
 .hover-card:hover {

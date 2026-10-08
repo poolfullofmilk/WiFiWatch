@@ -8,21 +8,72 @@ namespace WifiWatch.Services.Monitoring;
 
 public static class SummaryWriter
 {
+    public static async Task<List<HourSummary>> LoadHoursAsync(
+        WifiDbContext context,
+        DateTime startUtc,
+        DateTime endUtc
+    )
+    {
+        // Ponytail: UTC Hours, Exact Only For Whole Hour Time Zones
+        var hours = await context
+            .MinuteSamples.AsNoTracking()
+            .Where(sample => sample.MinuteUtc >= startUtc && sample.MinuteUtc < endUtc)
+            .GroupBy(sample => new { sample.MinuteUtc.Date, sample.MinuteUtc.Hour })
+            .Select(hour => new
+            {
+                hour.Key.Date,
+                hour.Key.Hour,
+                MinuteCount = hour.Count(),
+                OnlineMinutes = hour.Count(sample =>
+                    sample.Link != NetworkMonitor.OfflineLink && sample.InternetLossPercent < 100
+                ),
+                ChannelMinutes = hour.Count(sample => sample.Channel != null),
+
+                // Same Range As WifiChannels.IsDfs, Written Out For SQL
+                DfsMinutes = hour.Count(sample => sample.Channel >= 52 && sample.Channel <= 144),
+                RouterPing = hour.Average(sample => sample.RouterPingMilliseconds),
+                RouterCount = hour.Count(sample => sample.RouterPingMilliseconds != null),
+                InternetPing = hour.Average(sample => sample.InternetPingMilliseconds),
+                InternetCount = hour.Count(sample => sample.InternetPingMilliseconds != null),
+                DnsPing = hour.Average(sample => sample.DnsMilliseconds),
+                DnsCount = hour.Count(sample => sample.DnsMilliseconds != null),
+            })
+            .ToListAsync();
+
+        return
+        [
+            .. hours
+                .Select(hour => new HourSummary(
+                    DateTime.SpecifyKind(hour.Date.AddHours(hour.Hour), DateTimeKind.Utc),
+                    hour.MinuteCount,
+                    hour.OnlineMinutes,
+                    hour.ChannelMinutes,
+                    hour.DfsMinutes,
+                    hour.RouterPing,
+                    hour.RouterCount,
+                    hour.InternetPing,
+                    hour.InternetCount,
+                    hour.DnsPing,
+                    hour.DnsCount
+                ))
+                .OrderBy(hour => hour.HourUtc),
+        ];
+    }
+
     public static async Task<PeriodSummary> SummarizeAsync(DateTime startUtc, DateTime endUtc)
     {
         await using var context = new WifiDbContext();
-        var minutes = await context
-            .MinuteSamples.AsNoTracking()
-            .Where(sample => sample.MinuteUtc >= startUtc && sample.MinuteUtc < endUtc)
-            .Select(sample => new
-            {
-                sample.MinuteUtc,
-                sample.Link,
-                sample.Channel,
-                sample.InternetLossPercent,
-                sample.InternetPingMilliseconds,
-            })
-            .ToListAsync();
+        var hours = await LoadHoursAsync(context, startUtc, endUtc);
+        return await SummarizeAsync(context, hours, startUtc, endUtc);
+    }
+
+    public static async Task<PeriodSummary> SummarizeAsync(
+        WifiDbContext context,
+        List<HourSummary> hours,
+        DateTime startUtc,
+        DateTime endUtc
+    )
+    {
         var events = await context
             .Events.AsNoTracking()
             .Where(wifiEvent =>
@@ -42,25 +93,26 @@ public static class SummaryWriter
             .Where(Problems.IsProblem)
             .CountAsync();
 
-        var onlineMinutes = minutes.Count(minute =>
-            minute.Link != NetworkMonitor.OfflineLink && minute.InternetLossPercent < 100
-        );
-        var channelMinutes = minutes.Where(minute => minute.Channel is not null).ToList();
-        var (worstHour, worstHourPing) = minutes
-            .Where(minute => minute.InternetPingMilliseconds is not null)
-            .GroupBy(minute => minute.MinuteUtc.ToLocalTime().Hour)
-            .Select(hour =>
+        var minuteCount = hours.Sum(hour => hour.MinuteCount);
+        var onlineMinutes = hours.Sum(hour => hour.OnlineMinutes);
+        var channelMinutes = hours.Sum(hour => hour.ChannelMinutes);
+        var (worstHour, worstHourPing) = hours
+            .GroupBy(hour => hour.HourUtc.ToLocalTime().Hour)
+            .Select(hourOfDay =>
                 (
-                    Hour: hour.Key,
-                    Ping: hour.Average(minute => minute.InternetPingMilliseconds!.Value)
+                    Hour: hourOfDay.Key,
+                    Ping: HealthBuckets.Average(
+                        hourOfDay,
+                        hour => (hour.InternetPing, hour.InternetCount)
+                    ) ?? 0
                 )
             )
-            .OrderByDescending(hour => hour.Ping)
+            .OrderByDescending(hourOfDay => hourOfDay.Ping)
             .FirstOrDefault();
 
         return new(
-            minutes.Count,
-            minutes.Count == 0 ? 0 : Math.Round(100.0 * onlineMinutes / minutes.Count, 1),
+            minuteCount,
+            minuteCount == 0 ? 0 : Math.Round(100.0 * onlineMinutes / minuteCount, 1),
             problemCount,
             events
                 .Where(wifiEvent =>
@@ -71,13 +123,9 @@ public static class SummaryWriter
                 .DefaultIfEmpty(TimeSpan.Zero)
                 .Max(),
             events.Count(wifiEvent => wifiEvent.Kind == EventKind.DfsEviction),
-            channelMinutes.Count == 0
+            channelMinutes == 0
                 ? null
-                : Math.Round(
-                    100.0
-                        * channelMinutes.Count(minute => WifiChannels.IsDfs(minute.Channel))
-                        / channelMinutes.Count
-                ),
+                : Math.Round(100.0 * hours.Sum(hour => hour.DfsMinutes) / channelMinutes),
             worstHourPing > 0 ? worstHour : null,
             worstHourPing > 0 ? Math.Round(worstHourPing, 1) : null
         );
@@ -109,50 +157,25 @@ public static class SummaryWriter
 
     public static async Task WriteMissingAsync(EventJournal journal, bool isNotified)
     {
-        // Yesterday, Then Last Week Once A New Week Starts
         var yesterday = DateTime.Today.AddDays(-1);
-        await WriteAsync(
-            journal,
-            EventKind.DailySummary,
-            $"{yesterday:yyyy-MM-dd} {yesterday:dddd}",
-            yesterday,
-            DateTime.Today,
-            isNotified
-        );
-
-        var thisWeekStart = DateTime.Today.AddDays(-(((int)DateTime.Today.DayOfWeek + 6) % 7));
-        var lastWeekStart = thisWeekStart.AddDays(-7);
-        await WriteAsync(
-            journal,
-            EventKind.WeeklySummary,
-            $"Week Of {lastWeekStart:yyyy-MM-dd}",
-            lastWeekStart,
-            thisWeekStart,
-            isNotified
-        );
-    }
-
-    private static async Task WriteAsync(
-        EventJournal journal,
-        EventKind kind,
-        string label,
-        DateTime firstDay,
-        DateTime endDay,
-        bool isNotified
-    )
-    {
-        if (await EventJournal.HasMessageStartingWithAsync(kind, label))
+        var label = $"{yesterday:yyyy-MM-dd} {yesterday:dddd}";
+        if (await EventJournal.HasMessageStartingWithAsync(EventKind.DailySummary, label))
             return;
 
-        var summary = await SummarizeAsync(firstDay.ToUniversalTime(), endDay.ToUniversalTime());
+        var summary = await SummarizeAsync(
+            yesterday.ToUniversalTime(),
+            DateTime.Today.ToUniversalTime()
+        );
         if (summary.MonitoredMinutes == 0)
             return;
 
+        // A Fine Day Is Logged Quietly, A Bad One Notifies
+        var hadProblems = summary.ProblemCount > 0 || summary.LongestOutage > TimeSpan.Zero;
         await journal.RecordAsync(
-            kind,
+            EventKind.DailySummary,
             EventSeverity.Info,
             Describe(label, summary),
-            isAlwaysAlerted: isNotified
+            isAlwaysAlerted: isNotified && hadProblems
         );
     }
 }

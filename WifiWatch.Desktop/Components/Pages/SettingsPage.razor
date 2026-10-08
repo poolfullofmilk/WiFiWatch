@@ -15,7 +15,7 @@
                 <MudDivider />
                 @* Summary Switch *@
                 <SettingSwitch Title="Daily Summary Notification"
-                               Description="Sums Up Yesterday In A Notification Each Morning"
+                               Description="Notifies Each Morning After A Day With Problems"
                                Value="Monitor.Settings.DailySummaryNotification"
                                ValueChanged="value => SaveSettings(Monitor.Settings with { DailySummaryNotification = value })" />
                 <MudDivider />
@@ -24,6 +24,12 @@
                                Description="Measures Speed And Lag Under Load At 03:00"
                                Value="Monitor.Settings.NightlySpeedTest"
                                ValueChanged="value => SaveSettings(Monitor.Settings with { NightlySpeedTest = value })" />
+                <MudDivider />
+                @* Native Wi-Fi Switch *@
+                <SettingSwitch Title="Read Wi-Fi Natively"
+                               Description="Asks Windows Directly Instead Of netsh, Works In Any Language"
+                               Value="Monitor.Settings.ReadWifiNatively"
+                               ValueChanged="value => SaveSettings(Monitor.Settings with { ReadWifiNatively = value })" />
                 <MudDivider />
                 @* Update Popup Switch *@
                 <SettingSwitch Title="Update Popup"
@@ -39,7 +45,7 @@
         <TitleContent>
             <MudText Typo="Typo.body2"
                      Class="mx-2 mud-text-secondary">
-                A Problem Opens After 2 Minutes Past A Limit
+                2 Bad Minutes Open A Problem, Triple The Limit Notifies At Once
             </MudText>
         </TitleContent>
         <ChildContent>
@@ -56,28 +62,7 @@
                                          ValueChanged="value => SaveSettings(Monitor.Settings with { WeakSignalRssi = value })"
                                          Min="-100"
                                          Max="-30"
-                                         Variant="Variant.Outlined" />
-                    </MudItem>
-                    @* Slow Link *@
-                    <MudItem xs="12"
-                             md="4">
-                        <MudNumericField T="int"
-                                         Label="Slow Wi-Fi Below Mbps"
-                                         Value="Monitor.Settings.SlowLinkMbps"
-                                         ValueChanged="value => SaveSettings(Monitor.Settings with { SlowLinkMbps = value })"
-                                         Min="1"
-                                         Max="5000"
-                                         Variant="Variant.Outlined" />
-                    </MudItem>
-                    @* Packet Loss *@
-                    <MudItem xs="12"
-                             md="4">
-                        <MudNumericField T="int"
-                                         Label="Packet Loss From %"
-                                         Value="Monitor.Settings.PacketLossPercent"
-                                         ValueChanged="value => SaveSettings(Monitor.Settings with { PacketLossPercent = value })"
-                                         Min="1"
-                                         Max="100"
+                                         HelperText="Closer To Zero Is Stronger, -70 Suits Calls"
                                          Variant="Variant.Outlined" />
                     </MudItem>
                     @* Router Ping *@
@@ -89,17 +74,7 @@
                                          ValueChanged="value => SaveSettings(Monitor.Settings with { RouterPingMilliseconds = value })"
                                          Min="1"
                                          Max="1000"
-                                         Variant="Variant.Outlined" />
-                    </MudItem>
-                    @* Jitter *@
-                    <MudItem xs="12"
-                             md="4">
-                        <MudNumericField T="int"
-                                         Label="Router Jitter Above ms"
-                                         Value="Monitor.Settings.JitterMilliseconds"
-                                         ValueChanged="value => SaveSettings(Monitor.Settings with { JitterMilliseconds = value })"
-                                         Min="1"
-                                         Max="1000"
+                                         HelperText="Lag Between This PC And Your Router"
                                          Variant="Variant.Outlined" />
                     </MudItem>
                     @* Internet Ping *@
@@ -111,17 +86,7 @@
                                          ValueChanged="value => SaveSettings(Monitor.Settings with { InternetPingMilliseconds = value })"
                                          Min="1"
                                          Max="2000"
-                                         Variant="Variant.Outlined" />
-                    </MudItem>
-                    @* Slow DNS *@
-                    <MudItem xs="12"
-                             md="4">
-                        <MudNumericField T="int"
-                                         Label="DNS Lookup Above ms"
-                                         Value="Monitor.Settings.SlowDnsMilliseconds"
-                                         ValueChanged="value => SaveSettings(Monitor.Settings with { SlowDnsMilliseconds = value })"
-                                         Min="1"
-                                         Max="5000"
+                                         HelperText="Lag To 1.1.1.1 While The Router Is Fine"
                                          Variant="Variant.Outlined" />
                     </MudItem>
 

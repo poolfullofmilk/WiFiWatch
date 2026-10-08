@@ -14,7 +14,9 @@ public static class ConsoleCommand
                 UseShellExecute = false,
             }
         )!;
-        var output = await process.StandardOutput.ReadToEndAsync();
+        // Close The Stream Now, Not At The Finalizer
+        using var reader = process.StandardOutput;
+        var output = await reader.ReadToEndAsync();
         await process.WaitForExitAsync();
 
         return output;

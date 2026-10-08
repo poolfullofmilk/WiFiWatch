@@ -10,7 +10,7 @@ public static class DnsProbe
 {
     // A Cached Name Measures The Resolver, Not The Web
     private const string ProbeName = "www.google.com";
-    private const int TimeoutMilliseconds = 2000;
+    public const int TimeoutMilliseconds = 2000;
     private const int DnsPort = 53;
 
     public static readonly IPAddress ReferenceServer = IPAddress.Parse("1.1.1.1");

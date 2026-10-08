@@ -25,16 +25,16 @@ public static class HealthBuckets
     }
 
     public static List<HealthBucket> Build(
-        IReadOnlyList<MinuteSample> samples,
+        IReadOnlyList<HourSummary> hours,
         IReadOnlyList<WifiEvent> incidents,
         List<DateTime> startsUtc,
         DateTime endUtc,
         DateTime nowUtc
     )
     {
-        var samplesByBucket = samples.ToLookup(sample =>
+        var hoursByBucket = hours.ToLookup(hour =>
         {
-            var index = startsUtc.BinarySearch(sample.MinuteUtc);
+            var index = startsUtc.BinarySearch(hour.HourUtc);
             return index >= 0 ? index : ~index - 1;
         });
         var problems = incidents.Where(Problems.IsProblemInMemory).ToList();
@@ -54,12 +54,12 @@ public static class HealthBuckets
                             && (incident.EndedAtUtc ?? nowUtc) >= bucketStartUtc
                         )
                         .ToList();
-                    var minutes = samplesByBucket[bucket].ToList();
+                    var bucketHours = hoursByBucket[bucket].ToList();
                     var state =
                         overlapping.Any(incident => incident.Severity == EventSeverity.Critical)
                             ? HealthState.Critical
                         : overlapping.Count > 0 ? HealthState.Warning
-                        : minutes.Count == 0 ? HealthState.NoData
+                        : bucketHours.Sum(hour => hour.MinuteCount) == 0 ? HealthState.NoData
                         : HealthState.Healthy;
 
                     return new HealthBucket(
@@ -67,32 +67,36 @@ public static class HealthBuckets
                         bucketEndUtc,
                         state,
                         overlapping.Count,
-                        minutes.Average(sample => sample.RouterPingMilliseconds),
-                        minutes.Average(sample => sample.InternetPingMilliseconds),
-                        minutes.Average(sample => sample.DnsMilliseconds)
+                        Average(bucketHours, hour => (hour.RouterPing, hour.RouterCount)),
+                        Average(bucketHours, hour => (hour.InternetPing, hour.InternetCount)),
+                        Average(bucketHours, hour => (hour.DnsPing, hour.DnsCount))
                     );
                 }
             ),
         ];
     }
 
+    public static double? Average(
+        IEnumerable<HourSummary> hours,
+        Func<HourSummary, (double? Average, int Count)> selector
+    )
+    {
+        // Each Hour Weighs As Much As Its Minutes
+        var parts = hours
+            .Select(selector)
+            .Where(part => part.Average is not null && part.Count > 0)
+            .ToList();
+        var count = parts.Sum(part => part.Count);
+        return count == 0 ? null : parts.Sum(part => part.Average!.Value * part.Count) / count;
+    }
+
     private static bool SelfTestPasses()
     {
         var startUtc = new DateTime(2026, 10, 7, 10, 0, 0, DateTimeKind.Utc);
-        List<MinuteSample> samples =
+        List<HourSummary> hours =
         [
-            new()
-            {
-                MinuteUtc = startUtc.AddMinutes(5),
-                Link = "Wi-Fi",
-                InternetPingMilliseconds = 8,
-            },
-            new()
-            {
-                MinuteUtc = startUtc.AddMinutes(70),
-                Link = "Wi-Fi",
-                InternetPingMilliseconds = 12,
-            },
+            new(startUtc, 60, 60, 60, 60, 2, 60, 8, 60, null, 0),
+            new(startUtc.AddHours(1), 20, 20, 20, 20, 3, 20, 12, 20, 5, 4),
         ];
         List<WifiEvent> incidents =
         [
@@ -118,22 +122,31 @@ public static class HealthBuckets
             },
         ];
 
-        List<DateTime> startsUtc =
+        List<DateTime> hourStartsUtc =
         [
             .. Enumerable.Range(0, 5).Select(hour => startUtc.AddHours(hour)),
         ];
-        var buckets = Build(
-            samples,
+        var hourly = Build(
+            hours,
             incidents,
-            startsUtc,
+            hourStartsUtc,
             startUtc.AddHours(5),
             startUtc.AddMinutes(200)
         );
-        return buckets[0].State == HealthState.Healthy
-            && buckets[0].InternetPing == 8
-            && buckets[1].State == HealthState.Warning
-            && buckets[2].State == HealthState.Critical
-            && buckets[3].State == HealthState.Critical
-            && buckets[4].State == HealthState.NoData;
+        var whole = Build(
+            hours,
+            incidents,
+            [startUtc],
+            startUtc.AddHours(5),
+            startUtc.AddMinutes(200)
+        );
+        return hourly[0].State == HealthState.Healthy
+            && hourly[0].InternetPing == 8
+            && hourly[1].State == HealthState.Warning
+            && hourly[2].State == HealthState.Critical
+            && hourly[3].State == HealthState.Critical
+            && hourly[4].State == HealthState.NoData
+            && whole[0].InternetPing == 9
+            && whole[0].DnsPing == 5;
     }
 }

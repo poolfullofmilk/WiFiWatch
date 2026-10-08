@@ -8,34 +8,47 @@
               AlignItems="AlignItems.Center"
               Wrap="Wrap.Wrap"
               Spacing="3">
-        @* Preset Buttons *@
-        <SegmentedButtonGroup TValue="int"
-                              Options="s_presetOptions"
-                              Value="_presetDays"
-                              ValueChanged="ApplyPresetAsync" />
         <MudElement HtmlTag="div"
                     Style="width:320px">
             @* Range Picker *@
-            <MudDateRangePicker DateRange="_range"
+            <MudDateRangePicker @ref="_rangePicker"
+                                DateRange="_range"
                                 DateRangeChanged="SelectRangeAsync"
                                 MaxDate="DateTime.Today"
                                 DateFormat="yyyy-MM-dd"
                                 Color="Color.Info"
                                 Variant="Variant.Outlined"
-                                Margin="Margin.Dense"
-                                AutoClose />
+                                Margin="Margin.Dense">
+                <PickerActions>
+                    @foreach (var (label, dayCount) in s_presets)
+                    {
+                        @* Preset Button *@
+                        <MudButton Variant="Variant.Filled"
+                                   Size="Size.Small"
+                                   OnClick="() => ApplyPresetAsync(dayCount)">
+                            @label
+                        </MudButton>
+                    }
+                    <MudSpacer />
+                    @* Cancel Button *@
+                    <MudButton Variant="Variant.Filled"
+                               Size="Size.Small"
+                               OnClick="() => _rangePicker!.CloseAsync(false)">
+                        Cancel
+                    </MudButton>
+                    @* OK Button *@
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Info"
+                               Size="Size.Small"
+                               OnClick="() => _rangePicker!.CloseAsync()">
+                        OK
+                    </MudButton>
+                </PickerActions>
+            </MudDateRangePicker>
         </MudElement>
         <MudSpacer />
         @* Export Menu *@
         <ExportMenu OnExport="ExportMinutesAsync" />
-        @* Report Button *@
-        <MudButton Variant="Variant.Filled"
-                   Size="Size.Small"
-                   StartIcon="@Icons.Material.Rounded.Description"
-                   Disabled="_isReporting"
-                   OnClick="SaveReportAsync">
-            Report
-        </MudButton>
     </MudStack>
 
     @* Summary Tiles *@
@@ -140,9 +153,55 @@
             </MudPaper>
         </MudItem>
 
+        @* Channel Panel *@
+        <MudItem xs="12">
+            <MudPaper Elevation="4"
+                      Class="pa-4 rounded-panel">
+                <MudStack Row
+                          AlignItems="AlignItems.Center"
+                          Wrap="Wrap.Wrap"
+                          Spacing="1"
+                          Class="mx-2 mb-3">
+                    <MudText Typo="Typo.subtitle1">
+                        <b>Wi-Fi Channel</b>
+                    </MudText>
+                    <MudSpacer />
+                    @* Eviction Chip *@
+                    <ActionChip Icon="@Icons.Material.Rounded.Radar"
+                                Text="@EvictionText"
+                                Color="@(_evictionCount > 0 ? Color.Warning : Color.Default)"
+                                Target="@(_evictionCount > 0 ? Monitor.Status.RouterAdminUrl : null)" />
+                    @if (_airtimePercent is { } airtimePercent)
+                    {
+                        <ActionChip Icon="@Icons.Material.Rounded.DataUsage"
+                                    Text="@($"Airtime Busy {airtimePercent:0}%")"
+                                    Color="@(airtimePercent >= BusyAirtimePercent ? Color.Warning : Color.Default)" />
+                    }
+                </MudStack>
+                @if (_isLoading)
+                {
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle"
+                                 Animation="Animation.Wave"
+                                 Height="80px"
+                                 Style="border-radius:10px" />
+                }
+                else
+                {
+                    <MudStack Spacing="3">
+                        <ChannelStrip Blocks="ChannelBlocks"
+                                      Neighbors="_neighbors"
+                                      CurrentChannel="Monitor.Status.Reading?.Channel" />
+                        <MudText Typo="Typo.body1"
+                                 Class="mx-2">
+                            @_channelAdvice
+                        </MudText>
+                    </MudStack>
+                }
+            </MudPaper>
+        </MudItem>
+
         @* Speed Tests *@
-        <MudItem xs="12"
-                 md="6">
+        <MudItem xs="12">
             <MudPaper Elevation="4"
                       Class="pa-4 rounded-panel mud-height-full">
                 <MudText Typo="Typo.subtitle1"
@@ -178,12 +237,12 @@
                                     <td>@Formatter.FormatWhen(test.TestedAtUtc)</td>
                                     <td>@($"{test.DownloadMbps:0} Mbps")</td>
                                     <td>@($"{test.UploadMbps:0} Mbps")</td>
-                                    <td>@LagUnderLoad(test)</td>
+                                    <td>@Formatter.FormatLagUnderLoad(test)</td>
                                     <td>
                                         <MudChip T="string"
                                                  Size="Size.Small"
                                                  Variant="Variant.Text"
-                                                 Color="@GradeColor(test.Grade)">
+                                                 Color="@GradeColors.For(test.Grade)">
                                             @test.Grade
                                         </MudChip>
                                     </td>
@@ -195,35 +254,7 @@
             </MudPaper>
         </MudItem>
 
-        @* Channel Panel *@
-        <MudItem xs="12"
-                 md="6">
-            <MudPaper Elevation="4"
-                      Class="pa-4 rounded-panel mud-height-full">
-                <MudText Typo="Typo.subtitle1"
-                         Class="mx-2 mb-3">
-                    <b>Wi-Fi Channel</b>
-                </MudText>
-                @if (_isLoading)
-                {
-                    <MudSkeleton SkeletonType="SkeletonType.Text"
-                                 Animation="Animation.Wave" />
-                }
-                else
-                {
-                    <MudStack Spacing="3"
-                              AlignItems="AlignItems.Start"
-                              Class="mx-2">
-                        <MudText Typo="Typo.body1">@_channelAdvice</MudText>
-                        @* Eviction Chip *@
-                        <ActionChip Icon="@Icons.Material.Rounded.Radar"
-                                    Text="@EvictionText"
-                                    Color="@(_evictionCount > 0 ? Color.Warning : Color.Default)"
-                                    Target="@(_evictionCount > 0 ? Monitor.Status.RouterAdminUrl : null)" />
-                    </MudStack>
-                }
-            </MudPaper>
-        </MudItem>
+
 
     </MudGrid>
 </MudStack>

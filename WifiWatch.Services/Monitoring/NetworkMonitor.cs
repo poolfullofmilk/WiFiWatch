@@ -34,12 +34,17 @@ public sealed class NetworkMonitor
 
     // Cadence And Limits
     private const int PingTimeoutMilliseconds = 1000;
+    private const int LinkCheckEverySeconds = 5;
     private const int WifiReadEverySeconds = 5;
     private const int WlanReadEverySeconds = 5;
     private const int DnsProbeEverySeconds = 15;
     private const int NeighborScanEverySeconds = 300;
     private const int WanDownAfterFailures = 5;
     private const int NightlySpeedTestHour = 3;
+
+    // Fixed Limits, 2% Means Two Lost Pings A Minute
+    private const int PacketLossPercent = 2;
+    private const int SlowDnsMilliseconds = 150;
     private const string FiveGigahertz = "5 GHz";
 
     private static readonly IPAddress s_internetAddress = IPAddress.Parse("1.1.1.1");
@@ -90,12 +95,14 @@ public sealed class NetworkMonitor
     private DateTime _speedTestEndedUtc = DateTime.MinValue;
     private bool _isSpeedTesting;
     private bool _isFailing;
+    private volatile bool _isLinkStale = true;
 
     public NetworkMonitor(UserSettings settings, bool isStartedAtSignIn)
     {
         Settings = settings;
         _isStartedAtSignIn = isStartedAtSignIn;
         _conditions = new(_journal);
+        NetworkChange.NetworkAddressChanged += (_, _) => _isLinkStale = true;
         _conditions.IncidentOpened += TraceIncidentAsync;
         _journal.Alerted += (title, message) => Alerted?.Invoke(title, message);
         _journal.EventRecorded += () => EventRecorded?.Invoke();
@@ -169,7 +176,14 @@ public sealed class NetworkMonitor
                 _journal.AlertLongWarnings();
 
                 var tick = tickCount++;
-                await TrackLinkAsync();
+
+                // Listing Adapters Is The Costliest Step, So Only On Change
+                if (_isLinkStale || tick % LinkCheckEverySeconds == 0)
+                {
+                    _isLinkStale = false;
+                    await TrackLinkAsync();
+                }
+
                 await Task.WhenAll(
                     PingAsync(),
                     tick % WifiReadEverySeconds == 0 ? ReadWifiAsync() : Task.CompletedTask,
@@ -257,8 +271,8 @@ public sealed class NetworkMonitor
             InternetPingMilliseconds = internetPing,
             InternetJitterMilliseconds = internetJitter,
             InternetLossPercent = internetLoss,
-            DnsMilliseconds = Average(_dnsTimes),
-            ReferenceDnsMilliseconds = Average(_referenceDnsTimes),
+            DnsMilliseconds = Median(_dnsTimes),
+            ReferenceDnsMilliseconds = Median(_referenceDnsTimes),
         };
         _minuteReadings.Clear();
         _routerRoundTrips.Clear();
@@ -308,38 +322,12 @@ public sealed class NetworkMonitor
                 minuteUtc
             ),
             new(
-                "SlowLink",
-                EventKind.SlowLink,
-                "Slow Link",
-                "Mbps",
-                isOnWifi ? sample.ReceiveRateMbps : null,
-                settings.SlowLinkMbps,
-                false,
-                false,
-                WifiScope,
-                context,
-                minuteUtc
-            ),
-            new(
                 "LocalPing",
                 EventKind.PingSpike,
                 $"Ping Spike On {localScope}",
                 "ms",
                 sample.RouterPingMilliseconds,
                 settings.RouterPingMilliseconds,
-                true,
-                false,
-                localScope,
-                context,
-                minuteUtc
-            ),
-            new(
-                "LocalJitter",
-                EventKind.JitterSpike,
-                $"Jitter On {localScope}",
-                "ms",
-                sample.RouterJitterMilliseconds,
-                settings.JitterMilliseconds,
                 true,
                 false,
                 localScope,
@@ -365,7 +353,7 @@ public sealed class NetworkMonitor
                 $"Packet Loss On {localScope}",
                 "%",
                 isOnline ? sample.RouterLossPercent : null,
-                settings.PacketLossPercent,
+                PacketLossPercent,
                 true,
                 true,
                 localScope,
@@ -378,11 +366,11 @@ public sealed class NetworkMonitor
                 "Packet Loss At Internet Provider",
                 "%",
                 isOnline
-                && sample.RouterLossPercent < settings.PacketLossPercent
+                && sample.RouterLossPercent < PacketLossPercent
                 && !_journal.IsOpen(WanDownKey)
                     ? sample.InternetLossPercent
                     : null,
-                settings.PacketLossPercent,
+                PacketLossPercent,
                 true,
                 true,
                 ProviderScope,
@@ -395,7 +383,7 @@ public sealed class NetworkMonitor
                 "Slow DNS",
                 "ms",
                 sample.DnsMilliseconds,
-                settings.SlowDnsMilliseconds,
+                SlowDnsMilliseconds,
                 true,
                 false,
                 DnsScope,
@@ -589,7 +577,9 @@ public sealed class NetworkMonitor
     #region Wi-Fi Methods
     private async Task ReadWifiAsync()
     {
-        var reading = await WifiReader.ReadAsync();
+        var reading = Settings.ReadWifiNatively
+            ? NativeWifiReader.Read()
+            : await WifiReader.ReadAsync();
         if (reading.IsBlocked && !_journal.IsOpen(LocationKey))
         {
             await _journal.OpenAsync(
@@ -829,8 +819,19 @@ public sealed class NetworkMonitor
             ? Task.FromResult<double?>(null)
             : DnsProbe.MeasureAsync(systemServer);
         var referenceTask = DnsProbe.MeasureAsync(DnsProbe.ReferenceServer);
-        _dnsTimes.Add(await systemTask);
-        _referenceDnsTimes.Add(await referenceTask);
+        var systemTime = await systemTask;
+        var referenceTime = await referenceTask;
+
+        // A Silent Resolver Counts As A Timeout While 1.1.1.1 Answers
+        _dnsTimes.Add(
+            systemTime
+                ?? (
+                    systemServer is not null && referenceTime is not null
+                        ? DnsProbe.TimeoutMilliseconds
+                        : null
+                )
+        );
+        _referenceDnsTimes.Add(referenceTime);
     }
 
     private async Task ScanNeighborsAsync()
@@ -922,7 +923,10 @@ public sealed class NetworkMonitor
         return latest;
     }
 
-    public async Task<SpeedTest?> RunSpeedTestAsync()
+    public async Task<SpeedTest?> RunSpeedTestAsync(
+        IProgress<SpeedTestProgress>? progress = null,
+        CancellationToken cancellationToken = default
+    )
     {
         if (_isSpeedTesting)
             return null;
@@ -931,11 +935,15 @@ public sealed class NetworkMonitor
         PublishStatus();
         try
         {
-            var result = await SpeedTester.RunAsync(_link ?? OfflineLink);
+            // Off The UI Thread, Or Every Read Queues On It
+            var result = await Task.Run(
+                () => SpeedTester.RunAsync(_link ?? OfflineLink, progress, cancellationToken),
+                cancellationToken
+            );
             await using (var context = new WifiDbContext())
             {
                 context.SpeedTests.Add(result);
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(CancellationToken.None);
             }
 
             var addedLatency =
@@ -947,6 +955,11 @@ public sealed class NetworkMonitor
                 $"Speed Test {result.DownloadMbps:0} Mbps Down, {result.UploadMbps:0} Mbps Up, Ping Under Load +{Math.Max(0, addedLatency):0} ms, Grade {result.Grade}"
             );
             return result;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            // A Cancelled Test Is Not A Failure
+            return null;
         }
         catch (Exception exception)
         {
@@ -992,6 +1005,13 @@ public sealed class NetworkMonitor
 
     private static double? Average(List<double?> values) =>
         values.Average() is { } average ? Math.Round(average, 1) : null;
+
+    private static double? Median(List<double?> values)
+    {
+        // One Lost Lookup Of Four Is Ignored, Two Count
+        var sorted = values.OfType<double>().Order().ToList();
+        return sorted.Count == 0 ? null : Math.Round(sorted[sorted.Count / 2], 1);
+    }
 
     private static DateTime TruncateToMinute(DateTime value) =>
         new(value.Ticks - (value.Ticks % TimeSpan.TicksPerMinute), DateTimeKind.Utc);

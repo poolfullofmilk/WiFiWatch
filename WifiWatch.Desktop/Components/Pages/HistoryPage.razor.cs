@@ -20,29 +20,26 @@ public partial class HistoryPage
     // Ranges And Chart Shape
     private const int HourlyDayLimit = 3;
     private const int MaximumTicks = 12;
+    private const int BusyAirtimePercent = 50;
 
-    private static readonly List<SegmentedButtonOption<int>> s_presetOptions =
+    private static readonly (string Label, int DayCount)[] s_presets =
     [
-        new(1, "Today"),
-        new(7, "7 Days"),
-        new(30, "30 Days"),
+        ("Today", 1),
+        ("7 Days", 7),
+        ("30 Days", 30),
     ];
 
     [Inject]
     public required NetworkMonitor Monitor { get; set; }
-
-    [Inject]
-    public required ISnackbar Snackbar { get; set; }
 
     // Chart Options
     private readonly ApexChartOptions<ChartPoint> _pingOptions = BuildPingOptions();
 
     // Range State
     private DateRange _range = new(DateTime.Today, DateTime.Today);
-    private int _presetDays = 1;
+    private MudDateRangePicker? _rangePicker;
     private bool _isDaily;
     private bool _isLoading = true;
-    private bool _isReporting;
     private int _renderKey;
 
     // Range Data
@@ -56,6 +53,13 @@ public partial class HistoryPage
     // Channel State
     private string _channelAdvice = string.Empty;
     private int _evictionCount;
+    private double? _airtimePercent;
+    private List<NeighborReading> _neighbors = [];
+
+    private List<ChannelBlock> ChannelBlocks =>
+        Monitor.Status.Reading?.Channel < 36
+            ? [new(1, 13)]
+            : [.. ChannelAdvice.Blocks, new(132, 140)];
 
     private string EvictionText =>
         _evictionCount == 1 ? "1 Radar Eviction" : $"{_evictionCount} Radar Evictions";
@@ -111,9 +115,9 @@ public partial class HistoryPage
     #region Range Methods
     private async Task ApplyPresetAsync(int dayCount)
     {
-        _presetDays = dayCount;
-        _range = new(DateTime.Today.AddDays(1 - dayCount), DateTime.Today);
-        await LoadAsync();
+        // Presets Apply At Once, Picked Days Wait For OK
+        await _rangePicker!.CloseAsync(false);
+        await SelectRangeAsync(new(DateTime.Today.AddDays(1 - dayCount), DateTime.Today));
     }
 
     private async Task SelectRangeAsync(DateRange? range)
@@ -121,14 +125,6 @@ public partial class HistoryPage
         _range = range is { Start: not null, End: not null }
             ? range
             : new(DateTime.Today, DateTime.Today);
-
-        // A Range Ending Today Still Matches Its Preset
-        var dayCount = (_range.End!.Value.Date - _range.Start!.Value.Date).Days + 1;
-        _presetDays =
-            _range.End.Value.Date == DateTime.Today
-            && s_presetOptions.Any(option => option.Value == dayCount)
-                ? dayCount
-                : 0;
         await LoadAsync();
     }
     #endregion
@@ -153,10 +149,7 @@ public partial class HistoryPage
         _pingOptions.Xaxis.TickAmount = Math.Min(bucketCount, MaximumTicks);
 
         await using var context = new WifiDbContext();
-        var samples = await context
-            .MinuteSamples.AsNoTracking()
-            .Where(sample => sample.MinuteUtc >= startUtc && sample.MinuteUtc < endUtc)
-            .ToListAsync();
+        var hours = await SummaryWriter.LoadHoursAsync(context, startUtc, endUtc);
         var incidents = await context
             .Events.AsNoTracking()
             .Where(wifiEvent =>
@@ -171,7 +164,7 @@ public partial class HistoryPage
             .ToListAsync();
 
         // Every Bucket Shows, Empty Ones Included
-        _buckets = HealthBuckets.Build(samples, incidents, startsUtc, endUtc, DateTime.UtcNow);
+        _buckets = HealthBuckets.Build(hours, incidents, startsUtc, endUtc, DateTime.UtcNow);
         List<ChartPoint> Series(Func<HealthBucket, double?> selector) =>
             [
                 .. _buckets.Select(bucket => new ChartPoint(
@@ -185,23 +178,47 @@ public partial class HistoryPage
 
         _evictionCount = incidents.Count(incident => incident.Kind == EventKind.DfsEviction);
 
-        // Neighbors Over The Same Range, Our Own Network Left Out
-        var neighbors = await context
+        // Distinct Rows In SQL, Strongest Reading Per Network Here
+        var scanned = await context
             .NeighborSamples.AsNoTracking()
-            .Where(sample => sample.ScanUtc >= startUtc && sample.ScanUtc < endUtc && !sample.IsOwn)
+            .Where(sample => sample.ScanUtc >= startUtc && sample.ScanUtc < endUtc)
             .Select(sample => new
             {
+                sample.IsOwn,
+                sample.Ssid,
                 sample.Bssid,
                 sample.Channel,
                 sample.SignalPercent,
             })
+            .Distinct()
             .ToListAsync();
+        _neighbors =
+        [
+            .. scanned
+                .Where(row => !row.IsOwn)
+                .GroupBy(row => (row.Ssid, row.Bssid, row.Channel))
+                .Select(network => new NeighborReading(
+                    network.Key.Ssid,
+                    network.Key.Bssid,
+                    network.Key.Channel,
+                    network.Max(row => row.SignalPercent),
+                    null
+                )),
+        ];
+        _airtimePercent = await context
+            .NeighborSamples.Where(sample =>
+                sample.ScanUtc >= startUtc
+                && sample.ScanUtc < endUtc
+                && sample.IsOwn
+                && sample.ChannelUtilizationPercent != null
+            )
+            .AverageAsync(sample => (double?)sample.ChannelUtilizationPercent);
         var neighborsPerBlock = ChannelAdvice.CountNeighbors(
-            neighbors.Select(neighbor => (neighbor.Bssid, neighbor.Channel, neighbor.SignalPercent))
+            _neighbors.Select(neighbor =>
+                (neighbor.Bssid, neighbor.Channel, neighbor.SignalPercent)
+            )
         );
-        var hasScans = await context.NeighborSamples.AnyAsync(sample =>
-            sample.ScanUtc >= startUtc && sample.ScanUtc < endUtc
-        );
+        var hasScans = scanned.Count > 0;
 
         // Without Scans Every Block Looks Empty, So Advise Nothing
         _channelAdvice = hasScans
@@ -211,7 +228,7 @@ public partial class HistoryPage
                 _evictionCount
             )
             : "No Wi-Fi Scans In This Range";
-        _summary = await SummaryWriter.SummarizeAsync(startUtc, endUtc);
+        _summary = await SummaryWriter.SummarizeAsync(context, hours, startUtc, endUtc);
 
         // A New Key Rebuilds The Chart With The New Range
         _renderKey++;
@@ -220,24 +237,6 @@ public partial class HistoryPage
     #endregion
 
     #region Action Methods
-    private async Task SaveReportAsync()
-    {
-        _isReporting = true;
-        try
-        {
-            await ReportWriter.SaveAsync(_range.Start!.Value, _range.End!.Value);
-            Snackbar.Add("Report Saved To Documents", Severity.Success);
-        }
-        catch (Exception exception)
-        {
-            Snackbar.Add($"Report Failed {exception.GetType().Name}", Severity.Warning);
-        }
-        finally
-        {
-            _isReporting = false;
-        }
-    }
-
     private static async Task ExportMinutesAsync(DateTime? day)
     {
         var (startUtc, endUtc) = CsvExport.DayRangeUtc(day);
@@ -298,28 +297,6 @@ public partial class HistoryPage
     }
     #endregion
 
-    #region Format Methods
-    private static string LagUnderLoad(SpeedTest test)
-    {
-        // The Worse Direction Shows How Much A Busy Line Lags
-        var loadedPing = Math.Max(
-            test.DownloadPingMilliseconds ?? 0,
-            test.UploadPingMilliseconds ?? 0
-        );
-        return test.IdlePingMilliseconds is { } idlePing
-            ? $"+{Math.Max(0, loadedPing - idlePing):0} ms"
-            : "-";
-    }
-
-    private static Color GradeColor(string grade) =>
-        grade switch
-        {
-            "A+" or "A" => Color.Success,
-            "B" or "C" => Color.Warning,
-            _ => Color.Error,
-        };
-    #endregion
-
     #region Option Methods
     private static ApexChartOptions<ChartPoint> BuildPingOptions()
     {
@@ -330,7 +307,7 @@ public partial class HistoryPage
         [
             ChartTheme.LightGreyColor,
             ChartTheme.AccentColor,
-            ChartTheme.DarkGreyColor,
+            ChartTheme.VioletColor,
         ];
         options.Stroke = new Stroke
         {

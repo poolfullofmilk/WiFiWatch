@@ -22,8 +22,8 @@ The global `~/.claude/CLAUDE.md` holds every shared convention (git, releases, c
 |---|---|
 | `WifiDbContext.cs` | `%AppData%\WifiWatch\WifiWatch.db`, `DataDirectory`, the `DbSet`s, enums stored as strings |
 | `Models/` | `WifiEvent`, `MinuteSample`, `NeighborSample`, `SpeedTest` (the tables) |
-| `ViewModels/` | Records that are never tables: `MonitorStatus`, `WifiReading`, `NeighborReading`, `AdapterInfo`, `EventDetails` (JSON in `WifiEvent.Details`), `TraceHop`, `PeriodSummary`, `WlanNotice`, `ChartPoint`, `HealthBucket`, `ChannelBlock` |
-| `Enums/` | `EventKind`, `EventSeverity`, `HealthState` |
+| `ViewModels/` | Records that are never tables: `MonitorStatus`, `WifiReading`, `NeighborReading`, `AdapterInfo`, `EventDetails` (JSON in `WifiEvent.Details`), `TraceHop`, `PeriodSummary`, `WlanNotice`, `ChartPoint`, `HealthBucket`, `HourSummary`, `ChannelBlock`, `SpeedTestProgress` |
+| `Enums/` | `EventKind`, `EventSeverity`, `HealthState`, `SpeedTestPhase` |
 | `Helpers/` | `AppInfo` (display name, version), `WifiChannels` (DFS and weather radar ranges, timers), `Formatter` (durations, local times, numbers with units), `EventKindExtensions.ToLabel`, `QueryableExtensions.OrderByColumn`, `HealthBuckets` (worst state per hour or day, self-test), `Problems.IsProblem` |
 | `Migrations/` | `Initial`, `AddNeighborSamples`, `AddIncidentsSpeedTestsAndDns` |
 
@@ -35,20 +35,21 @@ The global `~/.claude/CLAUDE.md` holds every shared convention (git, releases, c
 | `Monitoring/EventJournal.cs` | Writes events, keeps open incidents by key, decides notifications, the quiet window |
 | `Monitoring/ConditionTracker.cs` | Per-minute threshold incidents with persistence and a baseline, self-test |
 | `Monitoring/WifiReader.cs` | `netsh wlan show interfaces` and `show networks mode=bssid` parsers, self-test |
+| `Monitoring/NativeWifiReader.cs` | The same current connection through `wlanapi` (`WlanQueryInterface`), used when Read Wi-Fi Natively is on |
 | `Monitoring/WlanEventReader.cs` | WLAN AutoConfig Operational log, the reason behind disconnects and failed connects |
 | `Monitoring/FaultTracer.cs` | MTR-style trace (30 hops, 3 probes) that names where a path stops |
 | `Monitoring/DnsProbe.cs` | Raw UDP DNS query timing against the system resolver and 1.1.1.1, self-test |
-| `Monitoring/SpeedTester.cs` | Cloudflare download and upload with ping under load, bufferbloat grade |
+| `Monitoring/SpeedTester.cs` | Cloudflare download and upload over parallel streams with live progress, ping under load, bufferbloat grade |
 | `Monitoring/AdapterInspector.cs` | Wi-Fi adapter, driver version and date, power saving, roaming |
 | `Monitoring/ChannelAdvice.cs` | EU 80 MHz blocks, neighbors per block, the advice line, self-test |
-| `Monitoring/SummaryWriter.cs` | Daily and weekly summaries, `PeriodSummary` for a range |
+| `Monitoring/SummaryWriter.cs` | The daily summary, `PeriodSummary` for a range, `LoadHoursAsync` (minutes rolled up per hour in SQL) |
 | `Monitoring/ConsoleCommand.cs` | Runs `netsh`, `powercfg`, `powershell` and returns stdout |
 | `Integration/QuickActions.cs` | Every clickable fix: Windows settings pages, Device Manager, the release page, the router admin |
 | `Integration/RouterAdmin.cs` | Finds the router's admin page by probing 8443, 443 and 80 on the gateway |
 | `Integration/UpdateChecker.cs`, `Updater.cs` | GitHub latest release check, download, swap and clean up |
 | `Integration/StartupRegistration.cs` | The `Run` value and the Start menu shortcut, Release only |
 | `Storage/UserSettings.cs` | Settings record, JSON in `%AppData%\WifiWatch\settings.json` |
-| `Storage/CsvExport.cs`, `ReportWriter.cs` | CSV exports and the HTML connection report |
+| `Storage/CsvExport.cs` | CSV exports of minutes and events |
 
 ### WifiWatch.Desktop
 
@@ -57,11 +58,11 @@ The global `~/.claude/CLAUDE.md` holds every shared convention (git, releases, c
 | `App.xaml.cs` | Finishes a previous update, single instance, migrations, settings, DI, starts the monitor |
 | `MainWindow.xaml(.cs)` | `BlazorWebView`, tray icon, balloon notifications, minimise to tray, `CloseRequested`, `Exit` |
 | `Interop/` | `TrayMenu` (native dark Win32 menu), `WindowCaptionTheme` (dark title bar) |
-| `Theming/` | `AppTheme`, `ChartTheme` (LetsWatch, plus palette hex values for charts), `EventKindColors` (colour and icon per kind and severity) |
+| `Theming/` | `AppTheme`, `ChartTheme` (LetsWatch, plus palette hex values for charts), `EventKindColors` (colour and icon per kind and severity), `GradeColors` (speed test grade) |
 | `Components/Home.razor(.cs)` | Providers, close dialog, app bar with the page buttons, the page switch, update popup |
 | `Components/Pages/` | `OverviewPage`, `IncidentsPage`, `HistoryPage`, `SettingsPage` |
-| `Components/Shared/Common/` | `ActionChip`, `ExportMenu`, `Header`, `HealthStrip`, `NowPanel`, `SegmentedButtonGroup`, `SettingSwitch`, `Tooltip` |
-| `Components/Shared/Dialogs/` | `IncidentDialog`, `UpdateDialog` |
+| `Components/Shared/Common/` | `ActionChip`, `ChannelStrip`, `ExportMenu`, `Header`, `HealthStrip`, `NowPanel`, `SegmentedButtonGroup`, `SettingSwitch`, `Tooltip` |
+| `Components/Shared/Dialogs/` | `IncidentDialog`, `SpeedTestDialog`, `UpdateDialog` |
 | `Components/Shared/Tables/` | `DataTable`, `SearchTextField` |
 | `wwwroot/` | `index.html`, `CSS/WifiWatch.css`, Nunito with `OFL.txt` |
 
@@ -75,7 +76,7 @@ dotnet build WifiWatch.slnx
 dotnet publish WifiWatch.Desktop -c Release
 ```
 
-Publish writes one file, `WifiWatch.Desktop\bin\Release\net10.0-windows10.0.17763.0\win-x64\publish\WifiWatch_v1.2.exe`, about 80 MB. `<Version>` lives in `WifiWatch.Desktop.csproj` only.
+Publish writes one file, `WifiWatch.Desktop\bin\Release\net10.0-windows10.0.17763.0\win-x64\publish\WifiWatch_v1.3.exe`, about 80 MB. `<Version>` lives in `WifiWatch.Desktop.csproj` only.
 
 Installing is copying that exe to `%LocalAppData%\Programs\WifiWatch` and running it once. Every Release launch rewrites the `Run` value (with `--tray`) and `Start Menu\Programs\01 Apps\Wifi Watch.lnk` to point at itself. A release on GitHub carries exactly one asset named `WifiWatch_v<version>.exe` under the tag `v<version>`, because the updater builds that URL.
 
@@ -92,7 +93,7 @@ dotnet ef migrations add Name --project WifiWatch.Data --startup-project WifiWat
 
 ## Data
 
-Everything lives in `%AppData%\WifiWatch`: `WifiWatch.db`, `settings.json` and the `WebView2` profile. Exports go to `Documents\WifiWatch\Exports`, reports to `Documents\WifiWatch\Reports`. **Nothing is ever deleted**: no retention, no delete buttons, migrations only add. A minute row is about 120 bytes, roughly 60 MB a year.
+Everything lives in `%AppData%\WifiWatch`: `WifiWatch.db`, `settings.json` and the `WebView2` profile. Exports go to `Documents\WifiWatch\Exports`. **Nothing is ever deleted**: no retention, no delete buttons, migrations only add. A minute row is about 120 bytes, roughly 60 MB a year.
 
 Times are stored as UTC and shown local. EF reads them back as `Unspecified`, and `ToLocalTime` treats that as UTC, which is what we want.
 
@@ -105,31 +106,33 @@ Times are stored as UTC and shown local. EF reads them back as `Unspecified`, an
 
 ## The Monitor
 
-One `PeriodicTimer` at 1 s in `NetworkMonitor.RunAsync`. Each tick detects the link and gateway (Ethernet before Wi-Fi) and pings the gateway and `1.1.1.1` in parallel. Every 5th tick reads Wi-Fi through `netsh` and the WLAN event log, every 15th times DNS, every 300th scans neighbors. At each minute boundary the readings fold into one `MinuteSample` and the per-minute checks run on it. A tick gap over 30 s logs `Resumed` and restarts the quiet window. A failure inside a tick logs one `MonitorFailed` per streak and the loop carries on.
+One `PeriodicTimer` at 1 s in `NetworkMonitor.RunAsync`. Each tick pings the gateway and `1.1.1.1` in parallel. The link and gateway (Ethernet before Wi-Fi) are re-read when `NetworkChange.NetworkAddressChanged` fires and every 5th tick, because listing adapters was three quarters of the app's CPU. Every 5th tick reads Wi-Fi through `netsh` and the WLAN event log, every 15th times DNS, every 300th scans neighbors. At each minute boundary the readings fold into one `MinuteSample` and the per-minute checks run on it. A tick gap over 30 s logs `Resumed` and restarts the quiet window. A failure inside a tick logs one `MonitorFailed` per streak and the loop carries on.
 
 ### Incidents, Not Loose Rows
 
 `EventJournal` keeps open incidents in a dictionary by key. `OpenAsync` writes the row with no end, `UpdateAsync` changes the message or raises the severity, `CloseAsync` sets the end and a closing message ("Jitter On Wi-Fi For 12m, Peak 48 ms, Average 31 ms"). Instants (`RecordAsync`) end where they start. On start `CloseLeftoversAsync` ends anything still open at the last minute of data with ", Cut Short When Monitoring Stopped". There is no `Recovered` kind any more for new data; old rows keep theirs.
 
-**Notifications.** Critical toasts at once. A warning toasts only if it is still open after 5 minutes (`AlertLongWarnings`), once. Info never toasts, unless forced (`isAlwaysAlerted`: the driver check, and the summaries when Daily Summary Notification is on). Nothing toasts in the 60 s quiet window after start or resume, because sign in and wake flap the link; forced alerts and `LocationBlocked` ignore the window.
+**Notifications.** Critical toasts at once. A warning toasts only if it is still open after 5 minutes (`AlertLongWarnings`), once. Info never toasts, unless forced (`isAlwaysAlerted`: the driver check, and the daily summary when Daily Summary Notification is on and the day had a problem or an outage; a fine day is logged quietly). The tray icon carries a dot, amber or red, while a problem is open, and its hover text names it. Nothing toasts in the 60 s quiet window after start or resume, because sign in and wake flap the link; forced alerts and `LocationBlocked` ignore the window.
 
-**What counts as a problem.** `Problems.IsProblem`: Critical, or a Warning that lasted, or is still open, at least `Problems.WarningMinutes` (5), the same wait a warning toast has. Overview, the Problems view of Incidents, History, the health strip, the summaries and the report all use it, so a warning too short to notify never counts. Old v1.0 rows are Warning instants and so never count; Everything still shows them.
+**What counts as a problem.** `Problems.IsProblem`: Critical, or a Warning that lasted, or is still open, at least `Problems.WarningMinutes` (5), the same wait a warning toast has. Overview, the Problems view of Incidents, History, the health strip and the summaries all use it, so a warning too short to notify never counts. Old v1.0 rows are Warning instants and so never count; Everything still shows them.
 
 **Per-minute checks** go through `ConditionTracker`. A check opens an incident after 2 bad minutes in a row (or 1 severe minute) and closes after 2 good ones, so a lone bad minute is Wi-Fi being Wi-Fi. For higher-is-worse values the limit is the larger of the setting and a baseline: median plus 3 × 1.4826 × MAD over the last 60 good minutes, used once 10 minutes are in. Severe (Critical) is 3× the setting, or 10% loss.
 
 | Check | Value | Scope |
 |---|---|---|
-| Weak signal, slow link | Signal and receive rate, Wi-Fi only | Wi-Fi |
-| Ping spike, jitter, packet loss to the router | Router ping, jitter, loss | Wi-Fi, or Home Network on Ethernet |
+| Weak signal | Signal, Wi-Fi only, never Critical | Wi-Fi |
+| Ping spike, packet loss to the router | Router ping, loss | Wi-Fi, or Home Network on Ethernet |
 | Ping spike at the provider | Internet ping, only while the router ping is fine | Internet Provider |
-| Packet loss at the provider | Internet loss, only while the router loses less than the setting and the internet is not down | Internet Provider |
+| Packet loss at the provider | Internet loss, only while the router loses less than 2% and the internet is not down | Internet Provider |
 | Slow DNS | System resolver time, with the 1.1.1.1 time in the context | DNS |
+
+Only three limits are settings: Weak Signal (-70 dBm), Router Ping (20 ms) and Internet Ping (60 ms). Packet loss (2%, two lost pings of 60) and slow DNS (150 ms) are constants in `NetworkMonitor`. Slow Link and Router Jitter checks were removed: link rate is a cause rather than something people feel and misfired on every 2.4 GHz or 40 MHz link, and jitter only rose with router ping and opened a second incident for the same minutes. Old `SlowLink` and `JitterSpike` rows keep their kinds.
 
 Speed test minutes and the minute after are skipped, because a speed test loads the line on purpose. Minutes closing inside the quiet window are skipped too, and DNS is not probed then: the first minute is partial and its first DNS query is cold (hundreds of milliseconds), which used to open a Critical Slow DNS incident on every start.
 
 **Instant incidents** in `NetworkMonitor`: internet down (5 failed internet pings while the router answers, Critical, always traced), Wi-Fi disconnect, wired offline, failed connects, location blocked. Each takes the Windows reason from the WLAN log when one arrives within 2 minutes (event 8003 disconnected, 8002 connect failed; property 6 is the reason).
 
-**Where the problem is.** Every incident carries a scope, and incidents get a trace (`FaultTracer`, at most one per 5 minutes, internet down always). The trace summary says the path is clear, stops at the router (the line to the provider is down), or stops after hop N inside the provider network. Hops go into `EventDetails.Trace`, shown in `IncidentDialog` and the report.
+**Where the problem is.** Every incident carries a scope, and incidents get a trace (`FaultTracer`, at most one per 5 minutes, internet down always). The trace summary says the path is clear, stops at the router (the line to the provider is down), or stops after hop N inside the provider network. Hops go into `EventDetails.Trace`, shown in `IncidentDialog`.
 
 ### DFS
 
@@ -140,14 +143,14 @@ Speed test minutes and the minute after are skipped, because a speed test loads 
 
 ### Daily Jobs
 
-After 60 ticks on each new day: write any missing daily summary (yesterday, "yyyy-MM-dd dddd: 99.8% Online, 3 Incidents...") and weekly summary ("Week Of yyyy-MM-dd"), deduplicated by message prefix; inspect the adapter (an old driver, over 18 months, logs one `DriverCheck` per driver version); check for updates. With Nightly Speed Test on, a speed test runs at 03:00.
+After 60 ticks on each new day: write yesterday's summary if missing ("yyyy-MM-dd dddd: 99.8% Online, 3 Problems..."), deduplicated by message prefix; the weekly summary is gone, old rows keep their kind; inspect the adapter (an old driver, over 18 months, logs one `DriverCheck` per driver version); check for updates. With Nightly Speed Test on, a speed test runs at 03:00.
 
 ## Measurements
 
-- **netsh lines end in `\r\n`**, so a value pattern is `.*` plus `Trim`. Labels are English, so a non-English Windows breaks parsing; the fix would be the Native Wifi API. Link rates can be decimals (`286.8`).
+- **netsh lines end in `\r\n`**, so a value pattern is `.*` plus `Trim`. Labels are English, so a non-English Windows breaks parsing; Read Wi-Fi Natively avoids it. The native read was checked on this PC: identical values, about 8 ms instead of 65 ms, no process started, and no location in use record. It stays off by default, `netsh` is the proven path. The neighbor scan always uses `netsh`. Link rates can be decimals (`286.8`).
 - **Location services must be on.** Windows 11 hides Wi-Fi details from `netsh` without it. `netsh.exe` does the WLAN call, so only Location services and "Let desktop apps access your location" matter.
-- **DNS timing** sends a raw UDP A query for `www.google.com`, which every resolver has cached, so it measures the resolver and not the web.
-- **Speed test** downloads from `speed.cloudflare.com/__down` and uploads to `/__up` for 8 s each, pinging 1.1.1.1 every 250 ms. Grade from the added latency under load: under 5 ms A+, 30 A, 60 B, 200 C, 400 D, else F.
+- **DNS timing** sends a raw UDP A query for `www.google.com`, which every resolver has cached, so it measures the resolver and not the web. A system lookup that times out counts as the full 2 s while 1.1.1.1 still answers, and the minute keeps the median of its 4 lookups, so one lost query is ignored and a resolver that stops answering opens a Critical Slow DNS.
+- **Speed test** runs off the UI thread with 4 parallel streams for 8 s each way: 50 MB downloads from `speed.cloudflare.com/__down` (100 MB needs a token, 8 streams get HTTP 429) and 25 MB uploads to `/__up` counted per 1 MB as they are written. The live number is the last second; the result is the 90th percentile of those one second readings after the first 2 s, as Cloudflare's own test reports. Cloudflare stays the server: measured on this line it beat fast.com's Netflix nodes (628 against 507 to 563 Mbps), and fast.com's API is undocumented and its terms forbid automated use. One failed stream ends the test. Pings 1.1.1.1 every 250 ms throughout, about 850 MB per test. `SpeedTestDialog` shows it live through `IProgress<SpeedTestProgress>`. Grade from the added latency under load: under 5 ms A+, 30 A, 60 B, 200 C, 400 D, else F.
 - **Adapter**: the first Wireless80211 interface that is not a virtual adapter, preferring one that is up (the Wi-Fi Direct virtual adapters come first otherwise). Driver date comes from the network class registry key as `M-d-yyyy`; power saving from `powercfg` on the current scheme; roaming from `Get-NetAdapterAdvancedProperty` with `-ErrorAction SilentlyContinue`, because PowerShell 5.1 prints errors to stdout here.
 - **Router admin** is found by probing `https://gateway:8443`, `https://gateway`, `http://gateway` with a 400 ms timeout, so no router brand is assumed.
 
@@ -172,12 +175,13 @@ Update Now: `Updater.DownloadAsync` saves `WifiWatch_v<new>.exe` beside the runn
 The look follows LetsWatch: navigation in the app bar, section titles above panels, cards that darken on hover. Every page answers one question.
 
 - **App bar**: the name, then four labelled page buttons (Overview, Incidents, History, Settings), the open one filled blue. A dot on Overview, amber or red, while a problem is still open. `Home` swaps pages with a plain `switch`, so every page loads fresh when opened and owns its own event subscriptions.
-- **Overview** (is it fine now, and what went wrong lately): `NowPanel` with the verdict (the worst open problem from `EventJournal.OpenProblemsAsync`, else Offline, else All Good), its fix button, the router button, Speed Test, and live Signal, Wi-Fi Speed, Router and Internet. Values stay plain and turn amber or red only past a setting. Then the last 24 hours as a `HealthStrip`, and the six newest problems as cards that open `IncidentDialog`.
-- **Incidents** (what happened): one `DataTable` of When, What, Where, Length and Details. Problems (by `Problems.IsProblem`) by default, Everything on the segmented toggle. Reloads on every recorded event. A row opens `IncidentDialog`: time range, message, where in plain words, Windows reason, context, trace hops, and one fix button from `QuickActions.ForEvent`.
-- **History** (how was it over a period): Today, 7 Days and 30 Days as a `SegmentedButtonGroup` beside a `MudDateRangePicker` for any range; the minutes CSV export and Report on the right. Four tiles from `SummaryWriter.SummarizeAsync` (Online, Problems, Longest Outage, Fastest Download), the `HealthStrip` per hour up to 3 days and per day beyond, one ping chart (Router grey, Internet blue, DNS dashed), the speed tests in range, and the channel advice with its radar eviction count.
+- **Overview** (is it fine now, and what went wrong lately): `NowPanel` with the verdict (the worst open problem from `EventJournal.OpenProblemsAsync`, else Offline, else All Good), a What To Do line from `QuickActions.AdviceFor`, its fix button, the router button, Speed Test, and live Signal, Wi-Fi Speed, Router and Internet. Values stay plain and turn amber or red only past a setting. Then the last 24 hours as a `HealthStrip`, and the six newest problems as cards that open `IncidentDialog`.
+- **Incidents** (what happened): one `DataTable` of When, What, Where, Length and Details. Problems (by `Problems.IsProblem`) by default, Everything on the segmented toggle. Reloads on every recorded event. A row opens `IncidentDialog`: time range, message, What To Do, where in plain words, Windows reason, context, trace hops, and one fix button from `QuickActions.ForEvent`.
+- **History** (how was it over a period): a `MudDateRangePicker` with Today, 7 Days and 30 Days on the left of its action bar (they apply at once) and Cancel and OK on the right, so picking days loads nothing until OK; the minutes CSV export on the right. Four tiles from `SummaryWriter.SummarizeAsync` (Online, Problems, Longest Outage, Fastest Download), the `HealthStrip` per hour up to 3 days and per day beyond, one ping chart (Router grey, Internet blue, DNS dashed violet), the Wi-Fi Channel panel, and the speed tests in range. The channel panel is a `ChannelStrip`: one cell per EU channel grouped by 80 MHz block (36 to 140, or 1 to 13 when on 2.4 GHz), yours blue, a block neighbour at 30% or more amber (it shares your airtime), audible ones elsewhere grey, the network count in each cell and names with dBm in the tooltip, from one DISTINCT query (the strongest reading per network and channel is taken in memory) plus an average for airtime. Radar evictions, airtime busy from your access point's BSS Load, and the advice line sit with it.
 - **`HealthStrip`** is one cell per bucket from `HealthBuckets.Build`: red for any Critical problem touching it, amber for a Warning, green when watched and fine, an outlined empty cell when the app was not running. Open problems run until now.
-- **Settings** is four sections: General switches, Problem Limits, Wi-Fi Adapter chips, About with version and updates.
+- **Settings** is four sections: General switches, Problem Limits (three fields, each with a helper line), Wi-Fi Adapter chips, About with version and updates.
 - **Raw minutes** have no page; the History export holds every column.
+- **Loading stays flat as data grows.** Overview and History never load minute rows: `SummaryWriter.LoadHoursAsync` groups them per UTC hour in SQL once per load, and the strip, the ping chart and the summary tiles all fold those hours (weighted by minute count). Measured on a synthetic year: Overview 10 ms, Today 16 ms, 7 Days 110 ms, 30 Days about 0.1 s, a whole year about 1.5 s. Incidents pages on the server. Grouping by UTC hour is exact for whole hour time zones only.
 - **Charts** take `@key="_renderKey"`, bumped on every load, because `ApexChart` does not redraw when only its items change. Hex values come from `ChartTheme`, which reads them from the `AppTheme` palette.
 - **No Bootstrap**, MudBlazor utilities only (`mb-6` is the 24 px gap). `DataTable` catches the `OperationCanceledException` a superseded `ServerData` call throws and returns the last good page.
 
@@ -186,7 +190,9 @@ The look follows LetsWatch: navigation in the app bar, section titles above pane
 - The internet target is `1.1.1.1`, chosen as a neutral anycast address; v1.0 used another one, so old minutes are not exactly comparable.
 - `ProviderPing` is skipped while the router ping is bad, and `ProviderLoss` while the router loses packets or the internet is down: the problem is then local, and counting it twice would blame the provider.
 - Old `PingSpike` rows mentioning jitter were moved to `JitterSpike` by the migration, and old rows are instants with a severity from `IsAlert`.
-- `ConditionTracker` uses `Math.Max(setting, baseline)`: the baseline only raises the bar on a naturally noisy link, never lowers it below the user's setting.
+- `ConditionTracker` uses `Math.Max(setting, baseline)`: the baseline only raises the bar on a naturally noisy link, never lowers it below the user's setting. It cannot rescue a limit set below someone's normal, which is why the defaults sit above common connections (Starlink and 4G run 40 to 50 ms to 1.1.1.1).
+- A saved `settings.json` keeps its old limits; defaults only fill keys that are missing, and removed keys are ignored.
+- Background cost was measured: about 0.5% of one core hidden in the tray, no measurable effect on router latency from the `netsh` reads, and the 5 minute neighbor read only returns Windows' cached list (never `WlanScan`, which takes the radio off channel). The 5 s `netsh wlan show interfaces` spawn is the biggest remaining cost; the native `WlanQueryInterface` would remove it and the English only limit, but may show the location in use icon.
 - `EventJournal.HasMessageStartingWithAsync`, `OpenProblemsAsync` and `CloseLeftoversAsync` are static; they only touch the database. Severity is stored as text, so `OpenProblemsAsync` ranks it in memory.
 
 ## Verifying

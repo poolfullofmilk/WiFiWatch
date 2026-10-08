@@ -16,7 +16,10 @@ public partial class NowPanel : IDisposable
     public required NetworkMonitor Monitor { get; set; }
 
     [Inject]
-    public required ISnackbar Snackbar { get; set; }
+    public required IDialogService DialogService { get; set; }
+
+    [Inject]
+    public required MainWindow Window { get; set; }
 
     [Parameter]
     public List<WifiEvent> Problems { get; set; } = [];
@@ -27,7 +30,15 @@ public partial class NowPanel : IDisposable
 
     protected override void OnInitialized() => Monitor.StatusChanged += OnStatusChanged;
 
-    private void OnStatusChanged() => InvokeAsync(StateHasChanged);
+    private void OnStatusChanged() =>
+        InvokeAsync(() =>
+        {
+            // Nobody Sees A Hidden Window, So It Skips The Redraw
+            if (Window.IsVisible)
+            {
+                StateHasChanged();
+            }
+        });
 
     private static VerdictView BuildVerdict(MonitorStatus status, List<WifiEvent> problems)
     {
@@ -42,7 +53,8 @@ public partial class NowPanel : IDisposable
                 $"{worst.Message}, {since}{more}",
                 EventKindColors.For(worst.Kind, worst.Severity),
                 EventKindColors.IconFor(worst.Severity),
-                QuickActions.ForEvent(worst.Kind, status.RouterAdminUrl)
+                QuickActions.ForEvent(worst.Kind, status.RouterAdminUrl),
+                QuickActions.AdviceFor(worst.Kind, worst.Scope)
             );
         }
 
@@ -53,7 +65,8 @@ public partial class NowPanel : IDisposable
                 "No Wi-Fi Or Cable Connection",
                 Color.Error,
                 Icons.Material.Rounded.WifiOff,
-                QuickActions.WifiSettings
+                QuickActions.WifiSettings,
+                "Check The Router And Cables"
             );
         }
 
@@ -62,6 +75,7 @@ public partial class NowPanel : IDisposable
             DescribeConnection(status),
             Color.Success,
             Icons.Material.Rounded.Check,
+            null,
             null
         );
     }
@@ -69,7 +83,7 @@ public partial class NowPanel : IDisposable
     private static string DescribeConnection(MonitorStatus status)
     {
         var connection = status.Reading is { IsConnected: true } reading
-            ? $"Connected To {reading.Ssid ?? "Wi-Fi"}, Channel {reading.Channel}{(reading.IsDfs ? " DFS" : string.Empty)}, {reading.Band ?? "-"}"
+            ? $"Connected To {reading.Ssid ?? "Wi-Fi"}, Channel {reading.Channel}{(reading.IsDfs ? " DFS" : string.Empty)} And {reading.Band ?? "-"}"
             : $"Connected Over {status.Link}";
 
         // A Radar Eviction Keeps The Router Off DFS For A While
@@ -84,7 +98,6 @@ public partial class NowPanel : IDisposable
         if (status.Reading is { IsConnected: true } reading)
         {
             var isWeak = reading.Rssi < settings.WeakSignalRssi;
-            var isSlow = reading.ReceiveRateMbps < settings.SlowLinkMbps;
             readings.Add(
                 new(
                     "Signal",
@@ -97,8 +110,8 @@ public partial class NowPanel : IDisposable
                 new(
                     "Wi-Fi Speed",
                     Formatter.FormatNumber(reading.ReceiveRateMbps, "Mbps"),
-                    isSlow ? "Slow Link" : "Link To The Router",
-                    isSlow ? Color.Warning : Color.Default
+                    "Link To The Router",
+                    Color.Default
                 )
             );
         }
@@ -135,22 +148,6 @@ public partial class NowPanel : IDisposable
             : new(label, $"{roundTrip} ms", hint, Color.Default);
     }
 
-    private async Task RunSpeedTestAsync()
-    {
-        Snackbar.Add("Speed Test Running, About 20 Seconds", Severity.Info);
-        var result = await Monitor.RunSpeedTestAsync();
-        if (result is null)
-        {
-            Snackbar.Add("Speed Test Failed", Severity.Warning);
-            return;
-        }
-
-        Snackbar.Add(
-            $"{result.DownloadMbps:0} Mbps Down, {result.UploadMbps:0} Mbps Up, Grade {result.Grade}",
-            Severity.Success
-        );
-    }
-
     public void Dispose()
     {
         Monitor.StatusChanged -= OnStatusChanged;
@@ -162,7 +159,8 @@ public partial class NowPanel : IDisposable
         string Detail,
         Color Color,
         string Icon,
-        string? FixTarget
+        string? FixTarget,
+        string? Advice
     );
 
     private sealed record ReadingView(string Label, string Value, string Hint, Color Color);

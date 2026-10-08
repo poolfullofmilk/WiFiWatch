@@ -7,7 +7,9 @@ public static class ChartTheme
 {
     // The Lightest Grey, Shaded Down Per Bar From Here
     public const string LightGreyColor = "#BDBDBD";
-    public const string DarkGreyColor = "#757575";
+
+    // Third Series, Neither Grey Nor A State Colour
+    public const string VioletColor = "#B39DDB";
 
     // Ten Bars Still Clear The Dark Panel At This Spread
     private const double MonochromeShadeIntensity = 0.45;

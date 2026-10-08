@@ -37,6 +37,9 @@ public partial class IncidentDialog
         {
             var details = Details;
             List<(string Label, string Value)> lines = [];
+            if (QuickActions.AdviceFor(Event.Kind, Event.Scope) is { } advice)
+                lines.Add(("What To Do", advice));
+
             if (Event.Scope is { } scope)
                 lines.Add(("Where", DescribeScope(scope)));
 

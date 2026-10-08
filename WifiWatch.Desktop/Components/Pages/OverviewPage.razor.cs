@@ -67,10 +67,8 @@ public partial class OverviewPage : IDisposable
         var startUtc = startsUtc[0];
 
         await using var context = new WifiDbContext();
-        var samples = await context
-            .MinuteSamples.AsNoTracking()
-            .Where(sample => sample.MinuteUtc >= startUtc)
-            .ToListAsync();
+        var endUtc = currentHour.AddHours(1).ToUniversalTime();
+        var hours = await SummaryWriter.LoadHoursAsync(context, startUtc, endUtc);
         var incidents = await context
             .Events.AsNoTracking()
             .Where(wifiEvent => wifiEvent.EndedAtUtc == null || wifiEvent.EndedAtUtc >= startUtc)
@@ -83,15 +81,9 @@ public partial class OverviewPage : IDisposable
             .Take(RecentCount)
             .ToListAsync();
 
-        _buckets = HealthBuckets.Build(
-            samples,
-            incidents,
-            startsUtc,
-            currentHour.AddHours(1).ToUniversalTime(),
-            nowUtc
-        );
+        _buckets = HealthBuckets.Build(hours, incidents, startsUtc, endUtc, nowUtc);
         _problems = await EventJournal.OpenProblemsAsync();
-        _summary = await SummaryWriter.SummarizeAsync(startUtc, nowUtc);
+        _summary = await SummaryWriter.SummarizeAsync(context, hours, startUtc, endUtc);
         _isLoading = false;
         StateHasChanged();
     }

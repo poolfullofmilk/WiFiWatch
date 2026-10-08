@@ -11,7 +11,8 @@
                   Wrap="Wrap.Wrap"
                   Spacing="4">
             <MudAvatar Color="@Verdict.Color"
-                       Size="Size.Large">
+                       Size="Size.Large"
+                       Elevation="5">
                 <MudIcon Icon="@Verdict.Icon" />
             </MudAvatar>
             <MudStack Spacing="0"
@@ -21,6 +22,13 @@
                          Class="mud-text-secondary selectable-text">
                     @Verdict.Detail
                 </MudText>
+                @if (Verdict.Advice is { } advice)
+                {
+                    <MudText Typo="Typo.body2"
+                             Color="@Verdict.Color">
+                        @advice
+                    </MudText>
+                }
             </MudStack>
             @if (Verdict.FixTarget is { } fixTarget)
             {
@@ -48,7 +56,7 @@
                        Size="Size.Small"
                        StartIcon="@Icons.Material.Rounded.Speed"
                        Disabled="Monitor.Status.IsSpeedTesting"
-                       OnClick="RunSpeedTestAsync">
+                       OnClick="() => SpeedTestDialog.ShowAsync(DialogService)">
                 @(Monitor.Status.IsSpeedTesting ? "Testing Speed" : "Speed Test")
             </MudButton>
         </MudStack>

@@ -6,15 +6,12 @@ namespace WifiWatch.Services.Storage;
 
 public sealed record UserSettings(
     bool StartWithWindows = true,
-    int WeakSignalRssi = -67,
-    int SlowLinkMbps = 600,
-    int RouterPingMilliseconds = 10,
-    int InternetPingMilliseconds = 40,
-    int JitterMilliseconds = 20,
-    int PacketLossPercent = 2,
-    int SlowDnsMilliseconds = 150,
+    int WeakSignalRssi = -70,
+    int RouterPingMilliseconds = 20,
+    int InternetPingMilliseconds = 60,
     bool DailySummaryNotification = true,
     bool NightlySpeedTest = false,
+    bool ReadWifiNatively = false,
     bool ShowUpdatePopup = true
 )
 {

@@ -7,7 +7,7 @@ namespace WifiWatch.Services.Monitoring;
 public static class ChannelAdvice
 {
     // Neighbors Below This Barely Reach Us
-    private const int AudibleSignalPercent = 30;
+    public const int AudibleSignalPercent = 30;
     private const int FrequentEvictions = 2;
 
     // Ponytail: EU 80 MHz Blocks, None From 132 Up
@@ -82,6 +82,9 @@ public static class ChannelAdvice
             && Advise(100, neighborsPerBlock, 0).Contains("Quietest")
             && Advise(100, neighborsPerBlock, 3).StartsWith("Radar Moved You 3")
             && Advise(36, neighborsPerBlock, 3).StartsWith("52 To 64 DFS Has 0")
-            && Advise(6, neighborsPerBlock, 0).StartsWith("Not On");
+            && Advise(6, neighborsPerBlock, 0).StartsWith("Not On")
+            && Blocks[0].Channels.SequenceEqual([36, 40, 44, 48])
+            && new ChannelBlock(1, 13).Channels.Count() == 13
+            && Blocks[3].Label == "116 To 128 Weather Radar";
     }
 }
