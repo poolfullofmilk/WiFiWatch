@@ -27,15 +27,21 @@ public sealed class ConditionTracker(EventJournal journal)
 
     public event Func<string, Task>? IncidentOpened;
 
+    public void Reset() => _conditions.Clear();
+
     public async Task EvaluateAsync(Check check)
     {
-        if (check.Value is not { } value)
-            return;
-
         if (!_conditions.TryGetValue(check.Key, out var condition))
         {
             condition = new();
             _conditions[check.Key] = condition;
+        }
+
+        // Unmeasurable Minutes Clear Too, Or Weak Signal Outlives Wi-Fi
+        if (check.Value is not { } value)
+        {
+            await CountClearMinuteAsync(check, condition);
+            return;
         }
 
         var limit = check.IsHigherWorse
@@ -62,6 +68,11 @@ public sealed class ConditionTracker(EventJournal journal)
             condition.Baseline.Dequeue();
         }
 
+        await CountClearMinuteAsync(check, condition);
+    }
+
+    private async Task CountClearMinuteAsync(Check check, Condition condition)
+    {
         condition.BadValues.Clear();
         condition.GoodStreak++;
         if (journal.IsOpen(check.Key) && condition.GoodStreak >= ClearMinutes)

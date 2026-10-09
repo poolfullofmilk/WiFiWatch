@@ -10,6 +10,7 @@
 /* Shared Tokens */
 :root {
     --radius-panel: 20px;
+    --radius-inner: 10px;
     --radius-cell: 6px;
     --row-hover: color-mix(in srgb, var(--mud-palette-black) 12%, var(--mud-palette-surface));
     --glass-opacity: 66%;
@@ -36,6 +37,12 @@
 /* Shared Panel Radius */
 .rounded-panel {
     border-radius: var(--radius-panel) !important;
+}
+
+/* Inner Surfaces, Clipped So Rows Follow The Corners */
+.rounded-inner {
+    border-radius: var(--radius-inner) !important;
+    overflow: hidden;
 }
 
 /* Theme Values For The Page */
@@ -159,9 +166,10 @@ svg.apexcharts-svg {
 }
 /* #endregion */
 
-/* Tooltips Keep The Line Breaks Their Text Carries */
+/* Tooltips Keep Their Line Breaks, Every Line Starting Left */
 .mud-tooltip {
     white-space: pre-line;
+    text-align: left;
 }
 
 /* #region Channel Strip */

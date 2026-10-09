@@ -156,6 +156,11 @@ public sealed class NetworkMonitor
                 // A Long Gap Means The PC Slept
                 if (nowUtc - lastTickUtc > s_sleepGap)
                 {
+                    // Sleep Ends Every Incident, Waking Reconnects Are No Drops
+                    await _journal.CloseAllAsync(lastTickUtc);
+                    _conditions.Reset();
+                    _lastReading = null;
+                    _internetFailures = 0;
                     _journal.StartQuietWindow();
                     await _journal.RecordAsync(
                         EventKind.Resumed,
@@ -303,7 +308,12 @@ public sealed class NetworkMonitor
         var localScope = sample.Link == EthernetLink ? HomeNetworkScope : WifiScope;
         var isOnWifi = sample.Link == WifiLink;
         var isOnline = sample.Link != OfflineLink;
-        var isRouterFine = sample.RouterPingMilliseconds <= settings.RouterPingMilliseconds;
+
+        // Some Routers Never Answer Ping While The Internet Does
+        var isRouterSilent =
+            sample.RouterPingMilliseconds is null && sample.InternetPingMilliseconds is not null;
+        var isRouterFine =
+            isRouterSilent || sample.RouterPingMilliseconds <= settings.RouterPingMilliseconds;
         var context = DescribeContext(sample);
 
         ConditionTracker.Check[] checks =
@@ -352,7 +362,7 @@ public sealed class NetworkMonitor
                 EventKind.PacketLoss,
                 $"Packet Loss On {localScope}",
                 "%",
-                isOnline ? sample.RouterLossPercent : null,
+                isOnline && !isRouterSilent ? sample.RouterLossPercent : null,
                 PacketLossPercent,
                 true,
                 true,
@@ -366,7 +376,7 @@ public sealed class NetworkMonitor
                 "Packet Loss At Internet Provider",
                 "%",
                 isOnline
-                && sample.RouterLossPercent < PacketLossPercent
+                && (isRouterSilent || sample.RouterLossPercent < PacketLossPercent)
                 && !_journal.IsOpen(WanDownKey)
                     ? sample.InternetLossPercent
                     : null,
@@ -740,7 +750,7 @@ public sealed class NetworkMonitor
                     );
                     await _journal.UpdateAsync(
                         ConnectFailedKey,
-                        $"Could Not Connect To {notice.Ssid}, {_connectFailures} Attempts",
+                        $"Could Not Connect To {notice.Ssid}, {Formatter.FormatCount(_connectFailures, "Attempt")}",
                         changeDetails: details => details with { Reason = notice.Reason }
                     );
                     break;
@@ -748,7 +758,7 @@ public sealed class NetworkMonitor
                     when _journal.OpenedAtUtc(ConnectFailedKey) is { } failingSinceUtc:
                     await _journal.CloseAsync(
                         ConnectFailedKey,
-                        $"Could Not Connect To {notice.Ssid} For {Formatter.FormatDuration(notice.TimeUtc - failingSinceUtc)}, {_connectFailures} Attempts, Then Connected"
+                        $"Could Not Connect To {notice.Ssid} For {Formatter.FormatDuration(notice.TimeUtc - failingSinceUtc)}, {Formatter.FormatCount(_connectFailures, "Attempt")}, Then Connected"
                     );
                     _connectFailures = 0;
                     break;
@@ -782,7 +792,10 @@ public sealed class NetworkMonitor
     private Task TraceIncidentAsync(string key)
     {
         // Outages Always Trace, Smaller Incidents At Most Every Few Minutes
-        if (key != WanDownKey && DateTime.UtcNow - _lastTraceUtc < s_traceSpacing)
+        if (
+            _journal.OpenIdOf(key) is not { } incidentId
+            || (key != WanDownKey && DateTime.UtcNow - _lastTraceUtc < s_traceSpacing)
+        )
             return Task.CompletedTask;
 
         _lastTraceUtc = DateTime.UtcNow;
@@ -795,9 +808,10 @@ public sealed class NetworkMonitor
                     s_internetAddress,
                     routerAddress
                 );
-                await _journal.UpdateAsync(
-                    key,
-                    changeDetails: details => details with { TraceSummary = summary, Trace = hops }
+                // By Id, A Short Outage Closes Before Its Trace Ends
+                await _journal.ChangeDetailsAsync(
+                    incidentId,
+                    details => details with { TraceSummary = summary, Trace = hops }
                 );
             }
             catch
@@ -910,7 +924,7 @@ public sealed class NetworkMonitor
     {
         // Announce Each New Version Once
         var latest = await UpdateChecker.CheckAsync();
-        if (latest is null || latest == AvailableUpdate)
+        if (latest is null || latest <= AppInfo.Version || latest == AvailableUpdate)
             return latest;
 
         AvailableUpdate = latest;

@@ -18,7 +18,11 @@
                                 DateFormat="yyyy-MM-dd"
                                 Color="Color.Info"
                                 Variant="Variant.Outlined"
-                                Margin="Margin.Dense">
+                                Margin="Margin.Dense"
+                                AdornmentIcon="@Icons.Material.Rounded.DateRange"
+                                PreviousIcon="@Icons.Material.Rounded.ChevronLeft"
+                                NextIcon="@Icons.Material.Rounded.ChevronRight"
+                                SeparatorIcon="@Icons.Material.Rounded.ArrowRightAlt">
                 <PickerActions>
                     @foreach (var (label, dayCount) in s_presets)
                     {

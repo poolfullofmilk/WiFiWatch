@@ -1,5 +1,4 @@
 using System.Net.Http;
-using WifiWatch.Data.Helpers;
 
 namespace WifiWatch.Services.Integration;
 
@@ -15,8 +14,6 @@ public static class UpdateChecker
         Timeout = TimeSpan.FromSeconds(10),
     };
 
-    public static Version CurrentVersion { get; } = AppInfo.Version;
-
     public static async Task<Version?> CheckAsync()
     {
         try
@@ -29,10 +26,11 @@ public static class UpdateChecker
             var location = response.Headers.Location?.ToString() ?? string.Empty;
             var tag = location[(location.LastIndexOf('/') + 1)..].TrimStart('v', 'V');
 
-            return Version.TryParse(tag, out var latest) && latest > CurrentVersion ? latest : null;
+            return Version.TryParse(tag, out var latest) ? latest : null;
         }
         catch
         {
+            // Unreachable Means Unknown, Never Up To Date
             return null;
         }
     }

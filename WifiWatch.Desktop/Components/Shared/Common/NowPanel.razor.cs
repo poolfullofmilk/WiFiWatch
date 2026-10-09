@@ -120,8 +120,16 @@ public partial class NowPanel : IDisposable
             readings.Add(new("Connection", status.Link, "No Wi-Fi Details", Color.Default));
         }
 
+        // Some Routers Never Answer Ping, Yet Pass The Internet On
         readings.Add(
-            RoundTrip("Router", status.RouterRoundTrip, settings.RouterPingMilliseconds, "Home")
+            status.RouterRoundTrip is null && status.InternetRoundTrip is not null
+                ? new("Router", "-", "No Answer", Color.Default)
+                : RoundTrip(
+                    "Router",
+                    status.RouterRoundTrip,
+                    settings.RouterPingMilliseconds,
+                    "Home"
+                )
         );
         readings.Add(
             RoundTrip(

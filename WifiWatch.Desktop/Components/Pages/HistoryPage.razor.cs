@@ -61,8 +61,7 @@ public partial class HistoryPage
             ? [new(1, 13)]
             : [.. ChannelAdvice.Blocks, new(132, 140)];
 
-    private string EvictionText =>
-        _evictionCount == 1 ? "1 Radar Eviction" : $"{_evictionCount} Radar Evictions";
+    private string EvictionText => Formatter.FormatCount(_evictionCount, "Radar Eviction");
 
     private List<TileView> Tiles =>
         _summary is not { MonitoredMinutes: > 0 } summary
@@ -100,12 +99,9 @@ public partial class HistoryPage
                     _speedTests.Count == 0
                         ? "-"
                         : $"{_speedTests.Max(test => test.DownloadMbps):0} Mbps",
-                    _speedTests.Count switch
-                    {
-                        0 => "No Speed Test",
-                        1 => "1 Speed Test",
-                        _ => $"{_speedTests.Count} Speed Tests",
-                    },
+                    _speedTests.Count == 0
+                        ? "No Speed Test"
+                        : Formatter.FormatCount(_speedTests.Count, "Speed Test"),
                     Color.Default
                 ),
             ];

@@ -81,7 +81,7 @@ public partial class Home : IDisposable
     {
         // Dismissing The Dialog Keeps Everything As It Was
         var keepRunning = await _closeMessageBox!.ShowAsync(
-            new DialogOptions { CloseButton = false, BackdropClick = true }
+            new DialogOptions { BackdropClick = true }
         );
 
         if (keepRunning == true)

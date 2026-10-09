@@ -108,12 +108,7 @@ public sealed partial class SpeedTestDialog : IDisposable
     public static Task ShowAsync(IDialogService dialogService) =>
         dialogService.ShowAsync<SpeedTestDialog>(
             title: null,
-            options: new DialogOptions
-            {
-                BackdropClick = false,
-                CloseButton = false,
-                MaxWidth = MaxWidth.Small,
-            }
+            options: new DialogOptions { BackdropClick = false, MaxWidth = MaxWidth.Small }
         );
 
     private void Close()

@@ -21,6 +21,7 @@ A Windows tray app that tells you when your connection drops, where it went wron
 ## ⚠️ Important
 - Needs Windows 11 with location services on
 - Windows in another language than English: turn on Read Wi-Fi Natively in Settings
+- Windows may warn on the first run because the app is not signed: click More info, then Run anyway
 
 ## Technical details
 - .NET 10, WPF, Blazor, MudBlazor and SQLite

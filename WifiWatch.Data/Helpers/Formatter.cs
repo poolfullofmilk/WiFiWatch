@@ -16,9 +16,8 @@ public static class Formatter
 
     public static string? FormatIncidentLength(DateTime occurredAtUtc, DateTime? endedAtUtc)
     {
-        // Instants End Where They Start, Open Incidents Have No End
-        return endedAtUtc is not { } endUtc
-                ? $"Ongoing {FormatDuration(DateTime.UtcNow - occurredAtUtc)}"
+        // Instants Have No Length, Open Ones Carry No Stale Clock
+        return endedAtUtc is not { } endUtc ? "Ongoing"
             : endUtc == occurredAtUtc ? null
             : FormatDuration(endUtc - occurredAtUtc);
     }
@@ -51,4 +50,7 @@ public static class Formatter
 
     public static string FormatNumber(double? value, string unit) =>
         value is null ? "-" : $"{value:0.#} {unit}";
+
+    public static string FormatCount(int count, string noun) =>
+        count == 1 ? $"1 {noun}" : $"{count} {noun}s";
 }

@@ -25,6 +25,7 @@ public partial class OverviewPage : IDisposable
     public EventCallback IncidentsRequested { get; set; }
 
     // Page State
+    private readonly PeriodicTimer _refreshTimer = new(TimeSpan.FromMinutes(1));
     private List<WifiEvent> _problems = [];
     private List<WifiEvent> _recent = [];
     private List<HealthBucket> _buckets = [];
@@ -40,12 +41,10 @@ public partial class OverviewPage : IDisposable
 
             // Online Only Means Something Next To How Long Was Watched
             var watched = Formatter.FormatDuration(TimeSpan.FromMinutes(summary.MonitoredMinutes));
-            var problems = summary.ProblemCount switch
-            {
-                0 => "No Problems",
-                1 => "1 Problem",
-                _ => $"{summary.ProblemCount} Problems",
-            };
+            var problems =
+                summary.ProblemCount == 0
+                    ? "No Problems"
+                    : Formatter.FormatCount(summary.ProblemCount, "Problem");
             return $"Watched {watched}, {summary.OnlinePercent:0.#}% Online, {problems}";
         }
     }
@@ -54,9 +53,19 @@ public partial class OverviewPage : IDisposable
     {
         Monitor.EventRecorded += OnEventRecorded;
         await LoadAsync();
+        _ = RefreshEveryMinuteAsync();
     }
 
     private void OnEventRecorded() => InvokeAsync(LoadAsync);
+
+    private async Task RefreshEveryMinuteAsync()
+    {
+        // The Day Strip Rolls On Without Any Event
+        while (await _refreshTimer.WaitForNextTickAsync())
+        {
+            await InvokeAsync(LoadAsync);
+        }
+    }
 
     private async Task LoadAsync()
     {
@@ -94,6 +103,7 @@ public partial class OverviewPage : IDisposable
     public void Dispose()
     {
         Monitor.EventRecorded -= OnEventRecorded;
+        _refreshTimer.Dispose();
         GC.SuppressFinalize(this);
     }
 }

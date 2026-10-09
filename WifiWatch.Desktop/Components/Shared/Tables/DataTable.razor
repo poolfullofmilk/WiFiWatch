@@ -59,7 +59,11 @@
     <PagerContent>
         <MudTablePager HorizontalAlignment="HorizontalAlignment.Center"
                        PageSizeOptions="new int[] { 50, 100, int.MaxValue }"
-                       RowsPerPageString="Rows Per Page" />
+                       RowsPerPageString="Rows Per Page"
+                       FirstIcon="@Icons.Material.Rounded.FirstPage"
+                       BeforeIcon="@Icons.Material.Rounded.NavigateBefore"
+                       NextIcon="@Icons.Material.Rounded.NavigateNext"
+                       LastIcon="@Icons.Material.Rounded.LastPage" />
     </PagerContent>
 
 </MudTable>

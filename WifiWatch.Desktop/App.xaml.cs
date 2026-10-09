@@ -3,6 +3,7 @@ using System.Windows;
 using ApexCharts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using MudBlazor;
 using MudBlazor.Services;
 using WifiWatch.Data;
 using WifiWatch.Services.Integration;
@@ -63,7 +64,12 @@ public partial class App : Application
         MainWindow? window = null;
         var services = new ServiceCollection();
         services.AddWpfBlazorWebView();
-        services.AddMudServices();
+        services.AddMudServices(configuration =>
+        {
+            // Snackbars Default To Outlined Icons, Every Other Icon Is Rounded
+            configuration.SnackbarConfiguration.SuccessIcon = Icons.Material.Rounded.CheckCircle;
+            configuration.SnackbarConfiguration.WarningIcon = Icons.Material.Rounded.Warning;
+        });
         services.AddApexCharts();
         services.AddSingleton(monitor);
         services.AddSingleton(_ => window!);

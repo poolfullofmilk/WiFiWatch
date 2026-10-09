@@ -53,6 +53,10 @@ public partial class SettingsPage
         _isChecking = false;
         if (latest is null)
         {
+            Snackbar.Add("Could Not Reach GitHub", Severity.Warning);
+        }
+        else if (latest <= AppInfo.Version)
+        {
             Snackbar.Add($"Version {AppInfo.Version.ToString(2)} Is The Latest", Severity.Success);
         }
     }

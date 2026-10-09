@@ -34,6 +34,9 @@ public sealed class EventJournal
     public DateTime? OpenedAtUtc(string key) =>
         _openIncidents.TryGetValue(key, out var incident) ? incident.StartedAtUtc : null;
 
+    public int? OpenIdOf(string key) =>
+        _openIncidents.TryGetValue(key, out var incident) ? incident.Id : null;
+
     #region Record Methods
     public async Task RecordAsync(
         EventKind kind,
@@ -199,6 +202,20 @@ public sealed class EventJournal
         EventRecorded?.Invoke();
     }
 
+    public async Task CloseAllAsync(DateTime endedAtUtc)
+    {
+        foreach (var (key, incident) in _openIncidents.ToList())
+        {
+            await CloseAsync(key, $"{incident.Message}, Cut Short By Sleep", endedAtUtc);
+        }
+    }
+
+    public async Task ChangeDetailsAsync(int id, Func<EventDetails, EventDetails> changeDetails)
+    {
+        await WithGateAsync(() => WriteAsync(id, null, null, changeDetails, null));
+        EventRecorded?.Invoke();
+    }
+
     public async Task<bool> AttachToLatestAsync(
         EventKind kind,
         TimeSpan within,
@@ -233,16 +250,25 @@ public sealed class EventJournal
         foreach (var incident in _openIncidents.Values.ToList())
         {
             if (
-                !incident.HasAlerted
-                && incident.Severity == EventSeverity.Warning
-                && DateTime.UtcNow - incident.StartedAtUtc >= s_warningAlertAfter
+                incident.Severity != EventSeverity.Warning
+                || DateTime.UtcNow - incident.StartedAtUtc < s_warningAlertAfter
             )
+                continue;
+
+            if (!incident.HasAlerted)
             {
                 incident.HasAlerted = Alert(
                     incident.Kind,
                     $"{incident.Message}, Still Going After {Formatter.FormatDuration(DateTime.UtcNow - incident.StartedAtUtc)}",
                     false
                 );
+            }
+
+            // Pages Listing Problems Count It From Now On
+            if (!incident.IsLasting)
+            {
+                incident.IsLasting = true;
+                EventRecorded?.Invoke();
             }
         }
     }
@@ -334,5 +360,7 @@ public sealed class EventJournal
         public string Message { get; set; } = message;
 
         public bool HasAlerted { get; set; }
+
+        public bool IsLasting { get; set; }
     }
 }

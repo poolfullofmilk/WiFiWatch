@@ -28,12 +28,7 @@ public partial class UpdateDialog
         dialogService.ShowAsync<UpdateDialog>(
             null,
             new DialogParameters<UpdateDialog> { { dialog => dialog.Version, version } },
-            new DialogOptions
-            {
-                BackdropClick = true,
-                CloseButton = false,
-                MaxWidth = MaxWidth.ExtraSmall,
-            }
+            new DialogOptions { BackdropClick = true, MaxWidth = MaxWidth.ExtraSmall }
         );
 
     public static async Task InstallAsync(Version version, ISnackbar snackbar, MainWindow window)

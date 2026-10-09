@@ -12,6 +12,9 @@ public static class FaultTracer
     private const int ProbesPerHop = 3;
     private const int ProbeTimeoutMilliseconds = 800;
 
+    // Four Silent Hops In A Row Mean The Path Ended
+    private const int SilentHopLimit = 4;
+
     private static readonly TimeSpan s_nameTimeout = TimeSpan.FromSeconds(1);
 
     public static async Task<(string Summary, List<TraceHop> Hops)> TraceAsync(
@@ -23,9 +26,10 @@ public static class FaultTracer
         var buffer = new byte[32];
         List<(int Number, IPAddress? Address, List<double> Times)> probes = [];
         var isReached = false;
+        var silentHops = 0;
 
         // Each Hop Answers Once Its Time To Live Runs Out
-        for (var hop = 1; hop <= MaximumHops && !isReached; hop++)
+        for (var hop = 1; hop <= MaximumHops && !isReached && silentHops < SilentHopLimit; hop++)
         {
             IPAddress? address = null;
             List<double> times = [];
@@ -47,6 +51,7 @@ public static class FaultTracer
             }
 
             probes.Add((hop, address, times));
+            silentHops = address is null ? silentHops + 1 : 0;
         }
 
         var names = await Task.WhenAll(probes.Select(probe => ResolveNameAsync(probe.Address)));

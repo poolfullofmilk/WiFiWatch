@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
+using System.Text.Json;
 using WifiWatch.Data.Enums;
 using WifiWatch.Data.Models;
 using WifiWatch.Data.ViewModels;
@@ -11,13 +12,13 @@ namespace WifiWatch.Services.Monitoring;
 
 public static class SpeedTester
 {
-    // Cloudflare's Public Speed Test Endpoints, No Account Or Install
-    // Cloudflare Refuses 100 MB Without A Token
-    private const string DownloadUrl = "https://speed.cloudflare.com/__down?bytes=50000000";
-    private const string UploadUrl = "https://speed.cloudflare.com/__up";
+    // Fast.com's Servers, Netflix Picks Ones Inside Your Provider
+    // Ponytail: Public Fast.com Token, Scrape Fast.com If It Changes
+    private const string ServersUrl =
+        "https://api.fast.com/netflix/speedtest/v2?https=true&token=YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm&urlCount=5";
     private const int UploadChunkBytes = 1_000_000;
     private const int UploadChunksPerRequest = 25;
-    private const int StreamCount = 4;
+    private const int StreamCount = 8;
 
     // Timing
     private static readonly TimeSpan s_idleLength = TimeSpan.FromSeconds(2);
@@ -47,12 +48,14 @@ public static class SpeedTester
     )
     {
         progress?.Report(new(SpeedTestPhase.Ping, 0, null, null, null));
+        var servers = await LoadServersAsync(cancellationToken);
         var idlePing = Median(
             await PingWhileAsync(Task.Delay(s_idleLength, cancellationToken), cancellationToken)
         );
         progress?.Report(new(SpeedTestPhase.Ping, 1, null, idlePing, null));
 
         var (downloadMbps, downloadPing) = await MeasureUnderLoadAsync(
+            servers,
             DownloadOnceAsync,
             report =>
                 progress?.Report(
@@ -61,6 +64,7 @@ public static class SpeedTester
             cancellationToken
         );
         var (uploadMbps, uploadPing) = await MeasureUnderLoadAsync(
+            servers,
             UploadOnceAsync,
             report =>
                 progress?.Report(
@@ -97,13 +101,31 @@ public static class SpeedTester
         };
     }
 
+    private static async Task<List<string>> LoadServersAsync(CancellationToken token)
+    {
+        using var document = JsonDocument.Parse(
+            await s_httpClient.GetStringAsync(ServersUrl, token)
+        );
+        List<string> servers =
+        [
+            .. document
+                .RootElement.GetProperty("targets")
+                .EnumerateArray()
+                .Select(target => target.GetProperty("url").GetString() ?? string.Empty),
+        ];
+        return servers.Count > 0
+            ? servers
+            : throw new InvalidOperationException("No Speed Test Servers");
+    }
+
     private static async Task<(double Mbps, double? Ping)> MeasureUnderLoadAsync(
-        Func<Action<long>, CancellationToken, Task> transferOnceAsync,
+        List<string> servers,
+        Func<string, Action<long>, CancellationToken, Task> transferOnceAsync,
         Action<(double Fraction, double Mbps)> report,
         CancellationToken cancellationToken
     )
     {
-        // Parallel Streams Fill A Fast Line, One Stream Rarely Can
+        // Parallel Streams Spread Over The Servers, As Fast.com Does
         using var stopTransfers = CancellationTokenSource.CreateLinkedTokenSource(
             cancellationToken
         );
@@ -111,8 +133,9 @@ public static class SpeedTester
         var pings = PingUntilAsync(stopTransfers.Token);
         var transfers = Enumerable
             .Range(0, StreamCount)
-            .Select(_ =>
+            .Select(streamIndex =>
                 TransferUntilStoppedAsync(
+                    servers[streamIndex % servers.Count],
                     transferOnceAsync,
                     bytes => Interlocked.Add(ref totalBytes, bytes),
                     stopTransfers.Token
@@ -149,7 +172,7 @@ public static class SpeedTester
             report((Math.Min(1, elapsed / s_phaseLength), windowMbps));
         }
 
-        // Ninetieth Percentile, As Cloudflare's Own Test Reports
+        // Ninetieth Percentile Of The Settled Seconds
         var measuredMbps = NinetiethPercentile(settledMbps);
         await stopTransfers.CancelAsync();
         await Task.WhenAll(transfers);
@@ -157,7 +180,8 @@ public static class SpeedTester
     }
 
     private static async Task TransferUntilStoppedAsync(
-        Func<Action<long>, CancellationToken, Task> transferOnceAsync,
+        string server,
+        Func<string, Action<long>, CancellationToken, Task> transferOnceAsync,
         Action<long> addBytes,
         CancellationToken stopToken
     )
@@ -166,7 +190,7 @@ public static class SpeedTester
         {
             while (!stopToken.IsCancellationRequested)
             {
-                await transferOnceAsync(addBytes, stopToken);
+                await transferOnceAsync(server, addBytes, stopToken);
             }
         }
         catch (OperationCanceledException) when (stopToken.IsCancellationRequested)
@@ -175,10 +199,14 @@ public static class SpeedTester
         }
     }
 
-    private static async Task DownloadOnceAsync(Action<long> addBytes, CancellationToken token)
+    private static async Task DownloadOnceAsync(
+        string server,
+        Action<long> addBytes,
+        CancellationToken token
+    )
     {
         using var response = await s_httpClient.GetAsync(
-            DownloadUrl,
+            server,
             HttpCompletionOption.ResponseHeadersRead,
             token
         );
@@ -192,10 +220,14 @@ public static class SpeedTester
         }
     }
 
-    private static async Task UploadOnceAsync(Action<long> addBytes, CancellationToken token)
+    private static async Task UploadOnceAsync(
+        string server,
+        Action<long> addBytes,
+        CancellationToken token
+    )
     {
         using var content = new CountingContent(addBytes);
-        using var response = await s_httpClient.PostAsync(UploadUrl, content, token);
+        using var response = await s_httpClient.PostAsync(server, content, token);
         response.EnsureSuccessStatusCode();
     }
 

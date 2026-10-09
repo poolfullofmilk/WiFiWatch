@@ -82,6 +82,7 @@ public static class SummaryWriter
             .Select(wifiEvent => new
             {
                 wifiEvent.Kind,
+                wifiEvent.Severity,
                 wifiEvent.OccurredAtUtc,
                 wifiEvent.EndedAtUtc,
             })
@@ -116,7 +117,11 @@ public static class SummaryWriter
             problemCount,
             events
                 .Where(wifiEvent =>
-                    wifiEvent.Kind is EventKind.WanDown or EventKind.Disconnect
+                    // Wi-Fi Lost While A Cable Holds Is No Outage
+                    wifiEvent.Kind
+                        is EventKind.WanDown
+                            or EventKind.Disconnect
+                    && wifiEvent.Severity != EventSeverity.Info
                     && wifiEvent.EndedAtUtc is not null
                 )
                 .Select(wifiEvent => wifiEvent.EndedAtUtc!.Value - wifiEvent.OccurredAtUtc)
@@ -136,11 +141,11 @@ public static class SummaryWriter
         List<string> parts =
         [
             $"{summary.OnlinePercent:0.#}% Online",
-            $"{summary.ProblemCount} Problems",
+            Formatter.FormatCount(summary.ProblemCount, "Problem"),
             summary.LongestOutage > TimeSpan.Zero
                 ? $"Longest Outage {Formatter.FormatDuration(summary.LongestOutage)}"
                 : "No Outages",
-            $"{summary.EvictionCount} DFS Evictions",
+            Formatter.FormatCount(summary.EvictionCount, "DFS Eviction"),
         ];
         if (summary.DfsPercent is { } dfsPercent)
         {

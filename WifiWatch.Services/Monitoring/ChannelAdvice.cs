@@ -63,7 +63,7 @@ public static class ChannelAdvice
 
         return quietestBlock == currentBlock
             ? $"Channel {currentChannel} Sits On The Quietest Block, Stay"
-            : $"{quietestBlock.Label} Has {neighborsPerBlock[quietestBlock]} Neighbors, Yours Has {neighborsPerBlock[currentBlock]}";
+            : $"{quietestBlock.Label} Has {Formatter.FormatCount(neighborsPerBlock[quietestBlock], "Neighbor")}, Yours Has {neighborsPerBlock[currentBlock]}";
     }
 
     private static bool SelfTestPasses()

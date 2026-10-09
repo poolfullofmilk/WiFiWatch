@@ -39,8 +39,8 @@ public static class EventKindColors
     public static string IconFor(EventSeverity severity) =>
         severity switch
         {
-            EventSeverity.Critical => Icons.Material.Rounded.ErrorOutline,
-            EventSeverity.Warning => Icons.Material.Rounded.WarningAmber,
+            EventSeverity.Critical => Icons.Material.Rounded.Error,
+            EventSeverity.Warning => Icons.Material.Rounded.Warning,
             _ => Icons.Material.Rounded.Info,
         };
 

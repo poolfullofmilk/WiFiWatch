@@ -27,8 +27,10 @@
             {
                 @* Detail Table *@
                 <MudSimpleTable Dense
+                                Bordered
+                                Outlined
                                 Elevation="0"
-                                Style="background:transparent">
+                                Class="rounded-inner">
                     <tbody>
                         @foreach (var (label, value) in DetailLines)
                         {
@@ -46,7 +48,9 @@
                 <MudSimpleTable Dense
                                 Striped
                                 Bordered
-                                Elevation="0">
+                                Outlined
+                                Elevation="0"
+                                Class="rounded-inner">
                     <thead>
                         <tr>
                             <th>Hop</th>
