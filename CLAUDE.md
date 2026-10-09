@@ -1,42 +1,42 @@
-# WifiWatch
+# WiFiWatch
 
 A Windows 11 tray app that watches the network connection and keeps a local log of it: the Wi-Fi channel (DFS or not), band, signal, link rate, router and internet ping, jitter, packet loss and DNS timing. Problems become incidents with a start, an end, a place (Wi-Fi, home network, internet provider, DNS) and a reason, and the serious ones show as Windows notifications. It is a general tool for any home network and any provider; nothing in it may be specific to one router brand or one ISP.
 
-.NET 10, WPF hosting Blazor in a `BlazorWebView`, MudBlazor, Blazor-ApexCharts, EF Core on SQLite. The shown name is "Wifi Watch"; the project, namespaces, data folder and exe are `WifiWatch`. Repository: `github.com/poolfullofmilk/WifiWatch`, GPL-3.0.
+.NET 10, WPF hosting Blazor in a `BlazorWebView`, MudBlazor, Blazor-ApexCharts, EF Core on SQLite. The shown name is "Wi-Fi Watch"; the project, namespaces, data folder and exe are `WiFiWatch`. Repository: `github.com/poolfullofmilk/WiFiWatch`, GPL-3.0.
 
-The global `~/.claude/CLAUDE.md` holds every shared convention (git, releases, comments, code style, design system, checks). This file only holds what is specific to WifiWatch.
+The global `~/.claude/CLAUDE.md` holds every shared convention (git, releases, comments, code style, design system, checks). This file only holds what is specific to WiFiWatch.
 
 ## Layout
 
 | Path | Holds |
 |---|---|
-| `WifiWatch.slnx` | The three projects |
-| `WifiWatch.Data` | `net10.0`, no Windows dependencies. EF context, models, migrations, view models, enums, small helpers |
-| `WifiWatch.Services` | `net10.0-windows`. Everything that watches, measures, stores or talks to Windows |
-| `WifiWatch.Desktop` | WPF exe, `Microsoft.NET.Sdk.Razor`, `net10.0-windows10.0.17763.0`. Window, tray, Blazor UI, theming |
+| `WiFiWatch.slnx` | The three projects |
+| `WiFiWatch.Data` | `net10.0`, no Windows dependencies. EF context, models, migrations, view models, enums, small helpers |
+| `WiFiWatch.Services` | `net10.0-windows`. Everything that watches, measures, stores or talks to Windows |
+| `WiFiWatch.Desktop` | WPF exe, `Microsoft.NET.Sdk.Razor`, `net10.0-windows10.0.17763.0`. Window, tray, Blazor UI, theming |
 | `.github/workflows/release.yml` | Builds, signs through SignPath and releases on a pushed version tag |
 | `Screenshots/` | `Overview.png`, `Incidents.png`, `History.png` and `Settings.png` for the README, taken maximized on a generated sample week (History on 7 Days) with default settings, never on real data |
 
-### WifiWatch.Data
+### WiFiWatch.Data
 
 | Path | Holds |
 |---|---|
-| `WifiDbContext.cs` | `%AppData%\WifiWatch\WifiWatch.db`, `DataDirectory`, the `DbSet`s, enums stored as strings |
-| `Models/` | `WifiEvent`, `MinuteSample`, `NeighborSample`, `SpeedTest` (the tables) |
-| `ViewModels/` | Records that are never tables: `MonitorStatus`, `WifiReading`, `NeighborReading`, `AdapterInfo`, `EventDetails` (JSON in `WifiEvent.Details`), `TraceHop`, `PeriodSummary`, `WlanNotice`, `ChartPoint`, `HealthBucket`, `HourSummary`, `ChannelBlock`, `SpeedTestProgress` |
+| `WiFiDbContext.cs` | `%AppData%\WiFiWatch\WiFiWatch.db`, `DataDirectory`, the `DbSet`s, enums stored as strings |
+| `Models/` | `WiFiEvent`, `MinuteSample`, `NeighborSample`, `SpeedTest` (the tables) |
+| `ViewModels/` | Records that are never tables: `MonitorStatus`, `WiFiReading`, `NeighborReading`, `AdapterInfo`, `EventDetails` (JSON in `WiFiEvent.Details`), `TraceHop`, `PeriodSummary`, `WlanNotice`, `ChartPoint`, `HealthBucket`, `HourSummary`, `ChannelBlock`, `SpeedTestProgress` |
 | `Enums/` | `EventKind`, `EventSeverity`, `HealthState`, `SpeedTestPhase` |
-| `Helpers/` | `AppInfo` (display name, version), `WifiChannels` (DFS and weather radar ranges, timers), `Formatter` (durations, local times, numbers with units, `FormatCount` for 1 Problem or 2 Problems), `EventKindExtensions.ToLabel`, `QueryableExtensions.OrderByColumn`, `HealthBuckets` (worst state per hour or day, self-test), `Problems.IsProblem` |
+| `Helpers/` | `AppInfo` (display name, version), `WiFiChannels` (DFS and weather radar ranges, timers), `Formatter` (durations, local times, numbers with units, `FormatCount` for 1 Problem or 2 Problems), `EventKindExtensions.ToLabel`, `QueryableExtensions.OrderByColumn`, `HealthBuckets` (worst state per hour or day, self-test), `Problems.IsProblem` |
 | `Migrations/` | `Initial`, `AddNeighborSamples`, `AddIncidentsSpeedTestsAndDns` |
 
-### WifiWatch.Services
+### WiFiWatch.Services
 
 | Path | Holds |
 |---|---|
 | `Monitoring/NetworkMonitor.cs` | The one loop, the scopes, every rule. The app's only long-lived service |
 | `Monitoring/EventJournal.cs` | Writes events, keeps open incidents by key, decides notifications, the quiet window |
 | `Monitoring/ConditionTracker.cs` | Per-minute threshold incidents with persistence and a baseline, self-test |
-| `Monitoring/WifiReader.cs` | `netsh wlan show interfaces` and `show networks mode=bssid` parsers, self-test |
-| `Monitoring/NativeWifiReader.cs` | The same current connection through `wlanapi` (`WlanQueryInterface`), used when Read Wi-Fi Natively is on |
+| `Monitoring/WiFiReader.cs` | `netsh wlan show interfaces` and `show networks mode=bssid` parsers, self-test |
+| `Monitoring/NativeWiFiReader.cs` | The same current connection through `wlanapi` (`WlanQueryInterface`), used when Read Wi-Fi Natively is on |
 | `Monitoring/WlanEventReader.cs` | WLAN AutoConfig Operational log, the reason behind disconnects and failed connects |
 | `Monitoring/FaultTracer.cs` | MTR-style trace (30 hops, 3 probes) that names where a path stops |
 | `Monitoring/DnsProbe.cs` | Raw UDP DNS query timing against the system resolver and 1.1.1.1, self-test |
@@ -49,10 +49,10 @@ The global `~/.claude/CLAUDE.md` holds every shared convention (git, releases, c
 | `Integration/RouterAdmin.cs` | Finds the router's admin page by probing 8443, 443 and 80 on the gateway |
 | `Integration/UpdateChecker.cs`, `Updater.cs` | GitHub latest release check, download, swap and clean up |
 | `Integration/StartupRegistration.cs` | The `Run` value and the Start menu shortcut, Release only |
-| `Storage/UserSettings.cs` | Settings record, JSON in `%AppData%\WifiWatch\settings.json` |
+| `Storage/UserSettings.cs` | Settings record, JSON in `%AppData%\WiFiWatch\settings.json` |
 | `Storage/CsvExport.cs` | CSV exports of minutes and events |
 
-### WifiWatch.Desktop
+### WiFiWatch.Desktop
 
 | Path | Holds |
 |---|---|
@@ -65,25 +65,25 @@ The global `~/.claude/CLAUDE.md` holds every shared convention (git, releases, c
 | `Components/Shared/Common/` | `ActionChip`, `ChannelStrip`, `ExportMenu`, `Header`, `HealthStrip`, `NowPanel`, `SegmentedButtonGroup`, `SettingSwitch`, `Tooltip` |
 | `Components/Shared/Dialogs/` | `IncidentDialog`, `SpeedTestDialog`, `UpdateDialog` |
 | `Components/Shared/Tables/` | `DataTable`, `SearchTextField` |
-| `wwwroot/` | `index.html`, `CSS/WifiWatch.css`, Nunito with `OFL.txt` |
+| `wwwroot/` | `index.html`, `CSS/WiFiWatch.css`, Nunito with `OFL.txt` |
 
 ## Build, Run, Publish
 
 ```bash
-dotnet build WifiWatch.slnx
+dotnet build WiFiWatch.slnx
 ```
 
 ```bash
-dotnet publish WifiWatch.Desktop -c Release
+dotnet publish WiFiWatch.Desktop -c Release
 ```
 
-Publish writes one file, `WifiWatch.Desktop\bin\Release\net10.0-windows10.0.17763.0\win-x64\publish\WifiWatch_v1.5.exe`, about 80 MB. `<Version>` lives in `WifiWatch.Desktop.csproj` only.
+Publish writes one file, `WiFiWatch.Desktop\bin\Release\net10.0-windows10.0.17763.0\win-x64\publish\WiFiWatch_v1.5.exe`, about 80 MB. `<Version>` lives in `WiFiWatch.Desktop.csproj` only.
 
-Installing is copying that exe to `%LocalAppData%\Programs\WifiWatch` and running it once. Every Release launch rewrites the `Run` value (with `--tray`) and `Start Menu\Programs\01 Apps\Wifi Watch.lnk` to point at itself. A release on GitHub carries exactly one asset named `WifiWatch_v<version>.exe` under the tag `v<version>`, because the updater builds that URL.
+Installing is copying that exe to `%LocalAppData%\Programs\WiFiWatch` and running it once. Every Release launch rewrites the `Run` value (with `--tray`) and `Start Menu\Programs\01 Apps\Wi-Fi Watch.lnk` to point at itself. A release on GitHub carries exactly one asset named `WiFiWatch_v<version>.exe` under the tag `v<version>`, because the updater builds that URL.
 
-**Releases come from `.github/workflows/release.yml`, not from this PC**, which replaces the global `gh release create` step: bump `<Version>`, commit and push, then `git tag v1.6` and `git push origin v1.6`. The workflow publishes on `windows-latest`, uploads the exe as the `unsigned` artifact, signs it through SignPath once the `SIGNPATH_API_TOKEN` secret and the `SIGNPATH_ORGANIZATION_ID` variable exist (waiting up to an hour for the approval in SignPath), and creates the release with the exe as its only asset, unsigned until SignPath is set up. A tag that does not match `<Version>` fails the release step, because no `WifiWatch_<tag>.exe` exists. A manual run only builds and uploads. `IncludeSourceRevisionInInformationalVersion` is off so the product version is exactly `1.5`, which SignPath's metadata check compares, and `Company` replaces the default, which was the assembly name.
+**Releases come from `.github/workflows/release.yml`, not from this PC**, which replaces the global `gh release create` step: bump `<Version>`, commit and push, then `git tag v1.6` and `git push origin v1.6`. The workflow publishes on `windows-latest`, uploads the exe as the `unsigned` artifact, signs it through SignPath once the `SIGNPATH_API_TOKEN` secret and the `SIGNPATH_ORGANIZATION_ID` variable exist (waiting up to an hour for the approval in SignPath), and creates the release with the exe as its only asset, unsigned until SignPath is set up. A tag that does not match `<Version>` fails the release step, because no `WiFiWatch_<tag>.exe` exists. A manual run only builds and uploads. `IncludeSourceRevisionInInformationalVersion` is off so the product version is exactly `1.5`, which SignPath's metadata check compares, and `Company` replaces the default, which was the assembly name.
 
-SignPath Foundation signs open source for free, but approves projects by hand. Once approved: project slug `WifiWatch`, signing policy `release-signing` with manual approval, the predefined GitHub.com trusted build system linked to the project, an API token of a submitter as the `SIGNPATH_API_TOKEN` repository secret, the organization id as the `SIGNPATH_ORGANIZATION_ID` repository variable, and this artifact configuration. Its product name and version restrictions are a Foundation rule, and the README's Code signing policy section is the one its terms require.
+SignPath Foundation signs open source for free, but approves projects by hand. Once approved: project slug `WiFiWatch`, signing policy `release-signing` with manual approval, the predefined GitHub.com trusted build system linked to the project, an API token of a submitter as the `SIGNPATH_API_TOKEN` repository secret, the organization id as the `SIGNPATH_ORGANIZATION_ID` repository variable, and this artifact configuration. Its product name and version restrictions are a Foundation rule, and the README's Code signing policy section is the one its terms require.
 
 ```xml
 <artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
@@ -91,7 +91,7 @@ SignPath Foundation signs open source for free, but approves projects by hand. O
     <parameter name="version" />
   </parameters>
   <zip-file>
-    <pe-file path="WifiWatch_v${version}.exe" product-name="Wifi Watch" product-version="${version}">
+    <pe-file path="WiFiWatch_v${version}.exe" product-name="Wi-Fi Watch" product-version="${version}">
       <authenticode-sign />
     </pe-file>
   </zip-file>
@@ -104,14 +104,14 @@ SignPath Foundation signs open source for free, but approves projects by hand. O
 - **Migrations** live in Data but need the Desktop project as the startup project, which carries the Debug-only `Microsoft.EntityFrameworkCore.Design`:
 
 ```bash
-dotnet ef migrations add Name --project WifiWatch.Data --startup-project WifiWatch.Desktop --output-dir Migrations
+dotnet ef migrations add Name --project WiFiWatch.Data --startup-project WiFiWatch.Desktop --output-dir Migrations
 ```
 
   Then convert the new migration to a file-scoped namespace, run CSharpier with `--include-generated`, and check `dotnet ef migrations has-pending-model-changes`. A migration that changes the meaning of old rows backfills them with `migrationBuilder.Sql` (see `AddIncidentsSpeedTestsAndDns`).
 
 ## Data
 
-Everything lives in `%AppData%\WifiWatch`: `WifiWatch.db`, `settings.json` and the `WebView2` profile. Exports go to `Documents\WifiWatch\Exports`. **Nothing is ever deleted**: no retention, no delete buttons, migrations only add. A minute row is about 120 bytes, roughly 60 MB a year.
+Everything lives in `%AppData%\WiFiWatch`: `WiFiWatch.db`, `settings.json` and the `WebView2` profile. Exports go to `Documents\WiFiWatch\Exports`. Debug builds use `%AppData%\WiFiWatch Debug` instead, a folder the installed app never has, so a test run can never open the real database or fall through to its `-wal` from the Claude app's container. **Nothing is ever deleted**: no retention, no delete buttons, migrations only add. A minute row is about 120 bytes, roughly 60 MB a year.
 
 Times are stored as UTC and shown local. EF reads them back as `Unspecified`, and `ToLocalTime` treats that as UTC, which is what we want.
 
@@ -124,7 +124,7 @@ Times are stored as UTC and shown local. EF reads them back as `Unspecified`, an
 
 ## The Monitor
 
-One `PeriodicTimer` at 1 s in `NetworkMonitor.RunAsync`. Each tick pings the gateway and `1.1.1.1` in parallel. The link and gateway (Ethernet before Wi-Fi) are re-read when `NetworkChange.NetworkAddressChanged` fires and every 5th tick, because listing adapters was three quarters of the app's CPU. Every 5th tick reads Wi-Fi through `netsh` and the WLAN event log, every 15th times DNS, every 300th scans neighbors. At each minute boundary the readings fold into one `MinuteSample` and the per-minute checks run on it. A tick gap over 30 s means the PC slept: every open incident closes at the last tick before it (", Cut Short By Sleep"), the condition tracker starts over, the last Wi-Fi reading is forgotten so the reconnect after waking is not a drop, then `Resumed` is logged and the quiet window restarts. A failure inside a tick logs one `MonitorFailed` per streak and the loop carries on.
+One `PeriodicTimer` at 1 s in `NetworkMonitor.RunAsync`. Each tick pings the gateway and `1.1.1.1` in parallel. The link and gateway (Ethernet before Wi-Fi) are re-read when `NetworkChange.NetworkAddressChanged` fires and every 5th tick, because listing adapters was three quarters of the app's CPU. Every 5th tick reads Wi-Fi through `netsh` and the WLAN event log, every 15th times DNS, every 300th scans neighbors. At each minute boundary the readings fold into one `MinuteSample` and the per-minute checks run on it. A tick gap over 30 s means the PC slept: every open incident closes at the last tick before it (", Cut Short By Sleep"), the condition tracker starts over, the last Wi-Fi reading is forgotten so the reconnect after waking is not a drop, then `Resumed` is logged and the quiet window restarts. A failure inside a tick logs one `MonitorFailed` per streak and the loop carries on. On Ethernet no Wi-Fi is read at all (no `netsh`), the last reading is cleared so Overview shows the cable rather than a Wi-Fi network carrying nothing, and moving onto Ethernet closes an open Wi-Fi Lost or Location Blocked incident.
 
 ### Incidents, Not Loose Rows
 
@@ -178,7 +178,7 @@ After 60 ticks on each new day: write yesterday's summary if missing ("yyyy-MM-d
 
 `Home` shows `UpdateDialog` once per run when an update is known and `ShowUpdatePopup` is on, on first render and on `UpdateFound`. The dialog has a "Don't Show Again" checkbox that turns the setting off; Settings has the same switch, the version, and Check For Updates or Update Now. While downloading, both Update Now buttons stay blue and swap their icon for a spinner beside "Downloading"; a second click is ignored.
 
-Update Now: `Updater.DownloadAsync` saves `WifiWatch_v<new>.exe` beside the running exe (through a `.download` file), `Updater.Launch` starts it with `--after-update <pid>`, the window exits. The new exe calls `Updater.FinishPreviousVersion` first in `OnStartup`: it waits up to 15 s for the old process and deletes the other `WifiWatch_v*.exe` files beside it (replaced builds, not data). A Debug build or a renamed exe (`Updater.CanInstall` false) opens the release page instead.
+Update Now: `Updater.DownloadAsync` saves `WiFiWatch_v<new>.exe` beside the running exe (through a `.download` file), `Updater.Launch` starts it with `--after-update <pid>`, the window exits. The new exe calls `Updater.FinishPreviousVersion` first in `OnStartup`: it waits up to 15 s for the old process and deletes the other `WiFiWatch_v*.exe` files beside it (replaced builds, not data). A Debug build or a renamed exe (`Updater.CanInstall` false) opens the release page instead.
 
 ## Window Behaviour
 
@@ -197,7 +197,8 @@ The look follows LetsWatch: navigation in the app bar, section titles above pane
 - **Incidents** (what happened): one `DataTable` of When, What, Where, Length and Details. Problems (by `Problems.IsProblem`) by default, Everything on the segmented toggle. Reloads on every recorded event. A row opens `IncidentDialog`: time range, message, What To Do, where in plain words, Windows reason, context, trace hops, and one fix button from `QuickActions.ForEvent`.
 - **History** (how was it over a period): a `MudDateRangePicker` with Today, 7 Days and 30 Days on the left of its action bar (they apply at once) and Cancel and OK on the right, so picking days loads nothing until OK; the minutes CSV export on the right. Four tiles from `SummaryWriter.SummarizeAsync` (Online, Problems, Longest Outage, Fastest Download), the `HealthStrip` per hour up to 3 days and per day beyond, one ping chart (Router grey, Internet blue, DNS dashed violet), the Wi-Fi Channel panel, and the speed tests in range. The channel panel is a `ChannelStrip`: one cell per EU channel grouped by 80 MHz block (36 to 140, or 1 to 13 when on 2.4 GHz), yours blue, a block neighbour at 30% or more amber (it shares your airtime), audible ones elsewhere grey, the network count in each cell and, in the tooltip the channel, Yours, then one network per line with its dBm, numbered once there are several (`.mud-tooltip` keeps line breaks and aligns left), from one DISTINCT query (the strongest reading per network and channel is taken in memory) plus an average for airtime. Radar evictions, airtime busy from your access point's BSS Load, and the advice line sit with it.
 - **`HealthStrip`** is one cell per bucket from `HealthBuckets.Build`: red for any Critical problem touching it, amber for a Warning, green when watched and fine, an outlined empty cell when the app was not running. Open problems run until now.
-- **Settings** is four sections: General switches, Problem Limits (three fields, each with a helper line), Wi-Fi Adapter chips, About with version and updates.
+- **Settings** is four sections: General switches, Problem Limits (three fields, each with a helper line), Wi-Fi Adapter chips (hidden on a PC without Wi-Fi), About with version and updates.
+- **Cable and powerline.** History hides the Wi-Fi Channel panel for a range without Wi-Fi minutes. A powerline adapter is an Ethernet bridge Windows cannot see, so a powerline PC simply looks wired: its trouble shows as ping spikes, loss and drops on Home Network, whose wording and advice name powerline adapters. Detecting the adapters for sure would take raw Ethernet frames (HomePlug AV management on EtherType 0x88E1, G.hn has its own), which Windows only allows through a packet driver such as Npcap, whose free edition may not be bundled; even TP-Link's own tool needs WinPcap. So nothing guesses at powerline.
 - **Raw minutes** have no page; the History export holds every column.
 - **Dialogs** have no corner X, each has its own Close or Cancel. Tables inside them are bordered and outlined with 10 px corners (`rounded-inner` over `--radius-inner`).
 - **Icons** are Rounded and filled (Error and Warning, never the Outline ones). MudBlazor's own defaults are overridden too: the date picker, pager, sort arrow, checkboxes and the snackbar icons in `App.xaml.cs`.
@@ -215,12 +216,14 @@ The look follows LetsWatch: navigation in the app bar, section titles above pane
 - `ConditionTracker` uses `Math.Max(setting, baseline)`: the baseline only raises the bar on a naturally noisy link, never lowers it below the user's setting. It cannot rescue a limit set below someone's normal, which is why the defaults sit above common connections (Starlink and 4G run 40 to 50 ms to 1.1.1.1).
 - A saved `settings.json` keeps its old limits; defaults only fill keys that are missing, and removed keys are ignored.
 - Background cost was measured: about 0.5% of one core hidden in the tray, no measurable effect on router latency from the `netsh` reads, and the 5 minute neighbor read only returns Windows' cached list (never `WlanScan`, which takes the radio off channel). The 5 s `netsh wlan show interfaces` spawn is the biggest remaining cost; the native `WlanQueryInterface` would remove it and the English only limit, but may show the location in use icon.
+- The project was `WifiWatch` (shown as "Wifi Watch") up to v1.5. Windows paths, the registry, GitHub repository URLs and release asset names all ignore case, so the data folder, the `Run` value and v1.5's updater (which asks for `WifiWatch_v1.6.exe`) carry over untouched. `Updater.CanInstall` compares the exe prefix ignoring case for the same reason, settings load case-insensitively because old files say `ReadWifiNatively`, and writing the shortcut deletes the old `Wifi Watch.lnk`. The single-instance event is now `WiFiWatch.Show`; kernel names are case-sensitive, but an update waits for the old process before it checks.
 - `EventJournal.HasMessageStartingWithAsync`, `OpenProblemsAsync` and `CloseLeftoversAsync` are static; they only touch the database. Severity is stored as text, so `OpenProblemsAsync` ranks it in memory.
 
 ## Verifying
 
-- **Self-tests** run from static constructors with `Debug.Assert`: `WifiReader`, `ChannelAdvice`, `ConditionTracker`, `DnsProbe`, `HealthBuckets`. A failing one kills a Debug launch with `FailFast` and the message `SelfTestPasses()` in the Application event log. To run them all headless, a file-based app with `#:project` pointing at `WifiWatch.Services.csproj` and `#:property TargetFramework=net10.0-windows` can invoke every `SelfTestPasses` through reflection.
+- **Self-tests** run from static constructors with `Debug.Assert`: `WiFiReader`, `ChannelAdvice`, `ConditionTracker`, `DnsProbe`, `HealthBuckets`. A failing one kills a Debug launch with `FailFast` and the message `SelfTestPasses()` in the Application event log. To run them all headless, a file-based app with `#:project` pointing at `WiFiWatch.Services.csproj` and `#:property TargetFramework=net10.0-windows` can invoke every `SelfTestPasses` through reflection.
 - **Analyzers** per project: `dotnet format analyzers <project>.csproj --verify-no-changes --severity info` and the same with `style`, for all three projects.
 - **Look at the UI** by launching with `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=9333` and driving it over the Chrome DevTools Protocol from Node (`/json`, `Page.captureScreenshot`, `Runtime.evaluate`, `Input.dispatchMouseEvent`). The page runs at a device pixel ratio of 1.25, so CSS coordinates are screenshot pixels divided by 1.25.
 - **The update popup** can be seen by building with `-p:Version=0.9` and waiting about 70 s for the daily jobs.
-- **One instance only.** A second launch, including a Debug build, just shows the first window and exits; stop the installed app before running a build.
+- **One instance only.** A second launch just shows the first window and exits. A Debug build has its own data folder, so it is safe beside the installed app as long as their single-instance names differ (they did while v1.5, `WifiWatch.Show`, was installed); otherwise ask the owner to exit the installed app from the tray, never kill it.
+- **Screenshots** for the README: generate the sample week, copy it to the container's `%AppData%\WiFiWatch Debug\WiFiWatch.db` (`C:\Users\yusuf\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\WiFiWatch Debug`) with `{}` as `settings.json`, launch the Debug build with the debugging port, maximize it on the primary screen and capture each page.

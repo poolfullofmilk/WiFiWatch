@@ -1,0 +1,5 @@
+<Solution>
+    <Project Path="WiFiWatch.Data/WiFiWatch.Data.csproj" />
+    <Project Path="WiFiWatch.Services/WiFiWatch.Services.csproj" />
+    <Project Path="WiFiWatch.Desktop/WiFiWatch.Desktop.csproj" />
+</Solution>

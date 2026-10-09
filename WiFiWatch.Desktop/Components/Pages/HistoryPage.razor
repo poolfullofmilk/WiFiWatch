@@ -1,0 +1,267 @@
+@using ApexCharts
+@using Color = MudBlazor.Color
+@using Size = MudBlazor.Size
+
+<MudStack Spacing="6">
+    @* Range Toolbar *@
+    <MudStack Row
+              AlignItems="AlignItems.Center"
+              Wrap="Wrap.Wrap"
+              Spacing="3">
+        <MudElement HtmlTag="div"
+                    Style="width:320px">
+            @* Range Picker *@
+            <MudDateRangePicker @ref="_rangePicker"
+                                DateRange="_range"
+                                DateRangeChanged="SelectRangeAsync"
+                                MaxDate="DateTime.Today"
+                                DateFormat="yyyy-MM-dd"
+                                Color="Color.Info"
+                                Variant="Variant.Outlined"
+                                Margin="Margin.Dense"
+                                AdornmentIcon="@Icons.Material.Rounded.DateRange"
+                                PreviousIcon="@Icons.Material.Rounded.ChevronLeft"
+                                NextIcon="@Icons.Material.Rounded.ChevronRight"
+                                SeparatorIcon="@Icons.Material.Rounded.ArrowRightAlt">
+                <PickerActions>
+                    @foreach (var (label, dayCount) in s_presets)
+                    {
+                        @* Preset Button *@
+                        <MudButton Variant="Variant.Filled"
+                                   Size="Size.Small"
+                                   OnClick="() => ApplyPresetAsync(dayCount)">
+                            @label
+                        </MudButton>
+                    }
+                    <MudSpacer />
+                    @* Cancel Button *@
+                    <MudButton Variant="Variant.Filled"
+                               Size="Size.Small"
+                               OnClick="() => _rangePicker!.CloseAsync(false)">
+                        Cancel
+                    </MudButton>
+                    @* OK Button *@
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Info"
+                               Size="Size.Small"
+                               OnClick="() => _rangePicker!.CloseAsync()">
+                        OK
+                    </MudButton>
+                </PickerActions>
+            </MudDateRangePicker>
+        </MudElement>
+        <MudSpacer />
+        @* Export Menu *@
+        <ExportMenu OnExport="ExportMinutesAsync" />
+    </MudStack>
+
+    @* Summary Tiles *@
+    <MudGrid>
+
+        @foreach (var tile in Tiles)
+        {
+            <MudItem xs="6"
+                     md="3">
+                <MudPaper Elevation="4"
+                          Class="pa-4 rounded-panel mud-height-full">
+                    <MudText Typo="Typo.caption"
+                             Class="mud-text-secondary">
+                        @tile.Label
+                    </MudText>
+                    @if (_isLoading)
+                    {
+                        <MudText Typo="Typo.h4">
+                            <MudSkeleton Animation="Animation.Wave"
+                                         Width="60%" />
+                        </MudText>
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.h4"
+                                 Color="@tile.Color">
+                            @tile.Value
+                        </MudText>
+                    }
+                    <MudText Typo="Typo.caption"
+                             Class="mud-text-secondary">
+                        @tile.Hint
+                    </MudText>
+                </MudPaper>
+            </MudItem>
+        }
+
+        @* Health Panel *@
+        <MudItem xs="12">
+            <MudPaper Elevation="4"
+                      Class="pa-4 rounded-panel">
+                <MudText Typo="Typo.subtitle1"
+                         Class="mx-2 mb-3">
+                    <b>@(_isDaily ? "Day By Day" : "Hour By Hour")</b>
+                </MudText>
+                @if (_isLoading)
+                {
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle"
+                                 Animation="Animation.Wave"
+                                 Height="56px"
+                                 Style="border-radius:10px" />
+                }
+                else
+                {
+                    <HealthStrip Buckets="_buckets"
+                                 IsDaily="_isDaily" />
+                }
+            </MudPaper>
+        </MudItem>
+
+        @* Ping Chart *@
+        <MudItem xs="12">
+            <MudPaper Elevation="4"
+                      Class="pa-4 rounded-panel">
+                <MudText Typo="Typo.subtitle1"
+                         Class="mx-2 mb-3">
+                    <b>@(_isDaily ? "Ping Per Day" : "Ping Per Hour")</b>
+                </MudText>
+                @if (_isLoading)
+                {
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle"
+                                 Animation="Animation.Wave"
+                                 Height="280px"
+                                 Style="border-radius:10px" />
+                }
+                else
+                {
+                    <ApexChart @key="_renderKey"
+                               TItem="ChartPoint"
+                               Options="_pingOptions"
+                               Height="@("280")">
+                        <ApexPointSeries TItem="ChartPoint"
+                                         Items="_routerPingPoints"
+                                         Name="Router"
+                                         SeriesType="SeriesType.Line"
+                                         XValue="@(point => point.Label)"
+                                         YValue="@(point => point.Value)" />
+                        <ApexPointSeries TItem="ChartPoint"
+                                         Items="_internetPingPoints"
+                                         Name="Internet"
+                                         SeriesType="SeriesType.Line"
+                                         XValue="@(point => point.Label)"
+                                         YValue="@(point => point.Value)" />
+                        <ApexPointSeries TItem="ChartPoint"
+                                         Items="_dnsPoints"
+                                         Name="DNS"
+                                         SeriesType="SeriesType.Line"
+                                         XValue="@(point => point.Label)"
+                                         YValue="@(point => point.Value)" />
+                    </ApexChart>
+                }
+            </MudPaper>
+        </MudItem>
+
+        @* Channel Panel *@
+        @if (ShowsChannelPanel)
+        {
+            <MudItem xs="12">
+                <MudPaper Elevation="4"
+                          Class="pa-4 rounded-panel">
+                    <MudStack Row
+                              AlignItems="AlignItems.Center"
+                              Wrap="Wrap.Wrap"
+                              Spacing="1"
+                              Class="mx-2 mb-3">
+                        <MudText Typo="Typo.subtitle1">
+                            <b>Wi-Fi Channel</b>
+                        </MudText>
+                        <MudSpacer />
+                        @* Eviction Chip *@
+                        <ActionChip Icon="@Icons.Material.Rounded.Radar"
+                                    Text="@EvictionText"
+                                    Color="@(_evictionCount > 0 ? Color.Warning : Color.Default)"
+                                    Target="@(_evictionCount > 0 ? Monitor.Status.RouterAdminUrl : null)" />
+                        @if (_airtimePercent is { } airtimePercent)
+                        {
+                            <ActionChip Icon="@Icons.Material.Rounded.DataUsage"
+                                        Text="@($"Airtime Busy {airtimePercent:0}%")"
+                                        Color="@(airtimePercent >= BusyAirtimePercent ? Color.Warning : Color.Default)" />
+                        }
+                    </MudStack>
+                    @if (_isLoading)
+                    {
+                        <MudSkeleton SkeletonType="SkeletonType.Rectangle"
+                                     Animation="Animation.Wave"
+                                     Height="80px"
+                                     Style="border-radius:10px" />
+                    }
+                    else
+                    {
+                        <MudStack Spacing="3">
+                            <ChannelStrip Blocks="ChannelBlocks"
+                                          Neighbors="_neighbors"
+                                          CurrentChannel="Monitor.Status.Reading?.Channel" />
+                            <MudText Typo="Typo.body1"
+                                     Class="mx-2">
+                                @_channelAdvice
+                            </MudText>
+                        </MudStack>
+                    }
+                </MudPaper>
+            </MudItem>
+        }
+
+        @* Speed Tests *@
+        <MudItem xs="12">
+            <MudPaper Elevation="4"
+                      Class="pa-4 rounded-panel mud-height-full">
+                <MudText Typo="Typo.subtitle1"
+                         Class="mx-2 mb-3">
+                    <b>Speed Tests</b>
+                </MudText>
+                @if (_speedTests.Count == 0)
+                {
+                    <MudText Typo="Typo.body2"
+                             Class="mx-2 mud-text-secondary">
+                        None In This Range, Start One From Overview
+                    </MudText>
+                }
+                else
+                {
+                    @* Speed Table *@
+                    <MudSimpleTable Dense
+                                    Elevation="0"
+                                    Style="background:transparent">
+                        <thead>
+                            <tr>
+                                <th>When</th>
+                                <th>Down</th>
+                                <th>Up</th>
+                                <th>Lag Under Load</th>
+                                <th>Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var test in _speedTests)
+                            {
+                                <tr>
+                                    <td>@Formatter.FormatWhen(test.TestedAtUtc)</td>
+                                    <td>@($"{test.DownloadMbps:0} Mbps")</td>
+                                    <td>@($"{test.UploadMbps:0} Mbps")</td>
+                                    <td>@Formatter.FormatLagUnderLoad(test)</td>
+                                    <td>
+                                        <MudChip T="string"
+                                                 Size="Size.Small"
+                                                 Variant="Variant.Text"
+                                                 Color="@GradeColors.For(test.Grade)">
+                                            @test.Grade
+                                        </MudChip>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                }
+            </MudPaper>
+        </MudItem>
+
+
+
+    </MudGrid>
+</MudStack>

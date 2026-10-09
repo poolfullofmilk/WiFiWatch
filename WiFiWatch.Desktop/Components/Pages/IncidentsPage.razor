@@ -1,0 +1,58 @@
+@using Size = MudBlazor.Size
+
+@* Incidents Table *@
+<DataTable TItem="WiFiEvent"
+           @ref="_incidentTable"
+           ServerData="LoadIncidentsAsync"
+           @bind-SearchTerm="_searchTerm"
+           OnRowClick="OpenDetailsAsync">
+
+    <ToolBarExtra>
+        @* Scope Buttons *@
+        <SegmentedButtonGroup TValue="bool"
+                              Options="s_scopeOptions"
+                              Value="_isEverything"
+                              ValueChanged="SelectScopeAsync" />
+        @* Export Menu *@
+        <ExportMenu OnExport="ExportAsync" />
+    </ToolBarExtra>
+
+    <HeaderContent>
+        <MudTh>
+            <MudTableSortLabel T="WiFiEvent"
+                               SortLabel="@nameof(WiFiEvent.OccurredAtUtc)"
+                               InitialDirection="SortDirection.Descending"
+                               SortIcon="@Icons.Material.Rounded.ArrowUpward">
+                When
+            </MudTableSortLabel>
+        </MudTh>
+        <MudTh>What</MudTh>
+        <MudTh>Where</MudTh>
+        <MudTh>Length</MudTh>
+        <MudTh>Details</MudTh>
+    </HeaderContent>
+
+    <RowTemplate>
+        <MudTd DataLabel="When"
+               Class="selectable-text">
+            @Formatter.FormatLocal(context.OccurredAtUtc, "yyyy-MM-dd HH:mm")
+        </MudTd>
+        <MudTd DataLabel="What">
+            <MudChip T="string"
+                     Icon="@EventKindColors.IconFor(context.Severity)"
+                     Color="@EventKindColors.For(context.Kind, context.Severity)"
+                     Size="Size.Small"
+                     Variant="Variant.Text">
+                @context.Kind.ToLabel()
+            </MudChip>
+        </MudTd>
+        <MudTd DataLabel="Where">@(context.Scope ?? "-")</MudTd>
+        <MudTd DataLabel="Length">@(Formatter.FormatIncidentLength(context.OccurredAtUtc, context.EndedAtUtc) ?? "-")</MudTd>
+        <MudTd DataLabel="Details"
+               Class="selectable-text">
+            <MudHighlighter Text="@context.Message"
+                            HighlightedText="@_searchTerm" />
+        </MudTd>
+    </RowTemplate>
+
+</DataTable>

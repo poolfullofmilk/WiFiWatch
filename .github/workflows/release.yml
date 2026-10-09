@@ -18,7 +18,7 @@ jobs:
       run:
         shell: bash
     env:
-      PUBLISH_DIRECTORY: WifiWatch.Desktop/bin/Release/net10.0-windows10.0.17763.0/win-x64/publish
+      PUBLISH_DIRECTORY: WiFiWatch.Desktop/bin/Release/net10.0-windows10.0.17763.0/win-x64/publish
       SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
     steps:
       - uses: actions/checkout@v7
@@ -28,7 +28,7 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Publish Exe
-        run: dotnet publish WifiWatch.Desktop -c Release
+        run: dotnet publish WiFiWatch.Desktop -c Release
 
       # SignPath Only Signs What GitHub Stored
       - name: Upload Unsigned Exe
@@ -36,7 +36,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: unsigned
-          path: ${{ env.PUBLISH_DIRECTORY }}/WifiWatch_v*.exe
+          path: ${{ env.PUBLISH_DIRECTORY }}/WiFiWatch_v*.exe
           if-no-files-found: error
 
       - name: Read Version
@@ -50,7 +50,7 @@ jobs:
         with:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
           organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
-          project-slug: WifiWatch
+          project-slug: WiFiWatch
           signing-policy-slug: release-signing
           github-artifact-id: ${{ steps.unsigned.outputs.artifact-id }}
           wait-for-completion: true
@@ -59,11 +59,11 @@ jobs:
           parameters: |
             version: ${{ toJSON(steps.version.outputs.number) }}
 
-      # The Updater Downloads WifiWatch_v<Version>.exe From The Tag
+      # The Updater Downloads WiFiWatch_v<Version>.exe From The Tag
       - name: Create Release
         if: github.ref_type == 'tag'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           directory=$([ -d signed ] && echo signed || echo "$PUBLISH_DIRECTORY")
-          gh release create "$GITHUB_REF_NAME" "$directory/WifiWatch_$GITHUB_REF_NAME.exe" --title "Wifi Watch $GITHUB_REF_NAME" --notes ""
+          gh release create "$GITHUB_REF_NAME" "$directory/WiFiWatch_$GITHUB_REF_NAME.exe" --title "Wi-Fi Watch $GITHUB_REF_NAME" --notes ""

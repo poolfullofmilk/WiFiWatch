@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net10.0-windows</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <DebugType>embedded</DebugType>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="System.Diagnostics.EventLog" Version="10.0.12" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\WiFiWatch.Data\WiFiWatch.Data.csproj" />
+    </ItemGroup>
+</Project>
