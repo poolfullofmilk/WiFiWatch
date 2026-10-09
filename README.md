@@ -25,3 +25,9 @@ A Windows tray app that tells you when your connection drops, where it went wron
 
 ## Technical details
 - .NET 10, WPF, Blazor, MudBlazor and SQLite
+
+## Code signing policy
+- Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org)
+- Committers, reviewers and approvers: [poolfullofmilk](https://github.com/poolfullofmilk)
+- Every release is built by [GitHub Actions](.github/workflows/release.yml) from this repository and approved by hand before it is signed
+- Privacy: Wifi Watch sends no data about you anywhere. It only pings your router and 1.1.1.1, times a DNS lookup of www.google.com, checks GitHub for a new version once a day and talks to fast.com's servers when a speed test runs. Everything it records stays on your PC

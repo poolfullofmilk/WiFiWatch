@@ -14,6 +14,7 @@ The global `~/.claude/CLAUDE.md` holds every shared convention (git, releases, c
 | `WifiWatch.Data` | `net10.0`, no Windows dependencies. EF context, models, migrations, view models, enums, small helpers |
 | `WifiWatch.Services` | `net10.0-windows`. Everything that watches, measures, stores or talks to Windows |
 | `WifiWatch.Desktop` | WPF exe, `Microsoft.NET.Sdk.Razor`, `net10.0-windows10.0.17763.0`. Window, tray, Blazor UI, theming |
+| `.github/workflows/release.yml` | Builds, signs through SignPath and releases on a pushed version tag |
 | `Screenshots/` | `Overview.png`, `Incidents.png`, `History.png` and `Settings.png` for the README, taken maximized on a generated sample week (History on 7 Days) with default settings, never on real data |
 
 ### WifiWatch.Data
@@ -79,6 +80,23 @@ dotnet publish WifiWatch.Desktop -c Release
 Publish writes one file, `WifiWatch.Desktop\bin\Release\net10.0-windows10.0.17763.0\win-x64\publish\WifiWatch_v1.5.exe`, about 80 MB. `<Version>` lives in `WifiWatch.Desktop.csproj` only.
 
 Installing is copying that exe to `%LocalAppData%\Programs\WifiWatch` and running it once. Every Release launch rewrites the `Run` value (with `--tray`) and `Start Menu\Programs\01 Apps\Wifi Watch.lnk` to point at itself. A release on GitHub carries exactly one asset named `WifiWatch_v<version>.exe` under the tag `v<version>`, because the updater builds that URL.
+
+**Releases come from `.github/workflows/release.yml`, not from this PC**, which replaces the global `gh release create` step: bump `<Version>`, commit and push, then `git tag v1.6` and `git push origin v1.6`. The workflow publishes on `windows-latest`, uploads the exe as the `unsigned` artifact, signs it through SignPath once the `SIGNPATH_API_TOKEN` secret and the `SIGNPATH_ORGANIZATION_ID` variable exist (waiting up to an hour for the approval in SignPath), and creates the release with the exe as its only asset, unsigned until SignPath is set up. A tag that does not match `<Version>` fails the release step, because no `WifiWatch_<tag>.exe` exists. A manual run only builds and uploads. `IncludeSourceRevisionInInformationalVersion` is off so the product version is exactly `1.5`, which SignPath's metadata check compares, and `Company` replaces the default, which was the assembly name.
+
+SignPath Foundation signs open source for free, but approves projects by hand. Once approved: project slug `WifiWatch`, signing policy `release-signing` with manual approval, the predefined GitHub.com trusted build system linked to the project, an API token of a submitter as the `SIGNPATH_API_TOKEN` repository secret, the organization id as the `SIGNPATH_ORGANIZATION_ID` repository variable, and this artifact configuration. Its product name and version restrictions are a Foundation rule, and the README's Code signing policy section is the one its terms require.
+
+```xml
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <parameters>
+    <parameter name="version" />
+  </parameters>
+  <zip-file>
+    <pe-file path="WifiWatch_v${version}.exe" product-name="Wifi Watch" product-version="${version}">
+      <authenticode-sign />
+    </pe-file>
+  </zip-file>
+</artifact-configuration>
+```
 
 - **The Desktop TFM is `net10.0-windows10.0.17763.0`.** BlazorWebView 10 uses `WebView2CompositionControl`, which needs `Microsoft.Windows.SDK.NET`; plain `net10.0-windows` throws `FileNotFoundException` on `Show`.
 - **`BundleWebRoot` and `RemoveLooseWebRoot` make the exe truly single.** Static web assets are copied after the bundle is computed, so `BundleWebRoot` runs `CopyStaticWebAssetsToPublishDirectory` first and adds `wwwroot` to `ResolvedFileToPublish`.

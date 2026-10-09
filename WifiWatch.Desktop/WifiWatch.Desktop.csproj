@@ -16,6 +16,8 @@
         <Version>1.5</Version>
         <AssemblyTitle>Wifi Watch</AssemblyTitle>
         <Product>Wifi Watch</Product>
+        <Company>poolfullofmilk</Company>
+        <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <AssemblyName>WifiWatch_v$(Version)</AssemblyName>
