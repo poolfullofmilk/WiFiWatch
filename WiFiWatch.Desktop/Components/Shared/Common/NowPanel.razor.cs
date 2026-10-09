@@ -53,7 +53,7 @@ public partial class NowPanel : IDisposable
                 $"{worst.Message}, {since}{more}",
                 EventKindColors.For(worst.Kind, worst.Severity),
                 EventKindColors.IconFor(worst.Severity),
-                QuickActions.ForEvent(worst.Kind, status.RouterAdminUrl),
+                QuickActions.ForEvent(worst.Kind, worst.Scope, status.RouterAdminUrl),
                 QuickActions.AdviceFor(worst.Kind, worst.Scope)
             );
         }
@@ -117,7 +117,16 @@ public partial class NowPanel : IDisposable
         }
         else
         {
-            readings.Add(new("Connection", status.Link, "No Wi-Fi Details", Color.Default));
+            readings.Add(
+                new(
+                    "Connection",
+                    status.Link,
+                    status.Link == NetworkMonitor.EthernetLink
+                        ? "Cable Or Powerline"
+                        : "Not Connected",
+                    Color.Default
+                )
+            );
         }
 
         // Some Routers Never Answer Ping, Yet Pass The Internet On

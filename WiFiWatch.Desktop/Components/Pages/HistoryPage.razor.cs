@@ -72,7 +72,7 @@ public partial class HistoryPage
             [
                 new("Online", "-", "Not Watched", Color.Default),
                 new("Problems", "-", "Warnings And Outages", Color.Default),
-                new("Longest Outage", "-", "Internet Or Wi-Fi Down", Color.Default),
+                new("Longest Outage", "-", "Internet Or Connection Down", Color.Default),
                 new("Fastest Download", "-", "From Speed Tests", Color.Default),
             ]
             :
@@ -94,7 +94,7 @@ public partial class HistoryPage
                     summary.LongestOutage > TimeSpan.Zero
                         ? Formatter.FormatDuration(summary.LongestOutage)
                         : "None",
-                    "Internet Or Wi-Fi Down",
+                    "Internet Or Connection Down",
                     summary.LongestOutage > TimeSpan.Zero ? Color.Error : Color.Default
                 ),
                 new(

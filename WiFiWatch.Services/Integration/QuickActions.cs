@@ -14,10 +14,11 @@ public static class QuickActions
     public const string WindowsUpdate = "ms-settings:windowsupdate-optionalupdates";
     public const string DeviceManager = "devmgmt.msc";
 
-    public static string? ForEvent(EventKind kind, string? routerAdminUrl) =>
+    public static string? ForEvent(EventKind kind, string? scope, string? routerAdminUrl) =>
         kind switch
         {
             EventKind.LocationBlocked => LocationSettings,
+            EventKind.Disconnect when scope == NetworkMonitor.HomeNetworkScope => EthernetSettings,
             EventKind.Disconnect
             or EventKind.Reconnect
             or EventKind.ConnectFailed

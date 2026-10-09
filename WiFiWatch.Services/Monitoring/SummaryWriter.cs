@@ -145,8 +145,12 @@ public static class SummaryWriter
             summary.LongestOutage > TimeSpan.Zero
                 ? $"Longest Outage {Formatter.FormatDuration(summary.LongestOutage)}"
                 : "No Outages",
-            Formatter.FormatCount(summary.EvictionCount, "DFS Eviction"),
         ];
+        if (summary.EvictionCount > 0)
+        {
+            parts.Add(Formatter.FormatCount(summary.EvictionCount, "DFS Eviction"));
+        }
+
         if (summary.DfsPercent is { } dfsPercent)
         {
             parts.Add($"{dfsPercent:0}% On DFS");

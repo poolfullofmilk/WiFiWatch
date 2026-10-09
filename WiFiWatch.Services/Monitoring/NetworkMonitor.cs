@@ -557,8 +557,12 @@ public sealed class NetworkMonitor
         var internetTask = SendPingAsync(_internetPing, s_internetAddress);
         _lastRouterRoundTrip = await routerTask;
         _lastInternetRoundTrip = await internetTask;
-        _routerRoundTrips.Add(_lastRouterRoundTrip);
-        _internetRoundTrips.Add(_lastInternetRoundTrip);
+        // Seconds Without A Network Are Drops, Not Loss
+        if (_routerAddress is not null)
+        {
+            _routerRoundTrips.Add(_lastRouterRoundTrip);
+            _internetRoundTrips.Add(_lastInternetRoundTrip);
+        }
 
         if (_lastInternetRoundTrip is not null)
         {
@@ -871,6 +875,10 @@ public sealed class NetworkMonitor
 
     private async Task ScanNeighborsAsync()
     {
+        // A Cabled PC Would Only Store Rows Nobody Shows
+        if (_link == EthernetLink)
+            return;
+
         var neighbors = await WiFiReader.ReadNeighborsAsync();
         if (neighbors.Count == 0)
             return;

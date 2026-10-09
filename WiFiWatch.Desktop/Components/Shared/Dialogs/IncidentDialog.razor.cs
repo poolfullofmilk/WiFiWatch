@@ -23,7 +23,8 @@ public partial class IncidentDialog
 
     private EventDetails Details => EventDetails.Parse(Event.Details);
 
-    private string? FixTarget => QuickActions.ForEvent(Event.Kind, Monitor.Status.RouterAdminUrl);
+    private string? FixTarget =>
+        QuickActions.ForEvent(Event.Kind, Event.Scope, Monitor.Status.RouterAdminUrl);
 
     private string TimeRange =>
         Event.EndedAtUtc is not { } endedAtUtc
