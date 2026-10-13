@@ -32,7 +32,9 @@ public partial class ChannelStrip
     {
         // Neighbors Inside Your 80 MHz Block Share Your Airtime
         var isAudible = On(channel)
-            .Any(neighbor => neighbor.SignalPercent >= ChannelAdvice.AudibleSignalPercent);
+            .Any(neighbor =>
+                !neighbor.IsOwn && neighbor.SignalPercent >= ChannelAdvice.AudibleSignalPercent
+            );
         var state =
             channel == CurrentChannel ? "channel-yours"
             : isAudible && CurrentBlock?.Contains(channel) == true ? "channel-shares"
@@ -45,13 +47,14 @@ public partial class ChannelStrip
     {
         var name = $"Channel {channel}{(WiFiChannels.IsDfs(channel) ? " DFS" : string.Empty)}";
         var networks = On(channel)
-            .OrderByDescending(neighbor => neighbor.SignalPercent)
+            .OrderByDescending(neighbor => neighbor.IsOwn)
+            .ThenByDescending(neighbor => neighbor.SignalPercent)
             .Select(neighbor =>
-                $"{(string.IsNullOrEmpty(neighbor.Ssid) ? "Hidden" : neighbor.Ssid)}, {(neighbor.SignalPercent / 2) - 100} dBm"
+                $"{(string.IsNullOrEmpty(neighbor.Ssid) ? "Hidden" : neighbor.Ssid)}, {(neighbor.SignalPercent / 2) - 100} dBm{(neighbor.IsOwn ? ", Yours" : string.Empty)}"
             )
             .ToList();
 
-        // One Network Per Line, Numbered Once There Are Several
+        // Yours First, Numbered Once There Are Several
         var networkLines = networks.Count switch
         {
             0 => ["No Other Networks"],
@@ -59,7 +62,9 @@ public partial class ChannelStrip
             _ => networks.Select((network, index) => $"{index + 1}. {network}"),
         };
         List<string> lines = [name];
-        if (channel == CurrentChannel)
+
+        // Your Channel Before Any Scan Saw Your Network On It
+        if (channel == CurrentChannel && !On(channel).Any(neighbor => neighbor.IsOwn))
             lines.Add("Yours");
 
         lines.AddRange(networkLines);

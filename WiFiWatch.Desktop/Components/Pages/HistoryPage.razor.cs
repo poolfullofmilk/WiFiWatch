@@ -15,7 +15,7 @@ using Color = MudBlazor.Color;
 
 namespace WiFiWatch.Desktop.Components.Pages;
 
-public partial class HistoryPage
+public partial class HistoryPage : IDisposable
 {
     // Ranges And Chart Shape
     private const int HourlyDayLimit = 3;
@@ -32,8 +32,13 @@ public partial class HistoryPage
     [Inject]
     public required NetworkMonitor Monitor { get; set; }
 
-    // Chart Options
+    [Inject]
+    public required MainWindow Window { get; set; }
+
+    // Chart State
     private readonly ApexChartOptions<ChartPoint> _pingOptions = BuildPingOptions();
+    private ApexChart<ChartPoint>? _pingChart;
+    private bool _isChartStale;
 
     // Range State
     private DateRange _range = new(DateTime.Today, DateTime.Today);
@@ -109,7 +114,23 @@ public partial class HistoryPage
                 ),
             ];
 
-    protected override Task OnInitializedAsync() => LoadAsync();
+    protected override async Task OnInitializedAsync()
+    {
+        Monitor.MinuteRecorded += OnMinuteRecorded;
+        await LoadAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // New Values Redraw In Place, A New Chart Would Flicker
+        if (_isChartStale && _pingChart is not null)
+        {
+            _isChartStale = false;
+            await _pingChart.UpdateSeriesAsync(false);
+        }
+    }
+
+    private void OnMinuteRecorded() => InvokeAsync(RefreshTodayAsync);
 
     #region Range Methods
     private async Task ApplyPresetAsync(int dayCount)
@@ -132,7 +153,26 @@ public partial class HistoryPage
     private async Task LoadAsync()
     {
         _isLoading = true;
+        await LoadRangeAsync();
 
+        // A New Key Rebuilds The Chart With The New Range
+        _renderKey++;
+        _isLoading = false;
+    }
+
+    private async Task RefreshTodayAsync()
+    {
+        // Only A Range Reaching Today Gains Minutes, Hidden Pages Wait
+        if (_isLoading || _range.End != DateTime.Today || !Window.IsVisible)
+            return;
+
+        await LoadRangeAsync();
+        _isChartStale = true;
+        StateHasChanged();
+    }
+
+    private async Task LoadRangeAsync()
+    {
         // Short Ranges Chart Per Hour, Longer Ones Per Day
         var firstDay = _range.Start!.Value.Date;
         var dayCount = (_range.End!.Value.Date - firstDay).Days + 1;
@@ -191,17 +231,19 @@ public partial class HistoryPage
             })
             .Distinct()
             .ToListAsync();
+
+        // One Scan That Knew Our Network Marks It Ours
         _neighbors =
         [
             .. scanned
-                .Where(row => !row.IsOwn)
                 .GroupBy(row => (row.Ssid, row.Bssid, row.Channel))
                 .Select(network => new NeighborReading(
                     network.Key.Ssid,
                     network.Key.Bssid,
                     network.Key.Channel,
                     network.Max(row => row.SignalPercent),
-                    null
+                    null,
+                    network.Any(row => row.IsOwn)
                 )),
         ];
         _airtimePercent = await context
@@ -213,9 +255,9 @@ public partial class HistoryPage
             )
             .AverageAsync(sample => (double?)sample.ChannelUtilizationPercent);
         var neighborsPerBlock = ChannelAdvice.CountNeighbors(
-            _neighbors.Select(neighbor =>
-                (neighbor.Bssid, neighbor.Channel, neighbor.SignalPercent)
-            )
+            _neighbors
+                .Where(neighbor => !neighbor.IsOwn)
+                .Select(neighbor => (neighbor.Bssid, neighbor.Channel, neighbor.SignalPercent))
         );
         var hasScans = scanned.Count > 0;
 
@@ -228,10 +270,6 @@ public partial class HistoryPage
             )
             : "No Wi-Fi Scans In This Range";
         _summary = await SummaryWriter.SummarizeAsync(context, hours, startUtc, endUtc);
-
-        // A New Key Rebuilds The Chart With The New Range
-        _renderKey++;
-        _isLoading = false;
     }
     #endregion
 
@@ -331,6 +369,12 @@ public partial class HistoryPage
         return options;
     }
     #endregion
+
+    public void Dispose()
+    {
+        Monitor.MinuteRecorded -= OnMinuteRecorded;
+        GC.SuppressFinalize(this);
+    }
 
     private sealed record TileView(string Label, string Value, string Hint, Color Color);
 }

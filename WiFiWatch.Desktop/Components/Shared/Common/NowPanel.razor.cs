@@ -24,7 +24,21 @@ public partial class NowPanel : IDisposable
     [Parameter]
     public List<WiFiEvent> Problems { get; set; } = [];
 
-    private VerdictView Verdict => BuildVerdict(Monitor.Status, Problems);
+    [Parameter]
+    public EventCallback RefreshRequested { get; set; }
+
+    private VerdictView Verdict =>
+        BuildVerdict(Monitor.Status, Problems, Monitor.ClearingIncidentIds);
+
+    private string? RouterButtonUrl
+    {
+        get
+        {
+            // The Fix Button May Already Open The Router
+            var routerAdminUrl = Monitor.Status.RouterAdminUrl;
+            return routerAdminUrl == Verdict.FixTarget ? null : routerAdminUrl;
+        }
+    }
 
     private List<ReadingView> Readings => BuildReadings(Monitor.Status, Monitor.Settings);
 
@@ -40,7 +54,11 @@ public partial class NowPanel : IDisposable
             }
         });
 
-    private static VerdictView BuildVerdict(MonitorStatus status, List<WiFiEvent> problems)
+    private static VerdictView BuildVerdict(
+        MonitorStatus status,
+        List<WiFiEvent> problems,
+        IReadOnlyList<int> clearingIncidentIds
+    )
     {
         if (problems.FirstOrDefault() is { } worst)
         {
@@ -48,13 +66,20 @@ public partial class NowPanel : IDisposable
             var more = problems.Count > 1 ? $", {problems.Count - 1} More Open" : string.Empty;
             var since =
                 $"Since {Formatter.FormatLocal(worst.OccurredAtUtc, "HH:mm")} ({Formatter.FormatDuration(DateTime.UtcNow - worst.OccurredAtUtc)})";
+            var color = EventKindColors.For(worst.Kind, worst.Severity);
+
+            // One Good Minute In, It Clears After The Next
+            var isClearing = clearingIncidentIds.Contains(worst.Id);
             return new(
                 worst.Kind.ToLabel(),
                 $"{worst.Message}, {since}{more}",
-                EventKindColors.For(worst.Kind, worst.Severity),
+                color,
                 EventKindColors.IconFor(worst.Severity),
                 QuickActions.ForEvent(worst.Kind, worst.Scope, status.RouterAdminUrl),
-                QuickActions.AdviceFor(worst.Kind, worst.Scope)
+                isClearing
+                    ? "Looks Fine Again, Clears After One More Good Minute"
+                    : QuickActions.AdviceFor(worst.Kind, worst.Scope),
+                isClearing ? Color.Success : color
             );
         }
 
@@ -66,7 +91,8 @@ public partial class NowPanel : IDisposable
                 Color.Error,
                 Icons.Material.Rounded.WifiOff,
                 QuickActions.WiFiSettings,
-                "Check The Router, Cables And Powerline Adapters"
+                "Check The Router, Cables And Powerline Adapters",
+                Color.Error
             );
         }
 
@@ -76,7 +102,8 @@ public partial class NowPanel : IDisposable
             Color.Success,
             Icons.Material.Rounded.Check,
             null,
-            null
+            null,
+            Color.Success
         );
     }
 
@@ -177,7 +204,8 @@ public partial class NowPanel : IDisposable
         Color Color,
         string Icon,
         string? FixTarget,
-        string? Advice
+        string? Advice,
+        Color AdviceColor
     );
 
     private sealed record ReadingView(string Label, string Value, string Hint, Color Color);

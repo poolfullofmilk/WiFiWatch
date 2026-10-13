@@ -29,6 +29,14 @@ public sealed class ConditionTracker(EventJournal journal)
 
     public void Reset() => _conditions.Clear();
 
+    public List<int> ClearingIncidentIds() =>
+        [
+            .. _conditions
+                .Where(condition => condition.Value.GoodStreak > 0)
+                .Select(condition => journal.OpenIdOf(condition.Key))
+                .OfType<int>(),
+        ];
+
     public async Task EvaluateAsync(Check check)
     {
         if (!_conditions.TryGetValue(check.Key, out var condition))

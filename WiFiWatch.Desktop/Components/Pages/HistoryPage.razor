@@ -131,6 +131,7 @@
                 else
                 {
                     <ApexChart @key="_renderKey"
+                               @ref="_pingChart"
                                TItem="ChartPoint"
                                Options="_pingOptions"
                                Height="@("280")">
@@ -260,8 +261,6 @@
                 }
             </MudPaper>
         </MudItem>
-
-
 
     </MudGrid>
 </MudStack>
