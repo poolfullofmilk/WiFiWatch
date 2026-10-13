@@ -25,7 +25,7 @@
                 @if (Verdict.Advice is { } advice)
                 {
                     <MudText Typo="Typo.body2"
-                             Color="@Verdict.Color">
+                             Color="@Verdict.AdviceColor">
                         @advice
                     </MudText>
                 }
@@ -40,7 +40,7 @@
                     @QuickActions.Describe(fixTarget)
                 </MudButton>
             }
-            @if (Monitor.Status.RouterAdminUrl is { } routerAdminUrl)
+            @if (RouterButtonUrl is { } routerAdminUrl)
             {
                 @* Router Button *@
                 <Tooltip Text="Open Router Settings">
@@ -50,6 +50,13 @@
                                    OnClick="() => QuickActions.Open(routerAdminUrl)" />
                 </Tooltip>
             }
+            @* Refresh Button *@
+            <Tooltip Text="Refresh">
+                <MudIconButton Icon="@Icons.Material.Rounded.Refresh"
+                               Variant="Variant.Filled"
+                               Size="Size.Small"
+                               OnClick="RefreshRequested" />
+            </Tooltip>
             @* Speed Test Button *@
             <MudButton Variant="Variant.Filled"
                        Color="Color.Info"

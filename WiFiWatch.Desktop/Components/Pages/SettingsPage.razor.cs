@@ -27,10 +27,14 @@ public partial class SettingsPage
 
     protected override async Task OnInitializedAsync()
     {
-        // The Daily Check May Not Have Run Yet
-        if (Monitor.Adapter is null)
+        // Fresh Each Visit, Driver Or Power Plan May Change
+        try
         {
             await Monitor.InspectAdapterAsync();
+        }
+        catch
+        {
+            // A Failed Look Keeps The Last Known Adapter
         }
     }
 

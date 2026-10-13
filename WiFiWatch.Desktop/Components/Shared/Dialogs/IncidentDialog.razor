@@ -5,10 +5,10 @@
         <MudStack Row
                   AlignItems="AlignItems.Center"
                   Spacing="3">
-            <MudIcon Icon="@EventKindColors.IconFor(Event.Severity)"
-                     Color="@EventKindColors.For(Event.Kind, Event.Severity)" />
+            <MudIcon Icon="@EventKindColors.IconFor(Current.Severity)"
+                     Color="@EventKindColors.For(Current.Kind, Current.Severity)" />
             <MudStack Spacing="0">
-                <MudText Typo="Typo.h6">@Event.Kind.ToLabel()</MudText>
+                <MudText Typo="Typo.h6">@Current.Kind.ToLabel()</MudText>
                 <MudText Typo="Typo.body2"
                          Class="mud-text-secondary">
                     @TimeRange
@@ -21,7 +21,7 @@
                   Style="max-width:720px">
             <MudText Typo="Typo.body1"
                      Class="selectable-text">
-                @Event.Message
+                @Current.Message
             </MudText>
             @if (DetailLines.Count > 0)
             {

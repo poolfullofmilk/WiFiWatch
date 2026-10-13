@@ -5,5 +5,6 @@ public sealed record NeighborReading(
     string Bssid,
     int Channel,
     int SignalPercent,
-    int? ChannelUtilizationPercent
+    int? ChannelUtilizationPercent,
+    bool IsOwn = false
 );

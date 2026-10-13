@@ -117,11 +117,15 @@ public sealed class NetworkMonitor
 
     public AdapterInfo? Adapter { get; private set; }
 
+    public IReadOnlyList<int> ClearingIncidentIds { get; private set; } = [];
+
     public event Action<string, string>? Alerted;
 
     public event Action? StatusChanged;
 
     public event Action? EventRecorded;
+
+    public event Action? MinuteRecorded;
 
     public event Action? UpdateFound;
 
@@ -175,6 +179,7 @@ public sealed class NetworkMonitor
                 {
                     await CloseMinuteAsync(minuteUtc);
                     minuteUtc = TruncateToMinute(nowUtc);
+                    MinuteRecorded?.Invoke();
                 }
 
                 StartScheduledJobs(tickCount);
@@ -406,6 +411,9 @@ public sealed class NetworkMonitor
         {
             await _conditions.EvaluateAsync(check);
         }
+
+        // A Snapshot, The Page Reads It From Another Thread
+        ClearingIncidentIds = _conditions.ClearingIncidentIds();
     }
 
     private string DescribeContext(MinuteSample sample)
@@ -875,8 +883,8 @@ public sealed class NetworkMonitor
 
     private async Task ScanNeighborsAsync()
     {
-        // A Cabled PC Would Only Store Rows Nobody Shows
-        if (_link == EthernetLink)
+        // Skip On A Cable, Or Until Our Network Is Known
+        if (_link == EthernetLink || _lastConnected is null)
             return;
 
         var neighbors = await WiFiReader.ReadNeighborsAsync();

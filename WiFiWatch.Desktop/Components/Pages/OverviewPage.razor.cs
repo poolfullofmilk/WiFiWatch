@@ -25,7 +25,6 @@ public partial class OverviewPage : IDisposable
     public EventCallback IncidentsRequested { get; set; }
 
     // Page State
-    private readonly PeriodicTimer _refreshTimer = new(TimeSpan.FromMinutes(1));
     private List<WiFiEvent> _problems = [];
     private List<WiFiEvent> _recent = [];
     private List<HealthBucket> _buckets = [];
@@ -51,21 +50,13 @@ public partial class OverviewPage : IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        Monitor.EventRecorded += OnEventRecorded;
+        // Reloads The Moment New Data Lands, Nothing Polls
+        Monitor.EventRecorded += OnDataRecorded;
+        Monitor.MinuteRecorded += OnDataRecorded;
         await LoadAsync();
-        _ = RefreshEveryMinuteAsync();
     }
 
-    private void OnEventRecorded() => InvokeAsync(LoadAsync);
-
-    private async Task RefreshEveryMinuteAsync()
-    {
-        // The Day Strip Rolls On Without Any Event
-        while (await _refreshTimer.WaitForNextTickAsync())
-        {
-            await InvokeAsync(LoadAsync);
-        }
-    }
+    private void OnDataRecorded() => InvokeAsync(LoadAsync);
 
     private async Task LoadAsync()
     {
@@ -102,8 +93,8 @@ public partial class OverviewPage : IDisposable
 
     public void Dispose()
     {
-        Monitor.EventRecorded -= OnEventRecorded;
-        _refreshTimer.Dispose();
+        Monitor.EventRecorded -= OnDataRecorded;
+        Monitor.MinuteRecorded -= OnDataRecorded;
         GC.SuppressFinalize(this);
     }
 }

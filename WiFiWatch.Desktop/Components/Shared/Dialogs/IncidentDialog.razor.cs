@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.EntityFrameworkCore;
 using MudBlazor;
+using WiFiWatch.Data;
 using WiFiWatch.Data.Helpers;
 using WiFiWatch.Data.Models;
 using WiFiWatch.Data.ViewModels;
@@ -8,7 +10,7 @@ using WiFiWatch.Services.Monitoring;
 
 namespace WiFiWatch.Desktop.Components.Shared.Dialogs;
 
-public partial class IncidentDialog
+public partial class IncidentDialog : IDisposable
 {
     private const string TimeFormat = "yyyy-MM-dd HH:mm:ss";
 
@@ -21,16 +23,22 @@ public partial class IncidentDialog
     [Parameter]
     public required WiFiEvent Event { get; set; }
 
-    private EventDetails Details => EventDetails.Parse(Event.Details);
+    // An Open Incident Ends Or Gains Its Trace Later
+    private WiFiEvent? _latest;
+
+    private WiFiEvent Current => _latest ?? Event;
+
+    private EventDetails Details => EventDetails.Parse(Current.Details);
 
     private string? FixTarget =>
-        QuickActions.ForEvent(Event.Kind, Event.Scope, Monitor.Status.RouterAdminUrl);
+        QuickActions.ForEvent(Current.Kind, Current.Scope, Monitor.Status.RouterAdminUrl);
 
     private string TimeRange =>
-        Event.EndedAtUtc is not { } endedAtUtc
-            ? $"{Formatter.FormatLocal(Event.OccurredAtUtc, TimeFormat)}, Still Going"
-        : endedAtUtc == Event.OccurredAtUtc ? Formatter.FormatLocal(Event.OccurredAtUtc, TimeFormat)
-        : $"{Formatter.FormatLocal(Event.OccurredAtUtc, TimeFormat)} To {Formatter.FormatLocal(endedAtUtc, "HH:mm:ss")}, {Formatter.FormatDuration(endedAtUtc - Event.OccurredAtUtc)}";
+        Current.EndedAtUtc is not { } endedAtUtc
+            ? $"{Formatter.FormatLocal(Current.OccurredAtUtc, TimeFormat)}, Still Going"
+        : endedAtUtc == Current.OccurredAtUtc
+            ? Formatter.FormatLocal(Current.OccurredAtUtc, TimeFormat)
+        : $"{Formatter.FormatLocal(Current.OccurredAtUtc, TimeFormat)} To {Formatter.FormatLocal(endedAtUtc, "HH:mm:ss")}, {Formatter.FormatDuration(endedAtUtc - Current.OccurredAtUtc)}";
 
     private List<(string Label, string Value)> DetailLines
     {
@@ -38,10 +46,10 @@ public partial class IncidentDialog
         {
             var details = Details;
             List<(string Label, string Value)> lines = [];
-            if (QuickActions.AdviceFor(Event.Kind, Event.Scope) is { } advice)
+            if (QuickActions.AdviceFor(Current.Kind, Current.Scope) is { } advice)
                 lines.Add(("What To Do", advice));
 
-            if (Event.Scope is { } scope)
+            if (Current.Scope is { } scope)
                 lines.Add(("Where", DescribeScope(scope)));
 
             if (details.Reason is { } reason)
@@ -68,6 +76,21 @@ public partial class IncidentDialog
             _ => scope,
         };
 
+    protected override void OnInitialized() => Monitor.EventRecorded += OnEventRecorded;
+
+    private void OnEventRecorded() => InvokeAsync(ReloadAsync);
+
+    private async Task ReloadAsync()
+    {
+        await using var context = new WiFiDbContext();
+        _latest =
+            await context
+                .Events.AsNoTracking()
+                .FirstOrDefaultAsync(wifiEvent => wifiEvent.Id == Event.Id)
+            ?? _latest;
+        StateHasChanged();
+    }
+
     public static Task ShowAsync(IDialogService dialogService, WiFiEvent wifiEvent) =>
         dialogService.ShowAsync<IncidentDialog>(
             null,
@@ -76,4 +99,10 @@ public partial class IncidentDialog
         );
 
     private void Close() => Dialog.Close();
+
+    public void Dispose()
+    {
+        Monitor.EventRecorded -= OnEventRecorded;
+        GC.SuppressFinalize(this);
+    }
 }
