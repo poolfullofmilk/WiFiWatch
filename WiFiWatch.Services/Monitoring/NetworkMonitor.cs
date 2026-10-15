@@ -34,7 +34,7 @@ public sealed class NetworkMonitor
 
     // Cadence And Limits
     private const int PingTimeoutMilliseconds = 1000;
-    private const int LinkCheckEverySeconds = 5;
+    private const int LinkCheckEverySeconds = 30;
     private const int WiFiReadEverySeconds = 5;
     private const int WlanReadEverySeconds = 5;
     private const int DnsProbeEverySeconds = 15;
@@ -129,7 +129,11 @@ public sealed class NetworkMonitor
 
     public event Action? UpdateFound;
 
-    public void Start() => _ = RunAsync();
+    public void Start()
+    {
+        // Off The UI Thread, Or Every Tick Resumes On It
+        _ = Task.Run(RunAsync);
+    }
 
     #region Loop Methods
     private async Task RunAsync()

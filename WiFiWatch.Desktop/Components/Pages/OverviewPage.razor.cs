@@ -1,3 +1,4 @@
+using System.Windows;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
@@ -20,6 +21,9 @@ public partial class OverviewPage : IDisposable
 
     [Inject]
     public required IDialogService DialogService { get; set; }
+
+    [Inject]
+    public required MainWindow Window { get; set; }
 
     [Parameter]
     public EventCallback IncidentsRequested { get; set; }
@@ -53,10 +57,20 @@ public partial class OverviewPage : IDisposable
         // Reloads The Moment New Data Lands, Nothing Polls
         Monitor.EventRecorded += OnDataRecorded;
         Monitor.MinuteRecorded += OnDataRecorded;
+        Window.IsVisibleChanged += OnVisibleChanged;
         await LoadAsync();
     }
 
-    private void OnDataRecorded() => InvokeAsync(LoadAsync);
+    private void OnDataRecorded() => InvokeAsync(LoadWhileSeenAsync);
+
+    private void OnVisibleChanged(object sender, DependencyPropertyChangedEventArgs eventArgs) =>
+        InvokeAsync(LoadWhileSeenAsync);
+
+    private Task LoadWhileSeenAsync()
+    {
+        // A Hidden Window Catches Up Once Shown
+        return Window.IsVisible ? LoadAsync() : Task.CompletedTask;
+    }
 
     private async Task LoadAsync()
     {
@@ -95,6 +109,7 @@ public partial class OverviewPage : IDisposable
     {
         Monitor.EventRecorded -= OnDataRecorded;
         Monitor.MinuteRecorded -= OnDataRecorded;
+        Window.IsVisibleChanged -= OnVisibleChanged;
         GC.SuppressFinalize(this);
     }
 }

@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Interop;
+using Microsoft.Web.WebView2.Core;
 using MudBlazor.Utilities;
 using WiFiWatch.Data.Enums;
 using WiFiWatch.Data.Helpers;
@@ -17,6 +18,9 @@ public partial class MainWindow : Window
     private const int BalloonMilliseconds = 5000;
     private const string OpenItem = "Open";
     private const string ExitItem = "Exit";
+
+    // A Quick Hide And Show Never Suspends
+    private static readonly TimeSpan s_suspendDelay = TimeSpan.FromSeconds(1);
 
     private readonly Forms.NotifyIcon _trayIcon;
     private bool _isExiting;
@@ -37,6 +41,7 @@ public partial class MainWindow : Window
             eventArgs.WebView.DefaultBackgroundColor = Drawing.Color.FromArgb(0x20, 0x20, 0x20);
         SourceInitialized += (_, _) => WindowCaptionTheme.Apply(this);
         StateChanged += (_, _) => HideWhenMinimized();
+        IsVisibleChanged += (_, _) => _ = RestPageAsync();
 
         // Windows Shutting Down Must Never Be Held Up
         Application.Current.SessionEnding += (_, _) => _isExiting = true;
@@ -164,6 +169,45 @@ public partial class MainWindow : Window
         {
             Hide();
         }
+    }
+
+    private async Task RestPageAsync()
+    {
+        // Not Shown Since Sign In, No Browser Yet
+        if (WebView.WebView is not { CoreWebView2: { } browser } control)
+            return;
+
+        if (IsVisible)
+        {
+            control.Visibility = Visibility.Visible;
+            ResumePage(browser);
+            return;
+        }
+
+        // In The Tray The Browser Sleeps And Frees Memory
+        control.Visibility = Visibility.Hidden;
+        browser.MemoryUsageTargetLevel = CoreWebView2MemoryUsageTargetLevel.Low;
+        await Task.Delay(s_suspendDelay);
+        if (IsVisible)
+            return;
+
+        await browser.TrySuspendAsync();
+
+        // Shown Again While It Was Suspending
+        if (IsVisible)
+        {
+            ResumePage(browser);
+        }
+    }
+
+    private static void ResumePage(CoreWebView2 browser)
+    {
+        if (browser.IsSuspended)
+        {
+            browser.Resume();
+        }
+
+        browser.MemoryUsageTargetLevel = CoreWebView2MemoryUsageTargetLevel.Normal;
     }
 
     protected override void OnClosing(CancelEventArgs eventArgs)
