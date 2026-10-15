@@ -1,3 +1,4 @@
+using System.Windows;
 using ApexCharts;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
@@ -117,6 +118,7 @@ public partial class HistoryPage : IDisposable
     protected override async Task OnInitializedAsync()
     {
         Monitor.MinuteRecorded += OnMinuteRecorded;
+        Window.IsVisibleChanged += OnVisibleChanged;
         await LoadAsync();
     }
 
@@ -131,6 +133,9 @@ public partial class HistoryPage : IDisposable
     }
 
     private void OnMinuteRecorded() => InvokeAsync(RefreshTodayAsync);
+
+    private void OnVisibleChanged(object sender, DependencyPropertyChangedEventArgs eventArgs) =>
+        InvokeAsync(RefreshTodayAsync);
 
     #region Range Methods
     private async Task ApplyPresetAsync(int dayCount)
@@ -373,6 +378,7 @@ public partial class HistoryPage : IDisposable
     public void Dispose()
     {
         Monitor.MinuteRecorded -= OnMinuteRecorded;
+        Window.IsVisibleChanged -= OnVisibleChanged;
         GC.SuppressFinalize(this);
     }
 

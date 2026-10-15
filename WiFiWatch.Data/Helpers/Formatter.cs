@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using WiFiWatch.Data.Models;
 
@@ -5,13 +6,17 @@ namespace WiFiWatch.Data.Helpers;
 
 public static class Formatter
 {
+    static Formatter() => Debug.Assert(SelfTestPasses());
+
     public static string FormatDuration(TimeSpan duration)
     {
-        // The Two Largest Parts, Seconds Only Under A Minute
-        return duration.TotalDays >= 1 ? $"{(int)duration.TotalDays}d {duration.Hours}h"
-            : duration.TotalHours >= 1 ? $"{(int)duration.TotalHours}h {duration.Minutes}m"
-            : duration.TotalMinutes >= 1 ? $"{duration.Minutes}m {duration.Seconds}s"
-            : $"{Math.Max(0, duration.Seconds)}s";
+        // The Two Largest Parts, A Zero Second Part Says Nothing
+        var (whole, part, partUnit) =
+            duration.TotalDays >= 1 ? ($"{(int)duration.TotalDays}d", duration.Hours, "h")
+            : duration.TotalHours >= 1 ? ($"{(int)duration.TotalHours}h", duration.Minutes, "m")
+            : duration.TotalMinutes >= 1 ? ($"{duration.Minutes}m", duration.Seconds, "s")
+            : ($"{Math.Max(0, duration.Seconds)}s", 0, "s");
+        return part == 0 ? whole : $"{whole} {part}{partUnit}";
     }
 
     public static string? FormatIncidentLength(DateTime occurredAtUtc, DateTime? endedAtUtc)
@@ -53,4 +58,12 @@ public static class Formatter
 
     public static string FormatCount(int count, string noun) =>
         count == 1 ? $"1 {noun}" : $"{count} {noun}s";
+
+    private static bool SelfTestPasses() =>
+        FormatDuration(TimeSpan.FromMinutes(2)) == "2m"
+        && FormatDuration(TimeSpan.FromSeconds(125)) == "2m 5s"
+        && FormatDuration(TimeSpan.FromMinutes(60)) == "1h"
+        && FormatDuration(TimeSpan.FromHours(26)) == "1d 2h"
+        && FormatDuration(TimeSpan.FromSeconds(25)) == "25s"
+        && FormatDuration(TimeSpan.FromSeconds(-3)) == "0s";
 }
