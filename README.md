@@ -1,7 +1,5 @@
 # Wi-Fi Watch
 
-A Windows tray app that tells you when your connection drops, where it went wrong and what to do about it.
-
 ![Overview](Screenshots/Overview.png)
 
 | Incidents | History | Settings |
