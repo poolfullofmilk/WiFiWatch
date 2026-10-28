@@ -608,6 +608,11 @@ internal static class Program
                 )
         );
         var interceptor = new AppLocalizationInterceptor();
+
+        // Notes Come From GitHub, Never Fetched Here
+        typeof(NetworkMonitor)
+            .GetProperty(nameof(NetworkMonitor.UpdateNotes))!
+            .SetValue(monitor, new List<string> { "Keep netsh Labels Out Of Localization" });
         foreach (
             var (language, overview) in new[]
             {
@@ -691,7 +696,7 @@ internal static class Program
                     (typeof(SettingsPage), "General"),
                     (typeof(IncidentDialog), "Close"),
                     (typeof(SpeedTestDialog), "Test Again"),
-                    (typeof(UpdateDialog), "Don't Show Again"),
+                    (typeof(UpdateDialog), "What Changed"),
                 }
             )
             {

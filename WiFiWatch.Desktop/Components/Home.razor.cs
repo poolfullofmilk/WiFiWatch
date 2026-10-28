@@ -78,11 +78,25 @@ public partial class Home : IDisposable
 
     private void OnEventRecorded() => InvokeAsync(LoadProblemColorAsync);
 
-    private void OnUpdateFound() => InvokeAsync(OfferUpdateAsync);
+    private void OnUpdateFound() =>
+        InvokeAsync(async () =>
+        {
+            StateHasChanged();
+            await OfferUpdateAsync();
+        });
 
     private Task OnCloseRequested() => InvokeAsync(AskBeforeClosingAsync);
 
     private void ShowPage(Page page) => _page = page;
+
+    // Red Or Amber Is An Open Problem, Blue A Waiting Update
+    private Color? DotColor(Page page) =>
+        page switch
+        {
+            Page.Overview => _problemColor,
+            Page.Settings when Monitor.AvailableUpdate is not null => Color.Info,
+            _ => null,
+        };
 
     private async Task LoadProblemColorAsync()
     {

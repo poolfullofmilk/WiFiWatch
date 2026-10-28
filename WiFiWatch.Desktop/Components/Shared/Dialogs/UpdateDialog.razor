@@ -14,6 +14,24 @@
             <MudText Typo="Typo.body1">
                 @(AppText.Get("Installed Version Is {0}, Updating Restarts {1}", AppInfo.VersionText, AppInfo.DisplayName))
             </MudText>
+            @* What Changed, Commit Titles As GitHub Supplies Them *@
+            @if (Monitor.UpdateNotes.Count > 0)
+            {
+                <MudText Typo="Typo.subtitle2">@AppText.Get("What Changed")</MudText>
+                <MudStack Spacing="1">
+                    @foreach (var note in Monitor.UpdateNotes)
+                    {
+                        <MudStack Row
+                                  AlignItems="AlignItems.Start"
+                                  Spacing="2">
+                            <MudIcon Icon="@Icons.Material.Rounded.CheckCircle"
+                                     Color="Color.Info"
+                                     Size="Size.Small" />
+                            <MudText Typo="Typo.body2">@note</MudText>
+                        </MudStack>
+                    }
+                </MudStack>
+            }
             @* Hide Checkbox *@
             <MudCheckBox T="bool"
                          Value="!Monitor.Settings.ShowUpdatePopup"

@@ -63,6 +63,10 @@
         <RemoveDir Directories="$(PublishDir)wwwroot" />
         <Delete Files="$(PublishDir)$(AssemblyName).staticwebassets.endpoints.json" />
     </Target>
+    <!-- Workflow Builds Name Their Commit, The Update Dialog Lists Every Commit Since -->
+    <ItemGroup Condition="'$(GITHUB_SHA)' != ''">
+        <AssemblyMetadata Include="Commit" Value="$(GITHUB_SHA)" />
+    </ItemGroup>
     <ItemGroup>
         <Using Remove="System.Drawing" />
         <Using Remove="System.Windows.Forms" />

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.Security.Cryptography;
 using WiFiWatch.Data.Helpers;
 
 namespace WiFiWatch.Services.Integration;
@@ -20,28 +21,53 @@ public static class Updater
         Path.GetFileName(Environment.ProcessPath)
             ?.StartsWith(ExecutablePrefix, StringComparison.OrdinalIgnoreCase) == true;
 
-    public static async Task<string> DownloadAsync(Version version)
+    // Off The Window's Thread, Writing And Hashing 80 MB Would Freeze It
+    public static Task<string> DownloadAsync(Version version) =>
+        Task.Run(() => DownloadOnPoolAsync(version));
+
+    private static async Task<string> DownloadOnPoolAsync(Version version)
     {
         var versionText = AppInfo.ShortText(version);
-        var targetPath = Path.Combine(
-            Path.GetDirectoryName(Environment.ProcessPath)!,
-            $"{ExecutablePrefix}{versionText}.exe"
-        );
+        var fileName = $"{ExecutablePrefix}{versionText}.exe";
+        var targetPath = Path.Combine(Path.GetDirectoryName(Environment.ProcessPath)!, fileName);
         var partialPath = targetPath + ".download";
 
-        using var response = await s_httpClient.GetAsync(
-            string.Format(AssetUrlFormat, versionText),
-            HttpCompletionOption.ResponseHeadersRead
-        );
-        response.EnsureSuccessStatusCode();
-        await using (var file = File.Create(partialPath))
-        {
-            await response.Content.CopyToAsync(file);
-        }
+        // GitHub Hashes Every Release Asset, A Download That Differs Never Runs
+        var digest =
+            (await UpdateChecker.GetJsonAsync("releases/tags/v" + versionText))
+                ?["assets"]?.AsArray()
+                .FirstOrDefault(asset => asset?["name"]?.GetValue<string>() == fileName)
+                ?["digest"]?.GetValue<string>()
+            ?? throw new InvalidDataException($"Release {versionText} Lists No Checksum");
 
-        // Only A Complete Download Gets The Real Name
-        File.Move(partialPath, targetPath, overwrite: true);
-        return targetPath;
+        try
+        {
+            using var response = await s_httpClient.GetAsync(
+                string.Format(AssetUrlFormat, versionText),
+                HttpCompletionOption.ResponseHeadersRead
+            );
+            response.EnsureSuccessStatusCode();
+            await using (var file = File.Create(partialPath))
+            {
+                await response.Content.CopyToAsync(file);
+            }
+
+            await using (var file = File.OpenRead(partialPath))
+            {
+                var actual = "sha256:" + Convert.ToHexStringLower(await SHA256.HashDataAsync(file));
+                if (!string.Equals(actual, digest, StringComparison.OrdinalIgnoreCase))
+                    throw new InvalidDataException($"Checksum Mismatch For {versionText}");
+            }
+
+            // Only A Complete, Verified Download Gets The Real Name
+            File.Move(partialPath, targetPath, overwrite: true);
+            return targetPath;
+        }
+        catch
+        {
+            File.Delete(partialPath);
+            throw;
+        }
     }
 
     public static void Launch(string executablePath) =>

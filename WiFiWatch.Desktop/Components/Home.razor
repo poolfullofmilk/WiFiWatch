@@ -49,8 +49,8 @@
                 @* Page Button *@
                 <MudBadge Dot
                           Overlap
-                          Visible="@(link.Page == Page.Overview && _problemColor is not null)"
-                          Color="@(_problemColor ?? Color.Default)">
+                          Visible="@(DotColor(link.Page) is not null)"
+                          Color="@(DotColor(link.Page) ?? Color.Default)">
                     <MudButton StartIcon="@link.Icon"
                                Color="@(link.Page == _page ? Color.Secondary : Color.Default)"
                                Variant="@(link.Page == _page ? Variant.Filled : Variant.Text)"

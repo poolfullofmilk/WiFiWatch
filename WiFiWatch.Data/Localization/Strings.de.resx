@@ -389,4 +389,5 @@
     <data name="{0} {1} {2} Exported {3:yyyy-MM-dd HH-mm-ss}.csv" xml:space="preserve"><value>{0} {1} {2} Exportiert {3:yyyy-MM-dd HH-mm-ss}.csv</value></data>
     <data name="No Measurements" xml:space="preserve"><value>Keine Messungen</value></data>
     <data name="ConditionValue" xml:space="preserve"><value>{0} {1}</value></data>
+    <data name="What Changed" xml:space="preserve"><value>Was Sich Geändert Hat</value></data>
 </root>

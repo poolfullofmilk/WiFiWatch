@@ -12,6 +12,14 @@ public static class AppInfo
 
     public static string VersionText => ShortText(Version);
 
+    // Workflow Builds Carry The Commit They Were Built From, Local Builds None
+    public static string? Commit { get; } =
+        Assembly
+            .GetEntryAssembly()
+            ?.GetCustomAttributes<AssemblyMetadataAttribute>()
+            .FirstOrDefault(attribute => attribute.Key == "Commit")
+            ?.Value;
+
     // Tags, Exe Names And Text Drop Trailing Zero Parts: 2, 2.0.1, 2.1
     public static string ShortText(Version version) =>
         version.ToString(
