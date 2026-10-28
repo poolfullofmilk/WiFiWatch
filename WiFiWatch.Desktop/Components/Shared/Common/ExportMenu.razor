@@ -2,7 +2,8 @@
 <MudElement HtmlTag="div">
     @* Export Button *@
     <Tooltip Text="@AppText.Get("Export")">
-        <MudIconButton Icon="@Icons.Material.Rounded.FileDownload"
+        <MudIconButton aria-label="@AppText.Get("Export")"
+                       Icon="@Icons.Material.Rounded.FileDownload"
                        Size="Size.Small"
                        OnClick="Open" />
     </Tooltip>

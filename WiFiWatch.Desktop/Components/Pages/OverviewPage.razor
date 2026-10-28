@@ -72,6 +72,9 @@
                 @* Problem Card *@
                 <MudPaper Elevation="4"
                           Class="pa-4 rounded-panel cursor-pointer hover-card"
+                          role="button"
+                          tabindex="0"
+                          data-keyclick
                           @onclick="() => OpenDetailsAsync(incident)">
                     <MudStack Row
                               AlignItems="AlignItems.Center"

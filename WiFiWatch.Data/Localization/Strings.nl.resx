@@ -391,4 +391,5 @@
     <data name="What Changed" xml:space="preserve"><value>Wat is er veranderd</value></data>
     <data name="Nothing Found" xml:space="preserve"><value>Niets gevonden</value></data>
     <data name="ChannelLegend" xml:space="preserve"><value>Blauw: je kanaal&#10;Oranje: een buur met 30% signaal of meer in je 80 MHz-blok, die zendertijd met je deelt&#10;Grijs: andere netwerken binnen bereik&#10;Zendertijd bezet: hoe vaak je toegangspunt het kanaal als bezet meldt</value></data>
+    <data name="StartFailed" xml:space="preserve"><value>{0} kon niet starten: {1}</value></data>
 </root>

@@ -44,7 +44,8 @@
             {
                 @* Router Button *@
                 <Tooltip Text="@AppText.Get("Open Router Settings")">
-                    <MudIconButton Icon="@Icons.Material.Rounded.Router"
+                    <MudIconButton aria-label="@AppText.Get("Open Router Settings")"
+                                   Icon="@Icons.Material.Rounded.Router"
                                    Variant="Variant.Filled"
                                    Size="Size.Small"
                                    OnClick="() => QuickActions.Open(routerAdminUrl)" />
@@ -52,7 +53,8 @@
             }
             @* Refresh Button *@
             <Tooltip Text="@AppText.Get("Refresh")">
-                <MudIconButton Icon="@Icons.Material.Rounded.Refresh"
+                <MudIconButton aria-label="@AppText.Get("Refresh")"
+                               Icon="@Icons.Material.Rounded.Refresh"
                                Variant="Variant.Filled"
                                Size="Size.Small"
                                OnClick="RefreshRequested" />

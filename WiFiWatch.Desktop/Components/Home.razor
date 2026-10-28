@@ -70,21 +70,44 @@
     <MudMainContent @key="_languageVersion" Class="px-7 pb-7 pt-20">
         <MudContainer MaxWidth="MaxWidth.Large"
                       Gutters="false">
-            @switch (_page)
-            {
-                case Page.Overview:
-                    <OverviewPage IncidentsRequested="() => ShowPage(Page.Incidents)" />
-                    break;
-                case Page.Incidents:
-                    <IncidentsPage />
-                    break;
-                case Page.History:
-                    <HistoryPage />
-                    break;
-                default:
-                    <SettingsPage />
-                    break;
-            }
+            <PageErrorBoundary @ref="_errorBoundary">
+                <ChildContent>
+                    @switch (_page)
+                    {
+                        case Page.Overview:
+                            <OverviewPage IncidentsRequested="() => ShowPage(Page.Incidents)" />
+                            break;
+                        case Page.Incidents:
+                            <IncidentsPage />
+                            break;
+                        case Page.History:
+                            <HistoryPage />
+                            break;
+                        default:
+                            <SettingsPage />
+                            break;
+                    }
+                </ChildContent>
+                <ErrorContent Context="exception">
+                    @* Page Error *@
+                    <MudStack AlignItems="AlignItems.Center"
+                              Spacing="4"
+                              Class="pa-8">
+                        <MudIcon Icon="@Icons.Material.Rounded.Error"
+                                 Color="Color.Error"
+                                 Size="Size.Large" />
+                        <MudText Typo="Typo.subtitle1"
+                                 Class="mud-text-secondary">
+                            @AppText.Get("App Failed {0}", exception.GetType().Name)
+                        </MudText>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Info"
+                                   OnClick="() => _errorBoundary!.Recover()">
+                            @AppText.Get("OK")
+                        </MudButton>
+                    </MudStack>
+                </ErrorContent>
+            </PageErrorBoundary>
         </MudContainer>
     </MudMainContent>
 </MudLayout>
