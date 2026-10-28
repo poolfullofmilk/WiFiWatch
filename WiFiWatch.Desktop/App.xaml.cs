@@ -75,6 +75,14 @@ public partial class App : Application
             // Snackbars Default To Outlined Icons, Every Other Icon Is Rounded
             configuration.SnackbarConfiguration.SuccessIcon = Icons.Material.Rounded.CheckCircle;
             configuration.SnackbarConfiguration.WarningIcon = Icons.Material.Rounded.Warning;
+            configuration.SnackbarConfiguration.InfoIcon = Icons.Material.Rounded.Info;
+            configuration.SnackbarConfiguration.ErrorIcon = Icons.Material.Rounded.Error;
+
+            // Bottom Right, Clear Of The Page Buttons In The App Bar
+            configuration.SnackbarConfiguration.PositionClass = Defaults
+                .Classes
+                .Position
+                .BottomRight;
         });
         services.AddLocalization();
         services.AddLocalizationInterceptor<AppLocalizationInterceptor>();

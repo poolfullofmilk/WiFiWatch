@@ -52,7 +52,9 @@ public partial class UpdateDialog
             return;
         }
 
+        // No Corner X Or Escape While The Download Runs
         _isInstalling = true;
+        await SetClosableAsync(false);
         try
         {
             Updater.Launch(await Updater.DownloadAsync(Version));
@@ -70,7 +72,16 @@ public partial class UpdateDialog
                 QuickActions.Open(UpdateChecker.LatestReleaseUrl);
         }
         _isInstalling = false;
+        await SetClosableAsync(true);
     }
 
-    private void Close() => Dialog.Close();
+    private Task SetClosableAsync(bool isClosable) =>
+        Dialog.SetOptionsAsync(
+            Dialog.Options with
+            {
+                CloseButton = isClosable,
+                CloseOnEscapeKey = isClosable,
+                BackdropClick = isClosable,
+            }
+        );
 }

@@ -694,7 +694,7 @@ internal static class Program
                     (typeof(IncidentsPage), "Details"),
                     (typeof(HistoryPage), "Speed Tests"),
                     (typeof(SettingsPage), "General"),
-                    (typeof(IncidentDialog), "Close"),
+                    (typeof(IncidentDialog), "What To Do"),
                     (typeof(SpeedTestDialog), "Test Again"),
                     (typeof(UpdateDialog), "What Changed"),
                 }

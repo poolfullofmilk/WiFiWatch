@@ -15,9 +15,6 @@ public partial class IncidentDialog : IDisposable
 {
     private const string TimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-    [CascadingParameter]
-    public required IMudDialogInstance Dialog { get; set; }
-
     [Inject]
     public required NetworkMonitor Monitor { get; set; }
 
@@ -107,8 +104,6 @@ public partial class IncidentDialog : IDisposable
             new DialogParameters<IncidentDialog> { { dialog => dialog.Event, wifiEvent } },
             new DialogOptions { BackdropClick = true, MaxWidth = MaxWidth.Medium }
         );
-
-    private void Close() => Dialog.Close();
 
     public void Dispose()
     {

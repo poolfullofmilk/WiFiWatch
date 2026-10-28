@@ -6,8 +6,6 @@
           SortLabel="@AppText.Get("Sort By")"
           Dense
           Hover
-          Bordered
-          Striped
           AllowUnsorted="false"
           Elevation="4"
           RowsPerPage="@_rowsPerPage"
@@ -54,6 +52,14 @@
     <RowTemplate>
         @RowTemplate(context)
     </RowTemplate>
+
+    @* Empty *@
+    <NoRecordsContent>
+        <MudText Typo="Typo.body2"
+                 Class="mud-text-secondary">
+            @AppText.Get("Nothing Found")
+        </MudText>
+    </NoRecordsContent>
 
     @* Pager *@
     <PagerContent>

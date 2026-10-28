@@ -43,32 +43,20 @@
         </MudStack>
     </DialogContent>
     <DialogActions>
-        <MudStack Row
-                  Justify="Justify.SpaceBetween"
-                  Spacing="4"
-                  Class="px-3 py-2 mud-width-full">
-            @* Later Button *@
-            <MudButton Variant="Variant.Filled"
-                       Size="Size.Small"
-                       OnClick="Close">
-                @AppText.Get("Later")
-            </MudButton>
-            @* Update Button *@
-            <MudButton Variant="Variant.Filled"
-                       Color="Color.Info"
-                       Size="Size.Small"
-                       StartIcon="@(_isInstalling ? null : Icons.Material.Rounded.SystemUpdateAlt)"
-                       OnClick="InstallAsync">
-                @if (_isInstalling)
-                {
-                    <MudProgressCircular Color="Color.Inherit"
-                                         Indeterminate
-                                         Class="mr-2"
-                                         Style="width:16px; height:16px" />
-                }
-                @(_isInstalling ? AppText.Get("Downloading") : AppText.Get("Update Now"))
-            </MudButton>
-        </MudStack>
+        @* Update Button *@
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Info"
+                   StartIcon="@(_isInstalling ? null : Icons.Material.Rounded.SystemUpdateAlt)"
+                   OnClick="InstallAsync">
+            @if (_isInstalling)
+            {
+                <MudProgressCircular Color="Color.Inherit"
+                                     Indeterminate
+                                     Class="mr-2"
+                                     Style="width:16px; height:16px" />
+            }
+            @(_isInstalling ? AppText.Get("Downloading") : AppText.Get("Update Now"))
+        </MudButton>
     </DialogActions>
 
 </MudDialog>

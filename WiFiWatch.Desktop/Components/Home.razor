@@ -6,6 +6,7 @@
                   IsDarkMode />
 <MudPopoverProvider />
 <MudDialogProvider BackdropClick="false"
+                   CloseButton="true"
                    MaxWidth="MaxWidth.False" />
 <MudSnackbarProvider />
 
@@ -35,20 +36,21 @@
 <MudLayout>
     <MudAppBar Elevation="4"
                Style="background-color:color-mix(in srgb, var(--mud-palette-appbar-background) var(--glass-opacity), transparent); backdrop-filter:var(--glass-blur)">
-        <MudText Typo="Typo.h6"
-                 Class="mx-2">
-            @AppInfo.DisplayName
-        </MudText>
-        <MudSpacer />
-        @* Page Menu *@
         <MudStack Row
                   AlignItems="AlignItems.Center"
-                  Spacing="1">
+                  Spacing="2"
+                  Class="mud-width-full px-2">
+            <MudText Typo="Typo.h6"
+                     Class="text-truncate mr-4">
+                @AppInfo.DisplayName
+            </MudText>
+            <MudSpacer />
             @foreach (var link in Pages)
             {
-                @* Page Button *@
+                @* Page Button, d-flex Keeps The Badge From Lifting It *@
                 <MudBadge Dot
                           Overlap
+                          Class="d-flex"
                           Visible="@(DotColor(link.Page) is not null)"
                           Color="@(DotColor(link.Page) ?? Color.Default)">
                     <MudButton StartIcon="@link.Icon"

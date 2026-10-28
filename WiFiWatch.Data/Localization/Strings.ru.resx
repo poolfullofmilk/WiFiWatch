@@ -149,7 +149,6 @@
     <data name="Measured Against Fast.com Servers, 8 Seconds Each Way" xml:space="preserve"><value>Измерено на серверах Fast.com, по 8 секунд в каждую сторону</value></data>
     <data name="Test Again" xml:space="preserve"><value>Повторить Тест</value></data>
     <data name="Don't Show Again" xml:space="preserve"><value>Больше Не Показывать</value></data>
-    <data name="Later" xml:space="preserve"><value>Позже</value></data>
     <data name="Update Now" xml:space="preserve"><value>Обновить Сейчас</value></data>
     <data name="Hidden" xml:space="preserve"><value>Скрытая</value></data>
     <data name="Yours" xml:space="preserve"><value>Ваша Сеть</value></data>
@@ -390,4 +389,6 @@
     <data name="No Measurements" xml:space="preserve"><value>Нет измерений</value></data>
     <data name="ConditionValue" xml:space="preserve"><value>{0} {1}</value></data>
     <data name="What Changed" xml:space="preserve"><value>Что Изменилось</value></data>
+    <data name="Nothing Found" xml:space="preserve"><value>Ничего не найдено</value></data>
+    <data name="ChannelLegend" xml:space="preserve"><value>Синий: ваш канал&#10;Оранжевый: сосед с сигналом 30% или сильнее в вашем блоке 80 МГц, делит с вами эфир&#10;Серый: другие сети в зоне приёма&#10;Эфир занят: как часто ваша точка доступа сообщает, что канал занят</value></data>
 </root>

@@ -55,13 +55,8 @@
     </Header>
 
     @* Limits Section *@
-    <Header Title="@AppText.Get("ProblemLimits")">
-        <TitleContent>
-            <MudText Typo="Typo.body2"
-                     Class="mx-2 mud-text-secondary">
-                @AppText.Get("LimitsDescription")
-            </MudText>
-        </TitleContent>
+    <Header Title="@AppText.Get("ProblemLimits")"
+            Info="@AppText.Get("LimitsDescription")">
         <ChildContent>
             <MudPaper Elevation="4"
                       Class="pa-4 rounded-panel">

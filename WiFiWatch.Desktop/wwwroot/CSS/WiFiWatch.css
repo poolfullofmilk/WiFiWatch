@@ -141,6 +141,31 @@ svg.apexcharts-svg {
 .mud-table-cell {
     white-space: nowrap;
 }
+
+/* Row Lines Only, None Under The Last Row */
+.mud-table-body .mud-table-row:last-child > .mud-table-cell,
+.mud-simple-table tbody tr:last-child > td {
+    border-bottom: none;
+}
+
+/* A See-Through Container Scrolls Smoothly At 125% Scaling */
+.mud-table-container {
+    background-color: inherit;
+}
+
+/* Badges Carry The Slightest Theme Shadow */
+.mud-badge {
+    box-shadow: var(--mud-elevation-1);
+}
+
+/* Info Icons Explain, They Are Not Buttons */
+.info-icon {
+    cursor: default;
+}
+
+    .info-icon svg {
+        filter: drop-shadow(0 3px 12px rgba(0,0,0, 0.22));
+    }
 /* #endregion */
 
 /* #region Health Strip */
