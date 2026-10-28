@@ -25,7 +25,7 @@ The global `~/.claude/CLAUDE.md` holds every shared convention (git, releases, c
 | `Models/` | `WiFiEvent`, `MinuteSample`, `NeighborSample`, `SpeedTest` (the tables) |
 | `ViewModels/` | Records that are never tables: `MonitorStatus`, `WiFiReading`, `NeighborReading`, `AdapterInfo`, `EventDetails` (JSON in `WiFiEvent.Details`), `TraceHop`, `PeriodSummary`, `WlanNotice`, `ChartPoint`, `HealthBucket`, `HourSummary`, `ChannelBlock`, `SpeedTestProgress` |
 | `Enums/` | `EventKind`, `EventSeverity`, `HealthState`, `SpeedTestPhase` |
-| `Helpers/` | `AppInfo` (display name, version), `WiFiChannels` (DFS and weather radar ranges, timers), `Formatter` (durations without a zero second part, local times, numbers with units, `FormatCount` for 1 Problem or 2 Problems), `EventKindExtensions.ToLabel`, `QueryableExtensions.OrderByColumn`, `HealthBuckets` (worst state per hour or day, self-test), `Problems.IsProblem` |
+| `Helpers/` | `AppInfo` (display name, version), `WiFiChannels` (DFS and weather radar ranges, timers, the channel change message), `Formatter` (durations without a zero second part, local times, numbers with units, `FormatCount` for 1 Problem or 2 Problems), `EventKindExtensions.ToLabel`, `QueryableExtensions.OrderByColumn`, `HealthBuckets` (worst state per hour or day, self-test), `Problems.IsProblem` |
 | `Migrations/` | `Initial`, `AddNeighborSamples`, `AddIncidentsSpeedTestsAndDns` |
 | `Localization/` | `AppText`, English resources and Dutch, Turkish, German, Spanish and Russian satellites |
 
@@ -36,7 +36,7 @@ The global `~/.claude/CLAUDE.md` holds every shared convention (git, releases, c
 | `Monitoring/NetworkMonitor.cs` | The one loop, the scopes, every rule. The app's only long-lived service |
 | `Monitoring/EventJournal.cs` | Writes events, keeps open incidents by key, decides notifications, the quiet window; `CloseAllAsync` ends every open incident at sleep, `ChangeDetailsAsync` writes details by row id, `OpenIdOf` hands out that id |
 | `Monitoring/ConditionTracker.cs` | Per-minute threshold incidents with persistence and a baseline, `Reset` after sleep, self-test |
-| `Monitoring/WiFiReader.cs` | `netsh wlan show interfaces` and `show networks mode=bssid` parsers, self-test |
+| `Monitoring/WiFiReader.cs` | `netsh wlan show interfaces` and `show networks mode=bssid` parsers, self-test. No `AppText`: the labels are netsh's, not ours |
 | `Monitoring/NativeWiFiReader.cs` | The same current connection through `wlanapi` (`WlanQueryInterface`), used when Read Wi-Fi Natively is on |
 | `Monitoring/WlanEventReader.cs` | WLAN AutoConfig Operational log, the reason behind disconnects and failed connects |
 | `Monitoring/FaultTracer.cs` | MTR-style trace (up to 30 hops, 3 probes each, stops after 4 silent hops) that names where a path stops |
@@ -168,7 +168,7 @@ After 60 ticks on each new day: write yesterday's summary if missing ("yyyy-MM-d
 
 ## Measurements
 
-- **netsh lines end in `\r\n`**, so a value pattern is `.*` plus `Trim`. Labels are English, so a non-English Windows breaks parsing; Read Wi-Fi Natively avoids it. A console app on this PC reads identical values natively in about 7 ms, but inside the app process (Debug build, inside and outside the Claude container, UI or pool thread) `WlanQueryInterface` returns `ERROR_ACCESS_DENIED`, so the app logs Location Blocked; Windows 11 tracks a location prompt per executable (`ConsentStore\location\NonPackaged\Executables`, `GlobalPromptShown`). So it stays off by default and must not become the default until it works in the real exe; `netsh` is the proven path. The neighbor scan always uses `netsh`. Link rates can be decimals (`286.8`).
+- **netsh lines end in `\r\n`**, so a value pattern is `.*` plus `Trim`. Labels are English, so a non-English Windows breaks parsing; Read Wi-Fi Natively avoids it. The parser keeps them as constants in `WiFiReader`; the localization tests parse the samples in every app language, and v1.10, which looked them up through `AppText`, lost channel, band and neighbors whenever the app language was not English. A console app on this PC reads identical values natively in about 7 ms, but inside the app process (Debug build, inside and outside the Claude container, UI or pool thread) `WlanQueryInterface` returns `ERROR_ACCESS_DENIED`, so the app logs Location Blocked; Windows 11 tracks a location prompt per executable (`ConsentStore\location\NonPackaged\Executables`, `GlobalPromptShown`). So it stays off by default and must not become the default until it works in the real exe; `netsh` is the proven path. The neighbor scan always uses `netsh`. Link rates can be decimals (`286.8`).
 - **Location services must be on.** Windows 11 hides Wi-Fi details from `netsh` without it. `netsh.exe` does the WLAN call, so only Location services and "Let desktop apps access your location" matter.
 - **DNS timing** sends a raw UDP A query for `www.google.com`, which every resolver has cached, so it measures the resolver and not the web. A system lookup that times out counts as the full 2 s while 1.1.1.1 still answers, and the minute keeps the median of its 4 lookups, so one lost query is ignored and a resolver that stops answering opens a Critical Slow DNS.
 - **Speed test** asks `api.fast.com` for 5 Netflix servers (Netflix picks them, often inside the provider's own network; the signed URLs last an hour, so every test asks again), then runs off the UI thread with 8 parallel streams spread round robin over them for 8 s each way: plain GETs of the 25 MiB test file and 25 MB POSTs to the same URLs, counted per 1 MB as they are written. The live number is the last second; the result is the 90th percentile of those one second readings after the first 2 s. One failed stream ends the test. Pings 1.1.1.1 every 250 ms throughout, about 1 GB per test. The token is fast.com's public app token, unchanged since 2016 and used the same way by Home Assistant; fast.com has no terms of its own. Cloudflare was dropped: since 2026 it caps clients without its own Referer at roughly one test per hour (HTTP 429 for 54 minutes), and faking the Referer gets around an access control. On this PC every server lands between 540 and 640 Mbps down, because the 5 GHz Wi-Fi link (1201 Mbps link rate) is the limit, not the server. `SpeedTestDialog` shows it live through `IProgress<SpeedTestProgress>`. Grade from the added latency under load: under 5 ms A+, 30 A, 60 B, 200 C, 400 D, else F.
@@ -240,6 +240,11 @@ on a language switch. Windows reasons, SSIDs, addresses and device names remain
 as supplied. New updates and closing messages use the selected language. Driver
 checks deduplicate through structured version details, with legacy compatibility;
 daily summaries use a date prefix independent of the translated weekday.
+
+Never route protocol or parser strings through `AppText`. netsh field names,
+PowerShell property names, registry values, event log fields and anything
+compared against another program's output are fixed constants. They follow the
+Windows language, not the app language.
 
 `AppLocalizationInterceptor` translates MudBlazor's built-in control text. A new
 visible string needs entries in all five satellites as well as neutral English.

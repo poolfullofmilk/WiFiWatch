@@ -1,3 +1,6 @@
+using WiFiWatch.Data.Enums;
+using WiFiWatch.Data.Localization;
+
 namespace WiFiWatch.Data.Helpers;
 
 public static class WiFiChannels
@@ -18,4 +21,18 @@ public static class WiFiChannels
         // 5600 To 5650 MHz Shares The Band With Weather Radar
         return channel is >= 120 and <= 128;
     }
+
+    public static (EventKind Kind, string Message) DescribeChange(int? from, int? to) =>
+        (IsDfs(from), IsDfs(to)) switch
+        {
+            (true, false) => (
+                EventKind.DfsEviction,
+                AppText.Get("Channel {0} To {1} Left DFS", from, to)
+            ),
+            (false, true) => (
+                EventKind.DfsReturn,
+                AppText.Get("Channel {0} To {1} Back On DFS", from, to)
+            ),
+            _ => (EventKind.ChannelChange, AppText.Get("Channel {0} To {1}", from, to)),
+        };
 }

@@ -770,7 +770,7 @@ public sealed class NetworkMonitor
         if (previous.Channel == current.Channel)
             return;
 
-        var (kind, message) = WiFiReader.DescribeChannelChange(previous.Channel, current.Channel);
+        var (kind, message) = WiFiChannels.DescribeChange(previous.Channel, current.Channel);
         switch (kind)
         {
             case EventKind.DfsEviction:
