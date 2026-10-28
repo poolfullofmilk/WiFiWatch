@@ -11,6 +11,7 @@
 - Every problem logged with where it happened and what to do
 - Notifications only for problems that matter
 - History, speed tests and a view of every Wi-Fi channel
+- Settings and new Slow DNS messages in English, Dutch, Turkish, German, Spanish and Russian
 
 ## Quick start
 1. Download the exe from the [latest release](https://github.com/poolfullofmilk/WiFiWatch/releases/latest)

@@ -9,11 +9,11 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <RootNamespace>WiFiWatch.Desktop</RootNamespace>
         <ApplicationIcon>Icon.ico</ApplicationIcon>
-        <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+        <SatelliteResourceLanguages>en;nl;tr;de;es;ru</SatelliteResourceLanguages>
         <DebugType>embedded</DebugType>
         <Description>Watches Wi-Fi Channel, Signal And Ping And Logs Every Change</Description>
         <Copyright>Copyright 2026</Copyright>
-        <Version>1.8</Version>
+        <Version>1.9</Version>
         <AssemblyTitle>Wi-Fi Watch</AssemblyTitle>
         <Product>Wi-Fi Watch</Product>
         <Company>poolfullofmilk</Company>
@@ -40,6 +40,24 @@
                 RelativePath="wwwroot\%(RecursiveDir)%(Filename)%(Extension)"
             />
         </ItemGroup>
+    </Target>
+    <Target
+        Name="VerifyLocalizationBundle"
+        AfterTargets="PrepareForBundle"
+        Condition="'$(PublishSingleFile)' == 'true'"
+    >
+        <ItemGroup>
+            <RequiredSatellite Include="nl;tr;de;es;ru" />
+        </ItemGroup>
+        <PropertyGroup>
+            <_BundledResourcePaths>;@(FilesToBundle->'%(RelativePath)', ';');</_BundledResourcePaths>
+            <_BundledResourcePaths>$(_BundledResourcePaths.Replace('\', '/'))</_BundledResourcePaths>
+        </PropertyGroup>
+        <Error
+            Condition="!$(_BundledResourcePaths.Contains(';%(RequiredSatellite.Identity)/WiFiWatch.Data.resources.dll;'))"
+            Text="Missing %(RequiredSatellite.Identity) localization resources in the single-file bundle."
+        />
+        <Message Importance="high" Text="Verified localization bundle: @(RequiredSatellite)" />
     </Target>
     <Target Name="RemoveLooseWebRoot" AfterTargets="Publish">
         <RemoveDir Directories="$(PublishDir)wwwroot" />

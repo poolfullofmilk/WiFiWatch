@@ -1,39 +1,53 @@
 @using Color = MudBlazor.Color
 @using Size = MudBlazor.Size
+@using WiFiWatch.Data.Localization
 
 <MudStack Spacing="6">
     @* General Section *@
-    <Header Title="General">
+    <Header Title="@AppText.Get("General")">
         <MudPaper Elevation="4"
                   Class="py-4 rounded-panel">
             <MudStack Spacing="3">
+                <MudSelect T="string" Label="@AppText.Get("Language")"
+                           Value="@SelectedLanguage"
+                           ValueChanged="SaveLanguage"
+                           Variant="Variant.Outlined"
+                           Class="mx-4"
+                           HelperText="@AppText.Get("LanguageDescription")">
+                    <MudSelectItem T="string" Value="@(string.Empty)">@AppText.Get("SystemLanguage")</MudSelectItem>
+                    @foreach (var language in AppText.Languages)
+                    {
+                        <MudSelectItem T="string" Value="@language.Key">@language.Value</MudSelectItem>
+                    }
+                </MudSelect>
+                <MudDivider />
                 @* Start Switch *@
-                <SettingSwitch Title="Start With Windows"
-                               Description="Runs Hidden In The Tray After Sign In"
+                <SettingSwitch Title="@AppText.Get("StartWithWindows")"
+                               Description="@AppText.Get("StartDescription")"
                                Value="Monitor.Settings.StartWithWindows"
                                ValueChanged="SaveStartWithWindows" />
                 <MudDivider />
                 @* Summary Switch *@
-                <SettingSwitch Title="Daily Summary Notification"
-                               Description="Notifies Each Morning After A Day With Problems"
+                <SettingSwitch Title="@AppText.Get("DailySummary")"
+                               Description="@AppText.Get("SummaryDescription")"
                                Value="Monitor.Settings.DailySummaryNotification"
                                ValueChanged="value => SaveSettings(Monitor.Settings with { DailySummaryNotification = value })" />
                 <MudDivider />
                 @* Speed Test Switch *@
-                <SettingSwitch Title="Nightly Speed Test"
-                               Description="Measures Speed And Lag Under Load At 03:00"
+                <SettingSwitch Title="@AppText.Get("NightlySpeedTest")"
+                               Description="@AppText.Get("SpeedDescription")"
                                Value="Monitor.Settings.NightlySpeedTest"
                                ValueChanged="value => SaveSettings(Monitor.Settings with { NightlySpeedTest = value })" />
                 <MudDivider />
                 @* Native Wi-Fi Switch *@
-                <SettingSwitch Title="Read Wi-Fi Natively"
-                               Description="Asks Windows Directly Instead Of netsh, Works In Any Language"
+                <SettingSwitch Title="@AppText.Get("NativeWiFi")"
+                               Description="@AppText.Get("NativeDescription")"
                                Value="Monitor.Settings.ReadWiFiNatively"
                                ValueChanged="value => SaveSettings(Monitor.Settings with { ReadWiFiNatively = value })" />
                 <MudDivider />
                 @* Update Popup Switch *@
-                <SettingSwitch Title="Update Popup"
-                               Description="Asks To Update When A New Version Is Out"
+                <SettingSwitch Title="@AppText.Get("UpdatePopup")"
+                               Description="@AppText.Get("UpdateDescription")"
                                Value="Monitor.Settings.ShowUpdatePopup"
                                ValueChanged="value => SaveSettings(Monitor.Settings with { ShowUpdatePopup = value })" />
             </MudStack>
@@ -41,11 +55,11 @@
     </Header>
 
     @* Limits Section *@
-    <Header Title="Problem Limits">
+    <Header Title="@AppText.Get("ProblemLimits")">
         <TitleContent>
             <MudText Typo="Typo.body2"
                      Class="mx-2 mud-text-secondary">
-                2 Bad Minutes Open A Problem, Triple The Limit Notifies At Once
+                @AppText.Get("LimitsDescription")
             </MudText>
         </TitleContent>
         <ChildContent>
@@ -57,36 +71,36 @@
                     <MudItem xs="12"
                              md="4">
                         <MudNumericField T="int"
-                                         Label="Weak Signal Below dBm"
+                                         Label="@AppText.Get("WeakSignal")"
                                          Value="Monitor.Settings.WeakSignalRssi"
                                          ValueChanged="value => SaveSettings(Monitor.Settings with { WeakSignalRssi = value })"
                                          Min="-100"
                                          Max="-30"
-                                         HelperText="Closer To Zero Is Stronger, -70 Suits Calls"
+                                         HelperText="@AppText.Get("SignalDescription")"
                                          Variant="Variant.Outlined" />
                     </MudItem>
                     @* Router Ping *@
                     <MudItem xs="12"
                              md="4">
                         <MudNumericField T="int"
-                                         Label="Router Ping Above ms"
+                                         Label="@AppText.Get("RouterPing")"
                                          Value="Monitor.Settings.RouterPingMilliseconds"
                                          ValueChanged="value => SaveSettings(Monitor.Settings with { RouterPingMilliseconds = value })"
                                          Min="1"
                                          Max="1000"
-                                         HelperText="Lag Between This PC And Your Router"
+                                         HelperText="@AppText.Get("RouterDescription")"
                                          Variant="Variant.Outlined" />
                     </MudItem>
                     @* Internet Ping *@
                     <MudItem xs="12"
                              md="4">
                         <MudNumericField T="int"
-                                         Label="Internet Ping Above ms"
+                                         Label="@AppText.Get("InternetPing")"
                                          Value="Monitor.Settings.InternetPingMilliseconds"
                                          ValueChanged="value => SaveSettings(Monitor.Settings with { InternetPingMilliseconds = value })"
                                          Min="1"
                                          Max="2000"
-                                         HelperText="Lag To 1.1.1.1 While The Router Is Fine"
+                                         HelperText="@AppText.Get("InternetDescription")"
                                          Variant="Variant.Outlined" />
                     </MudItem>
 
@@ -98,7 +112,7 @@
     @* Adapter Section *@
     @if (Monitor.Adapter is { } adapter)
     {
-        <Header Title="Wi-Fi Adapter">
+        <Header Title="@AppText.Get("WiFiAdapter")">
             <MudPaper Elevation="4"
                       Class="pa-4 rounded-panel">
                 @* Adapter Chips *@
@@ -113,14 +127,14 @@
                                 Color="@DriverColor(adapter)"
                                 Target="@(adapter.IsDriverOld ? QuickActions.WindowsUpdate : null)" />
                     <ActionChip Icon="@Icons.Material.Rounded.Power"
-                                Text="@($"Plugged In {adapter.PowerSavingOnPower ?? "-"}")"
+                                Text="@AppText.Get("PluggedIn", adapter.PowerSavingOnPower ?? "-")"
                                 Color="@PowerColor(adapter.PowerSavingOnPower)" />
                     <ActionChip Icon="@Icons.Material.Rounded.BatteryStd"
-                                Text="@($"On Battery {adapter.PowerSavingOnBattery ?? "-"}")" />
+                                Text="@AppText.Get("OnBattery", adapter.PowerSavingOnBattery ?? "-")" />
                     @if (adapter.Roaming is { } roaming)
                     {
                         <ActionChip Icon="@Icons.Material.Rounded.SettingsInputAntenna"
-                                    Text="@($"Roaming {roaming}")" />
+                                    Text="@AppText.Get("Roaming", roaming)" />
                     }
                 </MudStack>
             </MudPaper>
@@ -128,7 +142,7 @@
     }
 
     @* About Section *@
-    <Header Title="About">
+    <Header Title="@AppText.Get("About")">
         <MudPaper Elevation="4"
                   Class="pa-4 rounded-panel">
             @* Version Row *@
@@ -137,12 +151,12 @@
                       Spacing="2">
                 <MudText Typo="Typo.body2"
                          Class="mud-text-secondary">
-                    @AppInfo.DisplayName @AppInfo.Version.ToString(2)
+                    @AppText.Get("AppName") @AppInfo.Version.ToString(2)
                 </MudText>
                 @if (Monitor.AvailableUpdate is { } availableUpdate)
                 {
                     <ActionChip Icon="@Icons.Material.Rounded.NewReleases"
-                                Text="@($"Version {availableUpdate.ToString(2)} Available")"
+                                Text="@AppText.Get("VersionAvailable", availableUpdate.ToString(2))"
                                 Color="Color.Info"
                                 Target="@UpdateChecker.LatestReleaseUrl" />
                     <MudSpacer />
@@ -159,7 +173,7 @@
                                                  Class="mr-2"
                                                  Style="width:16px; height:16px" />
                         }
-                        @(_isInstalling ? "Downloading" : "Update Now")
+                        @AppText.Get(_isInstalling ? "Downloading" : "UpdateNow")
                     </MudButton>
                 }
                 else
@@ -171,7 +185,7 @@
                                StartIcon="@Icons.Material.Rounded.Refresh"
                                Disabled="_isChecking"
                                OnClick="CheckForUpdateAsync">
-                        Check For Updates
+                        @AppText.Get("CheckUpdates")
                     </MudButton>
                 }
             </MudStack>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+    <resheader name="version"><value>2.0</value></resheader>
+    <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+    <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+    <data name="General" xml:space="preserve"><value>Общие</value></data>
+    <data name="StartWithWindows" xml:space="preserve"><value>Запускать вместе с Windows</value></data>
+    <data name="StartDescription" xml:space="preserve"><value>Работает в области уведомлений после входа в систему</value></data>
+    <data name="DailySummary" xml:space="preserve"><value>Ежедневная сводка</value></data>
+    <data name="SummaryDescription" xml:space="preserve"><value>Уведомляет утром о проблемах за предыдущий день</value></data>
+    <data name="NightlySpeedTest" xml:space="preserve"><value>Ночной тест скорости</value></data>
+    <data name="SpeedDescription" xml:space="preserve"><value>Измеряет скорость и задержку под нагрузкой в 03:00</value></data>
+    <data name="NativeWiFi" xml:space="preserve"><value>Читать данные Wi-Fi напрямую</value></data>
+    <data name="NativeDescription" xml:space="preserve"><value>Запрашивает Windows напрямую вместо netsh, работает на любом языке</value></data>
+    <data name="UpdatePopup" xml:space="preserve"><value>Окно обновления</value></data>
+    <data name="UpdateDescription" xml:space="preserve"><value>Предлагает обновление при выходе новой версии</value></data>
+    <data name="ProblemLimits" xml:space="preserve"><value>Пороговые значения</value></data>
+    <data name="LimitsDescription" xml:space="preserve"><value>2 плохие минуты открывают инцидент; тройное превышение порога вызывает уведомление сразу</value></data>
+    <data name="WeakSignal" xml:space="preserve"><value>Слабый сигнал ниже, дБм</value></data>
+    <data name="SignalDescription" xml:space="preserve"><value>Чем ближе к нулю, тем сильнее сигнал; -70 подходит для звонков</value></data>
+    <data name="RouterPing" xml:space="preserve"><value>Пинг роутера выше, мс</value></data>
+    <data name="RouterDescription" xml:space="preserve"><value>Задержка между этим ПК и роутером</value></data>
+    <data name="InternetPing" xml:space="preserve"><value>Пинг интернета выше, мс</value></data>
+    <data name="InternetDescription" xml:space="preserve"><value>Задержка до 1.1.1.1 при нормальной работе роутера</value></data>
+    <data name="WiFiAdapter" xml:space="preserve"><value>Адаптер Wi-Fi</value></data>
+    <data name="About" xml:space="preserve"><value>О программе</value></data>
+    <data name="PluggedIn" xml:space="preserve"><value>От сети {0}</value></data>
+    <data name="OnBattery" xml:space="preserve"><value>От батареи {0}</value></data>
+    <data name="Roaming" xml:space="preserve"><value>Роуминг {0}</value></data>
+    <data name="VersionAvailable" xml:space="preserve"><value>Доступна версия {0}</value></data>
+    <data name="Downloading" xml:space="preserve"><value>Загрузка</value></data>
+    <data name="UpdateNow" xml:space="preserve"><value>Обновить сейчас</value></data>
+    <data name="CheckUpdates" xml:space="preserve"><value>Проверить обновления</value></data>
+    <data name="GitHubUnavailable" xml:space="preserve"><value>Не удалось связаться с GitHub</value></data>
+    <data name="VersionLatest" xml:space="preserve"><value>Версия {0} — последняя</value></data>
+    <data name="DriverFrom" xml:space="preserve"><value>Драйвер {0} от {1:yyyy-MM-dd}</value></data>
+    <data name="Driver" xml:space="preserve"><value>Драйвер {0}</value></data>
+    <data name="Language" xml:space="preserve"><value>Язык</value></data>
+    <data name="SystemLanguage" xml:space="preserve"><value>Язык Windows (автоматически)</value></data>
+    <data name="LanguageDescription" xml:space="preserve"><value>Сразу применяется к настройкам и новым сообщениям о медленном DNS; остальные экраны остаются на английском</value></data>
+    <data name="SlowDnsValue" xml:space="preserve"><value>Медленный DNS: {0:0.#} мс</value></data>
+    <data name="SlowDnsSummary" xml:space="preserve"><value>Медленный DNS наблюдался {0}, пик {1:0.#} мс, среднее {2:0.#} мс</value></data>
+    <data name="MinuteOne" xml:space="preserve"><value>{0} минуту</value></data>
+    <data name="MinuteFew" xml:space="preserve"><value>{0} минуты</value></data>
+    <data name="MinuteMany" xml:space="preserve"><value>{0} минут</value></data>
+    <data name="SecondOne" xml:space="preserve"><value>{0} секунду</value></data>
+    <data name="SecondFew" xml:space="preserve"><value>{0} секунды</value></data>
+    <data name="SecondMany" xml:space="preserve"><value>{0} секунд</value></data>
+</root>

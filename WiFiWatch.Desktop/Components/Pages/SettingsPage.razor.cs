@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using WiFiWatch.Data.Helpers;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Data.ViewModels;
 using WiFiWatch.Desktop.Components.Shared.Dialogs;
 using WiFiWatch.Services.Integration;
@@ -44,6 +45,22 @@ public partial class SettingsPage
         settings.Save();
     }
 
+    private string SelectedLanguage =>
+        string.IsNullOrWhiteSpace(Monitor.Settings.Language)
+            ? string.Empty
+            : AppText.Culture.TwoLetterISOLanguageName;
+
+    private void SaveLanguage(string language)
+    {
+        AppText.Select(language);
+        SaveSettings(
+            Monitor.Settings with
+            {
+                Language = string.IsNullOrEmpty(language) ? null : language,
+            }
+        );
+    }
+
     private void SaveStartWithWindows(bool isStarted)
     {
         StartupRegistration.Apply(isStarted);
@@ -57,11 +74,14 @@ public partial class SettingsPage
         _isChecking = false;
         if (latest is null)
         {
-            Snackbar.Add("Could Not Reach GitHub", Severity.Warning);
+            Snackbar.Add(AppText.Get("GitHubUnavailable"), Severity.Warning);
         }
         else if (latest <= AppInfo.Version)
         {
-            Snackbar.Add($"Version {AppInfo.Version.ToString(2)} Is The Latest", Severity.Success);
+            Snackbar.Add(
+                AppText.Get("VersionLatest", AppInfo.Version.ToString(2)),
+                Severity.Success
+            );
         }
     }
 
@@ -78,8 +98,8 @@ public partial class SettingsPage
 
     private static string DriverText(AdapterInfo adapter) =>
         adapter.DriverDate is { } driverDate
-            ? $"Driver {adapter.DriverVersion} From {driverDate:yyyy-MM-dd}"
-            : $"Driver {adapter.DriverVersion ?? "-"}";
+            ? AppText.Get("DriverFrom", adapter.DriverVersion ?? "-", driverDate)
+            : AppText.Get("Driver", adapter.DriverVersion ?? "-");
 
     private static Color DriverColor(AdapterInfo adapter) =>
         adapter.DriverDate is null ? Color.Default
