@@ -37,7 +37,15 @@ public partial class MainWindow : Window
 
         // Page Background Before The First Paint, No White Flash
         WebView.BlazorWebViewInitialized += (_, eventArgs) =>
+        {
             eventArgs.WebView.DefaultBackgroundColor = Drawing.Color.FromArgb(0x20, 0x20, 0x20);
+
+            // Browser Keys Like F5 And Ctrl P, Ctrl Wheel And Pinch Zoom Stay Off
+            var settings = eventArgs.WebView.CoreWebView2.Settings;
+            settings.AreBrowserAcceleratorKeysEnabled = false;
+            settings.IsZoomControlEnabled = false;
+            settings.IsPinchZoomEnabled = false;
+        };
         SourceInitialized += (_, _) => WindowCaptionTheme.Apply(this);
         StateChanged += (_, _) => HideWhenMinimized();
         IsVisibleChanged += (_, _) => _ = RestPageAsync();

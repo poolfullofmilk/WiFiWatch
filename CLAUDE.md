@@ -66,7 +66,7 @@ The global `~/.claude/CLAUDE.md` holds every shared convention (git, releases, c
 | `Components/Shared/Common/` | `ActionChip`, `ChannelStrip`, `ExportMenu`, `Header`, `HealthStrip`, `NowPanel`, `SegmentedButtonGroup`, `SettingSwitch`, `Tooltip` |
 | `Components/Shared/Dialogs/` | `IncidentDialog`, `SpeedTestDialog`, `UpdateDialog` |
 | `Components/Shared/Tables/` | `DataTable`, `SearchTextField` |
-| `wwwroot/` | `index.html`, `CSS/WiFiWatch.css`, Nunito with `OFL.txt` |
+| `wwwroot/` | `index.html`, `CSS/WiFiWatch.css`, Nunito (Latin, Latin Extended for Turkish, Cyrillic for Russian, one `unicode-range` each) with `OFL.txt` |
 
 ## Build, Run, Publish
 
@@ -191,6 +191,7 @@ Update Now: `Updater.DownloadAsync` runs on the thread pool, reads the asset's S
 
 - **A hidden page sleeps.** When the window hides, `MainWindow.RestPageAsync` hides the inner WebView2, sets its memory target to Low and after 1 s suspends it; showing resumes it. Render batches sent meanwhile are delivered on resume. Measured over 3 tray minutes after one open: WebView2 working set 351 to 33 MB, app CPU 1.8 to 0.9 s. Tearing the page down instead does not work: `BlazorWebView.DisposeAsync` never completes (the manager marks itself disposed before MudBlazor's scoped services await their script calls), and every recreated composition control leaks about 77 MB of native memory. A window never shown since sign in has no browser at all (122 MB).
 - **It never closes by itself.** Minimise hides to the tray. Close raises `MainWindow.CloseRequested`; `Home` answers with a `MudMessageBox`: Keep Running (blue, hides) or Exit. Dismissing it changes nothing. Only Exit in the dialog or tray ends the app.
+- **It is an app, not a browser.** `BlazorWebViewInitialized` turns off WebView2's browser keys (F5 reloaded the page and dropped its state, Ctrl+P printed it), Ctrl+wheel zoom and pinch zoom.
 - **`SessionEnding` sets the exit flag** so Windows shutdown is never held up. `DispatcherUnhandledException` is handled and recorded through `NetworkMonitor.RecordFailureAsync`.
 - **`Home` gets the window from DI** through a factory that only runs after the window exists.
 - **The tray menu is a native Win32 popup** (`TrayMenu`), dark through the uxtheme ordinals 135 and 136. The owner window must be foreground before `TrackPopupMenuEx` and get a `WM_NULL` after, or the menu never closes.
