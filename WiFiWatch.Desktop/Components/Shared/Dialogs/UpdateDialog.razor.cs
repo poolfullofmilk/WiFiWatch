@@ -1,3 +1,4 @@
+using System.IO;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using WiFiWatch.Data.Localization;
@@ -32,29 +33,6 @@ public partial class UpdateDialog
             new DialogOptions { BackdropClick = true, MaxWidth = MaxWidth.ExtraSmall }
         );
 
-    public static async Task InstallAsync(Version version, ISnackbar snackbar, MainWindow window)
-    {
-        // A Debug Build Has No Release Exe To Replace
-        if (!Updater.CanInstall)
-        {
-            QuickActions.Open(UpdateChecker.LatestReleaseUrl);
-            return;
-        }
-
-        try
-        {
-            Updater.Launch(await Updater.DownloadAsync(version));
-            window.Exit();
-        }
-        catch (Exception exception)
-        {
-            snackbar.Add(
-                AppText.Get("Update Failed {0}", exception.GetType().Name),
-                Severity.Warning
-            );
-        }
-    }
-
     private void SetHidden(bool isHidden)
     {
         Monitor.Settings = Monitor.Settings with { ShowUpdatePopup = !isHidden };
@@ -67,8 +45,30 @@ public partial class UpdateDialog
         if (_isInstalling)
             return;
 
+        // A Debug Build Has No Release Exe To Replace
+        if (!Updater.CanInstall)
+        {
+            QuickActions.Open(UpdateChecker.LatestReleaseUrl);
+            return;
+        }
+
         _isInstalling = true;
-        await InstallAsync(Version, Snackbar, Window);
+        try
+        {
+            Updater.Launch(await Updater.DownloadAsync(Version));
+            Window.Exit();
+        }
+        catch (Exception exception)
+        {
+            Snackbar.Add(
+                AppText.Get("Update Failed {0}", exception.GetType().Name),
+                Severity.Warning
+            );
+
+            // A Bad Checksum Or A Protected Folder Needs The Release Page
+            if (exception is InvalidDataException or UnauthorizedAccessException)
+                QuickActions.Open(UpdateChecker.LatestReleaseUrl);
+        }
         _isInstalling = false;
     }
 

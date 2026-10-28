@@ -124,6 +124,9 @@ public sealed class NetworkMonitor
 
     public Version? AvailableUpdate { get; private set; }
 
+    // Commit Titles From GitHub, Shown As Supplied
+    public IReadOnlyList<string> UpdateNotes { get; private set; } = [];
+
     public AdapterInfo? Adapter { get; private set; }
 
     public IReadOnlyList<int> ClearingIncidentIds { get; private set; } = [];
@@ -1038,6 +1041,8 @@ public sealed class NetworkMonitor
         if (latest is null || latest <= AppInfo.Version || latest == AvailableUpdate)
             return latest;
 
+        // Notes First, So Whoever Sees The Update Sees Its Notes
+        UpdateNotes = await UpdateChecker.NotesAsync(latest);
         AvailableUpdate = latest;
         await _journal.RecordAsync(
             EventKind.UpdateAvailable,

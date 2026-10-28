@@ -18,13 +18,12 @@ public partial class SettingsPage
     public required NetworkMonitor Monitor { get; set; }
 
     [Inject]
-    public required MainWindow Window { get; set; }
+    public required IDialogService DialogService { get; set; }
 
     [Inject]
     public required ISnackbar Snackbar { get; set; }
 
     private bool _isChecking;
-    private bool _isInstalling;
 
     protected override async Task OnInitializedAsync()
     {
@@ -80,17 +79,6 @@ public partial class SettingsPage
         {
             Snackbar.Add(AppText.Get("VersionLatest", AppInfo.VersionText), Severity.Success);
         }
-    }
-
-    private async Task InstallAsync(Version version)
-    {
-        // The Button Stays Blue, So Ignore A Second Click
-        if (_isInstalling)
-            return;
-
-        _isInstalling = true;
-        await UpdateDialog.InstallAsync(version, Snackbar, Window);
-        _isInstalling = false;
     }
 
     private static string DriverText(AdapterInfo adapter) =>
