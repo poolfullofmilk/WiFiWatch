@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using WiFiWatch.Data.Helpers;
 
 namespace WiFiWatch.Services.Integration;
 
@@ -21,7 +22,7 @@ public static class Updater
 
     public static async Task<string> DownloadAsync(Version version)
     {
-        var versionText = version.ToString(2);
+        var versionText = AppInfo.ShortText(version);
         var targetPath = Path.Combine(
             Path.GetDirectoryName(Environment.ProcessPath)!,
             $"{ExecutablePrefix}{versionText}.exe"

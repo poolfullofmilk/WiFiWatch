@@ -1042,7 +1042,7 @@ public sealed class NetworkMonitor
         await _journal.RecordAsync(
             EventKind.UpdateAvailable,
             EventSeverity.Info,
-            AppText.Get("Version {0} Is Available", latest.ToString(2))
+            AppText.Get("Version {0} Is Available", AppInfo.ShortText(latest))
         );
         UpdateFound?.Invoke();
         return latest;

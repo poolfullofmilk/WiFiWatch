@@ -69,4 +69,4 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           directory=$([ -d signed ] && echo signed || echo "$PUBLISH_DIRECTORY")
-          gh release create "$GITHUB_REF_NAME" "$directory/WiFiWatch_$GITHUB_REF_NAME.exe" --title "Wi-Fi Watch $GITHUB_REF_NAME" --notes ""
+          gh release create "$GITHUB_REF_NAME" "$directory/WiFiWatch_$GITHUB_REF_NAME.exe" --title "Wi-Fi Watch ${GITHUB_REF_NAME%.0}" --notes ""

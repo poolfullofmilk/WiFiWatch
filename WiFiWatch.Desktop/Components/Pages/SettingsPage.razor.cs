@@ -78,10 +78,7 @@ public partial class SettingsPage
         }
         else if (latest <= AppInfo.Version)
         {
-            Snackbar.Add(
-                AppText.Get("VersionLatest", AppInfo.Version.ToString(2)),
-                Severity.Success
-            );
+            Snackbar.Add(AppText.Get("VersionLatest", AppInfo.VersionText), Severity.Success);
         }
     }
 
