@@ -52,13 +52,13 @@ public partial class SettingsPage
 
     private void SaveLanguage(string language)
     {
-        AppText.Select(language);
         SaveSettings(
             Monitor.Settings with
             {
                 Language = string.IsNullOrEmpty(language) ? null : language,
             }
         );
+        AppText.Select(language);
     }
 
     private void SaveStartWithWindows(bool isStarted)

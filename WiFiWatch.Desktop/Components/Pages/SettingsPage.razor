@@ -127,10 +127,10 @@
                                 Color="@DriverColor(adapter)"
                                 Target="@(adapter.IsDriverOld ? QuickActions.WindowsUpdate : null)" />
                     <ActionChip Icon="@Icons.Material.Rounded.Power"
-                                Text="@AppText.Get("PluggedIn", adapter.PowerSavingOnPower ?? "-")"
+                                Text="@AppText.Get("PluggedIn", AppText.Get(adapter.PowerSavingOnPower ?? "-"))"
                                 Color="@PowerColor(adapter.PowerSavingOnPower)" />
                     <ActionChip Icon="@Icons.Material.Rounded.BatteryStd"
-                                Text="@AppText.Get("OnBattery", adapter.PowerSavingOnBattery ?? "-")" />
+                                Text="@AppText.Get("OnBattery", AppText.Get(adapter.PowerSavingOnBattery ?? "-"))" />
                     @if (adapter.Roaming is { } roaming)
                     {
                         <ActionChip Icon="@Icons.Material.Rounded.SettingsInputAntenna"
@@ -173,7 +173,7 @@
                                                  Class="mr-2"
                                                  Style="width:16px; height:16px" />
                         }
-                        @AppText.Get(_isInstalling ? "Downloading" : "UpdateNow")
+                        @AppText.Get(_isInstalling ? AppText.Get("Downloading") : "UpdateNow")
                     </MudButton>
                 }
                 else

@@ -82,7 +82,7 @@ Publish writes one file, `WiFiWatch.Desktop\bin\Release\net10.0-windows10.0.1776
 
 Installing is copying that exe to `%LocalAppData%\Programs\WiFiWatch` and running it once. Every Release launch rewrites the `Run` value (with `--tray`) and `Start Menu\Programs\01 Apps\Wi-Fi Watch.lnk` to point at itself. A release on GitHub carries exactly one asset named `WiFiWatch_v<version>.exe` under the tag `v<version>`, because the updater builds that URL.
 
-**Releases come from `.github/workflows/release.yml`, not from this PC**, which replaces the global `gh release create` step: bump `<Version>`, commit and push, then `git tag v1.9` and `git push origin v1.9`. The workflow publishes on `windows-latest`, uploads the exe as the `unsigned` artifact, signs it through SignPath once the `SIGNPATH_API_TOKEN` secret and the `SIGNPATH_ORGANIZATION_ID` variable exist (waiting up to an hour for the approval in SignPath), and creates the release with the exe as its only asset, unsigned until SignPath is set up. A tag that does not match `<Version>` fails the release step, because no `WiFiWatch_<tag>.exe` exists. A manual run only builds and uploads. `IncludeSourceRevisionInInformationalVersion` is off so the product version is exactly the `<Version>`, which SignPath's metadata check compares, and `Company` replaces the default, which was the assembly name.
+**Releases come from `.github/workflows/release.yml`, not from this PC**, which replaces the global `gh release create` step: bump `<Version>`, commit and push, then `git tag v1.10` and `git push origin v1.10`. The workflow publishes on `windows-latest`, uploads the exe as the `unsigned` artifact, signs it through SignPath once the `SIGNPATH_API_TOKEN` secret and the `SIGNPATH_ORGANIZATION_ID` variable exist (waiting up to an hour for the approval in SignPath), and creates the release with the exe as its only asset, unsigned until SignPath is set up. A tag that does not match `<Version>` fails the release step, because no `WiFiWatch_<tag>.exe` exists. A manual run only builds and uploads. `IncludeSourceRevisionInInformationalVersion` is off so the product version is exactly the `<Version>`, which SignPath's metadata check compares, and `Company` replaces the default, which was the assembly name.
 
 The workflow uses `actions/checkout@v7`, `actions/setup-dotnet@v6` (SDK `10.0.x`), `actions/upload-artifact@v7` (zipped, which the `<zip-file>` root of the artifact configuration expects) and `signpath/github-action-submit-signing-request@v3`, with `actions: read` and `contents: write`, all bash steps on the Windows runner. `gh workflow run release.yml` is the dry run and `gh run watch` follows it. Only the newest release is kept: once a new one is live, `gh release delete v<old> --yes --cleanup-tag`; old installs still find the new one through `releases/latest`. The global rule to launch the exe alone in an empty folder is met by installing the release asset outside the Claude container (an `explorer.exe` script copying it into `%LocalAppData%\Programs\WiFiWatch`), or by Update Now in the installed app, which tests the updater on the way.
 
@@ -227,19 +227,26 @@ The look follows LetsWatch: navigation in the app bar, section titles above pane
 
 ## Localization
 
-Settings and new Slow DNS messages are localized; the other pages, shell and
-remaining event kinds are still English. `AppText.Culture` selects resources
-explicitly so existing monitor tasks see a language change. Numeric formatting
-keeps `CultureInfo.CurrentCulture` (the Windows number format). The language
-selector is outlined and saves `UserSettings.Language`; null uses the Windows
-user UI culture captured at startup. Missing translations use neutral English.
-Russian duration resources use one/few/many forms. Stored historical messages
-are never translated or rewritten by a language switch; an open incident's next
-update or close uses the current language. Russian strings need wporgru's review.
+All app-owned UI, tray and notification text, advice, event templates, summaries,
+export labels, dialogs and built-in controls use the six `.resx` language sets.
+`AppText.Culture` is the language source for WPF, Blazor and monitor tasks.
+`AppText.Changed` refreshes navigation, the current page and tray without restart.
+Numbers keep the Windows format; month/day names and picker/chart locales follow
+the chosen language. Settings save the choice, with the Windows user UI culture
+as default and neutral English fallback. Russian count resources use one/few/many.
 
-`VerifyLocalizationBundle` checks all five satellite assemblies before bundling
-the single EXE. The release workflow runs the regression executable first.
-See `docs/LOCALIZATION.md` for the verified results and remaining Windows checks.
+Never translate stored link/scope/kind identifiers or rewrite historical messages
+on a language switch. Windows reasons, SSIDs, addresses and device names remain
+as supplied. New updates and closing messages use the selected language. Driver
+checks deduplicate through structured version details, with legacy compatibility;
+daily summaries use a date prefix independent of the translated weekday.
+
+`AppLocalizationInterceptor` translates MudBlazor's built-in control text. A new
+visible string needs entries in all five satellites as well as neutral English.
+The publication target verifies every satellite in the single EXE. Test coverage
+includes actual Razor rendering in all six languages; see `docs/LOCALIZATION.md`
+for commands, results and the Windows checks that still need a Windows runtime.
+Russian translations need wporgru's review; do not claim that they supplied them.
 
 ## Verifying
 

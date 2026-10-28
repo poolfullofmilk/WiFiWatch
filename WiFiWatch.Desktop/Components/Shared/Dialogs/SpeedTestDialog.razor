@@ -5,7 +5,7 @@
 <MudDialog>
 
     <TitleContent>
-        <MudText Typo="Typo.h6">Speed Test</MudText>
+        <MudText Typo="Typo.h6">@AppText.Get("Speed Test")</MudText>
     </TitleContent>
     <DialogContent>
         <MudStack Spacing="6"
@@ -19,7 +19,7 @@
                 <MudText Typo="Typo.h2">@HeadlineValue</MudText>
                 <MudText Typo="Typo.body2"
                          Class="mud-text-secondary">
-                    Mbps
+                    @AppText.Get("Mbps")
                 </MudText>
             </MudStack>
             <MudProgressLinear Color="@(_error is null ? Color.Info : Color.Warning)"
@@ -53,18 +53,18 @@
                              Size="Size.Small"
                              Variant="Variant.Text"
                              Color="@GradeColors.For(result.Grade)">
-                        @($"Grade {result.Grade}")
+                        @(AppText.Get("Grade {0}", result.Grade))
                     </MudChip>
                     <MudText Typo="Typo.body2"
                              Class="mud-text-secondary">
-                        @($"Lag Under Load {Formatter.FormatLagUnderLoad(result)}")
+                        @(AppText.Get("Lag Under Load {0}", Formatter.FormatLagUnderLoad(result)))
                     </MudText>
                 </MudStack>
             }
             <MudText Typo="Typo.caption"
                      Align="Align.Center"
                      Class="mud-text-secondary">
-                Measured Against Fast.com Servers, 8 Seconds Each Way
+                @AppText.Get("Measured Against Fast.com Servers, 8 Seconds Each Way")
             </MudText>
             @if (_error is { } error)
             {
@@ -85,7 +85,7 @@
             <MudButton Variant="Variant.Filled"
                        Size="Size.Small"
                        OnClick="Close">
-                @(IsRunning ? "Cancel" : "Close")
+                @(IsRunning ? AppText.Get("Cancel") : AppText.Get("Close"))
             </MudButton>
             @* Again Button *@
             <MudButton Variant="Variant.Filled"
@@ -94,7 +94,7 @@
                        StartIcon="@Icons.Material.Rounded.Refresh"
                        Disabled="IsRunning"
                        OnClick="RunAsync">
-                Test Again
+                @AppText.Get("Test Again")
             </MudButton>
         </MudStack>
     </DialogActions>

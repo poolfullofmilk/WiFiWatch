@@ -8,6 +8,7 @@ using MudBlazor;
 using MudBlazor.Services;
 using WiFiWatch.Data;
 using WiFiWatch.Data.Localization;
+using WiFiWatch.Desktop.Localization;
 using WiFiWatch.Services.Integration;
 using WiFiWatch.Services.Monitoring;
 using WiFiWatch.Services.Storage;
@@ -60,7 +61,9 @@ public partial class App : Application
         DispatcherUnhandledException += (_, exceptionArgs) =>
         {
             exceptionArgs.Handled = true;
-            _ = monitor.RecordFailureAsync($"App Failed {exceptionArgs.Exception.GetType().Name}");
+            _ = monitor.RecordFailureAsync(
+                AppText.Get("App Failed {0}", exceptionArgs.Exception.GetType().Name)
+            );
         };
 
         // The Page Resolves The Window Only After It Exists
@@ -73,6 +76,8 @@ public partial class App : Application
             configuration.SnackbarConfiguration.SuccessIcon = Icons.Material.Rounded.CheckCircle;
             configuration.SnackbarConfiguration.WarningIcon = Icons.Material.Rounded.Warning;
         });
+        services.AddLocalization();
+        services.AddLocalizationInterceptor<AppLocalizationInterceptor>();
         services.AddApexCharts();
         services.AddSingleton(monitor);
         services.AddSingleton(_ => window!);

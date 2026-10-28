@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using WiFiWatch.Data;
 using WiFiWatch.Data.Helpers;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Data.Models;
 using WiFiWatch.Data.ViewModels;
 using WiFiWatch.Desktop.Components.Shared.Dialogs;
@@ -40,15 +41,20 @@ public partial class OverviewPage : IDisposable
         get
         {
             if (_summary is not { MonitoredMinutes: > 0 } summary)
-                return "Nothing Watched Yet";
+                return AppText.Get("Nothing Watched Yet");
 
             // Online Only Means Something Next To How Long Was Watched
             var watched = Formatter.FormatDuration(TimeSpan.FromMinutes(summary.MonitoredMinutes));
             var problems =
                 summary.ProblemCount == 0
-                    ? "No Problems"
+                    ? AppText.Get("No Problems")
                     : Formatter.FormatCount(summary.ProblemCount, "Problem");
-            return $"Watched {watched}, {summary.OnlinePercent:0.#}% Online, {problems}";
+            return AppText.Get(
+                "Watched {0}, {1:0.#}% Online, {2}",
+                watched,
+                summary.OnlinePercent,
+                problems
+            );
         }
     }
 

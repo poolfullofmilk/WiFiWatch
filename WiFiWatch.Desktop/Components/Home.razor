@@ -11,15 +11,15 @@
 
 @* Close Message Box *@
 <MudMessageBox @ref="_closeMessageBox"
-               Title="@($"Close {AppInfo.DisplayName}")">
+               Title="@(AppText.Get("Close {0}", AppInfo.DisplayName))">
     <MessageContent>
-        Keep Watching From The Tray Or Exit Completely
+        @AppText.Get("Keep Watching From The Tray Or Exit Completely")
     </MessageContent>
     <NoButton>
         <MudButton Variant="Variant.Filled"
                    Size="Size.Small"
                    StartIcon="@Icons.Material.Rounded.PowerSettingsNew">
-            Exit
+            @AppText.Get("Exit")
         </MudButton>
     </NoButton>
     <YesButton>
@@ -27,7 +27,7 @@
                    Color="Color.Info"
                    Size="Size.Small"
                    StartIcon="@Icons.Material.Rounded.Check">
-            Keep Running
+            @AppText.Get("Keep Running")
         </MudButton>
     </YesButton>
 </MudMessageBox>
@@ -44,7 +44,7 @@
         <MudStack Row
                   AlignItems="AlignItems.Center"
                   Spacing="1">
-            @foreach (var link in s_pages)
+            @foreach (var link in Pages)
             {
                 @* Page Button *@
                 <MudBadge Dot
@@ -65,7 +65,7 @@
     </MudAppBar>
 
     @* Main Content *@
-    <MudMainContent Class="px-7 pb-7 pt-20">
+    <MudMainContent @key="_languageVersion" Class="px-7 pb-7 pt-20">
         <MudContainer MaxWidth="MaxWidth.Large"
                       Gutters="false">
             @switch (_page)

@@ -16,12 +16,21 @@
 <body>
     <div id="app"></div>
     <div id="blazor-error-ui">
-        An Unhandled Error Has Occurred
+        <span id="blazor-error-message">An Unhandled Error Has Occurred</span>
         <a href=""
            class="reload">
             Reload
         </a>
     </div>
+    <script>
+        window.wifiwatch = {
+            setLanguage: (language, errorMessage, reloadLabel) => {
+                document.documentElement.lang = language;
+                document.getElementById('blazor-error-message').textContent = errorMessage;
+                document.querySelector('#blazor-error-ui .reload').textContent = reloadLabel;
+            }
+        };
+    </script>
     <script src="_framework/blazor.webview.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
 </body>

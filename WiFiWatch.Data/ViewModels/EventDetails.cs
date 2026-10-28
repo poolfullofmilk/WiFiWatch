@@ -6,7 +6,8 @@ public sealed record EventDetails(
     string? Context = null,
     string? Reason = null,
     string? TraceSummary = null,
-    List<TraceHop>? Trace = null
+    List<TraceHop>? Trace = null,
+    string? DriverVersion = null
 )
 {
     public static EventDetails Parse(string? json)

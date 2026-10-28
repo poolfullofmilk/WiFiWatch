@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Services.Integration;
 using WiFiWatch.Services.Monitoring;
 
@@ -47,7 +48,10 @@ public partial class UpdateDialog
         }
         catch (Exception exception)
         {
-            snackbar.Add($"Update Failed {exception.GetType().Name}", Severity.Warning);
+            snackbar.Add(
+                AppText.Get("Update Failed {0}", exception.GetType().Name),
+                Severity.Warning
+            );
         }
     }
 

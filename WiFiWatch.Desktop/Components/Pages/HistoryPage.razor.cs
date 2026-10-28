@@ -6,6 +6,7 @@ using MudBlazor;
 using WiFiWatch.Data;
 using WiFiWatch.Data.Enums;
 using WiFiWatch.Data.Helpers;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Data.Models;
 using WiFiWatch.Data.ViewModels;
 using WiFiWatch.Desktop.Components.Shared.Common;
@@ -23,12 +24,8 @@ public partial class HistoryPage : IDisposable
     private const int MaximumTicks = 12;
     private const int BusyAirtimePercent = 50;
 
-    private static readonly (string Label, int DayCount)[] s_presets =
-    [
-        ("Today", 1),
-        ("7 Days", 7),
-        ("30 Days", 30),
-    ];
+    private static (string Label, int DayCount)[] Presets =>
+        [(AppText.Get("Today"), 1), (AppText.Get("7 Days"), 7), (AppText.Get("30 Days"), 30)];
 
     [Inject]
     public required NetworkMonitor Monitor { get; set; }
@@ -76,40 +73,58 @@ public partial class HistoryPage : IDisposable
         _summary is not { MonitoredMinutes: > 0 } summary
             ?
             [
-                new("Online", "-", "Not Watched", Color.Default),
-                new("Problems", "-", "Warnings And Outages", Color.Default),
-                new("Longest Outage", "-", "Internet Or Connection Down", Color.Default),
-                new("Fastest Download", "-", "From Speed Tests", Color.Default),
+                new(AppText.Get("Online"), "-", AppText.Get("Not Watched"), Color.Default),
+                new(
+                    AppText.Get("Problems"),
+                    "-",
+                    AppText.Get("Warnings And Outages"),
+                    Color.Default
+                ),
+                new(
+                    AppText.Get("Longest Outage"),
+                    "-",
+                    AppText.Get("Internet Or Connection Down"),
+                    Color.Default
+                ),
+                new(
+                    AppText.Get("Fastest Download"),
+                    "-",
+                    AppText.Get("From Speed Tests"),
+                    Color.Default
+                ),
             ]
             :
             [
                 new(
-                    "Online",
+                    AppText.Get("Online"),
                     $"{summary.OnlinePercent:0.#}%",
-                    $"Of {Formatter.FormatDuration(TimeSpan.FromMinutes(summary.MonitoredMinutes))} Watched",
+                    AppText.Get(
+                        "Of {0} Watched",
+                        Formatter.FormatDuration(TimeSpan.FromMinutes(summary.MonitoredMinutes))
+                    ),
                     summary.OnlinePercent < 99 ? Color.Warning : Color.Default
                 ),
                 new(
-                    "Problems",
+                    AppText.Get("Problems"),
                     $"{summary.ProblemCount}",
-                    "Warnings And Outages",
+                    AppText.Get("Warnings And Outages"),
                     summary.ProblemCount > 0 ? Color.Warning : Color.Default
                 ),
                 new(
-                    "Longest Outage",
+                    AppText.Get("Longest Outage"),
                     summary.LongestOutage > TimeSpan.Zero
                         ? Formatter.FormatDuration(summary.LongestOutage)
-                        : "None",
-                    "Internet Or Connection Down",
+                        : AppText.Get("None"),
+                    AppText.Get("Internet Or Connection Down"),
                     summary.LongestOutage > TimeSpan.Zero ? Color.Error : Color.Default
                 ),
                 new(
-                    "Fastest Download",
+                    AppText.Get("Fastest Download"),
                     _speedTests.Count == 0
                         ? "-"
-                        : $"{_speedTests.Max(test => test.DownloadMbps):0} Mbps",
+                        : $"{_speedTests.Max(test => test.DownloadMbps):0} {AppText.Get("Mbps")}",
                     _speedTests.Count == 0
-                        ? "No Speed Test"
+                        ? AppText.Get("No Speed Test")
                         : Formatter.FormatCount(_speedTests.Count, "Speed Test"),
                     Color.Default
                 ),
@@ -188,8 +203,8 @@ public partial class HistoryPage : IDisposable
         var startsUtc = HealthBuckets.Starts(firstDay, bucketCount, _isDaily);
         var labelFormat =
             _isDaily ? "dd MMM"
-            : dayCount == 1 ? "HH'h'"
-            : "ddd HH'h'";
+            : dayCount == 1 ? "HH:mm"
+            : "ddd HH:mm";
         _pingOptions.Xaxis.TickAmount = Math.Min(bucketCount, MaximumTicks);
 
         await using var context = new WiFiDbContext();
@@ -273,7 +288,7 @@ public partial class HistoryPage : IDisposable
                 neighborsPerBlock,
                 _evictionCount
             )
-            : "No Wi-Fi Scans In This Range";
+            : AppText.Get("No Wi-Fi Scans In This Range");
         _summary = await SummaryWriter.SummarizeAsync(context, hours, startUtc, endUtc);
     }
     #endregion
@@ -290,37 +305,37 @@ public partial class HistoryPage : IDisposable
             .ToListAsync();
 
         CsvExport.Save(
-            "Minutes",
+            AppText.Get("Minutes"),
             day,
             [
                 [
-                    "Time",
-                    "Link",
-                    "Network",
-                    "Band",
-                    "Channel",
-                    "DFS",
-                    "Signal dBm",
-                    "Receive Mbps",
-                    "Transmit Mbps",
-                    "Router Ping ms",
-                    "Router Jitter ms",
-                    "Router Loss %",
-                    "Internet Ping ms",
-                    "Internet Jitter ms",
-                    "Internet Loss %",
-                    "DNS ms",
-                    "Reference DNS ms",
+                    AppText.Get("Time"),
+                    AppText.Get("Link"),
+                    AppText.Get("Network"),
+                    AppText.Get("Band"),
+                    AppText.Get("Channel"),
+                    AppText.Get("DFS"),
+                    AppText.Get("Signal dBm"),
+                    AppText.Get("Receive Mbps"),
+                    AppText.Get("Transmit Mbps"),
+                    AppText.Get("Router Ping ms"),
+                    AppText.Get("Router Jitter ms"),
+                    AppText.Get("Router Loss %"),
+                    AppText.Get("Internet Ping ms"),
+                    AppText.Get("Internet Jitter ms"),
+                    AppText.Get("Internet Loss %"),
+                    AppText.Get("DNS ms"),
+                    AppText.Get("Reference DNS ms"),
                 ],
                 .. samples.Select(sample =>
                     new object?[]
                     {
                         Formatter.FormatLocal(sample.MinuteUtc, "yyyy-MM-dd HH:mm"),
-                        sample.Link,
+                        AppText.Get(sample.Link),
                         sample.Ssid,
                         sample.Band,
                         sample.Channel,
-                        WiFiChannels.IsDfs(sample.Channel) ? "Yes" : "No",
+                        WiFiChannels.IsDfs(sample.Channel) ? AppText.Get("Yes") : AppText.Get("No"),
                         sample.Rssi,
                         sample.ReceiveRateMbps,
                         sample.TransmitRateMbps,
@@ -367,7 +382,9 @@ public partial class HistoryPage : IDisposable
                 Labels = new YAxisLabels
                 {
                     Formatter =
-                        "function (value) { return value == null ? '' : Math.round(value) + ' ms'; }",
+                        "function (value) { return value == null ? '' : Math.round(value) + "
+                        + System.Text.Json.JsonSerializer.Serialize(" " + AppText.Get("ms"))
+                        + "; }",
                 },
             },
         ];

@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using WiFiWatch.Data.Helpers;
+using WiFiWatch.Data.Localization;
 
 namespace WiFiWatch.Services.Storage;
 
@@ -25,10 +26,16 @@ public static class CsvExport
         var separator = CultureInfo.CurrentCulture.TextInfo.ListSeparator;
 
         // Unique Name, An Export Never Overwrites Another
-        var dayLabel = day?.ToString("yyyy-MM-dd") ?? "All";
+        var dayLabel = day?.ToString("yyyy-MM-dd") ?? AppText.Get("All");
         var filePath = Path.Combine(
             DirectoryPath,
-            $"{AppInfo.DisplayName} {name} {dayLabel} Exported {DateTime.Now:yyyy-MM-dd HH-mm-ss}.csv"
+            AppText.Get(
+                "{0} {1} {2} Exported {3:yyyy-MM-dd HH-mm-ss}.csv",
+                AppInfo.DisplayName,
+                name,
+                dayLabel,
+                DateTime.Now
+            )
         );
 
         Directory.CreateDirectory(DirectoryPath);

@@ -1,13 +1,14 @@
 using WiFiWatch.Data.Helpers;
+using WiFiWatch.Data.Localization;
 
 namespace WiFiWatch.Data.ViewModels;
 
 public sealed record ChannelBlock(int First, int Last)
 {
     public string Label =>
-        WiFiChannels.IsWeatherRadar(Last) ? $"{First} To {Last} Weather Radar"
-        : WiFiChannels.IsDfs(First) ? $"{First} To {Last} DFS"
-        : $"{First} To {Last}";
+        WiFiChannels.IsWeatherRadar(Last) ? AppText.Get("{0} To {1} Weather Radar", First, Last)
+        : WiFiChannels.IsDfs(First) ? AppText.Get("{0} To {1} DFS", First, Last)
+        : AppText.Get("{0} To {1}", First, Last);
 
     public IEnumerable<int> Channels
     {

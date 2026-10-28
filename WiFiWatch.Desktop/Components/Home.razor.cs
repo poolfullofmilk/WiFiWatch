@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using MudBlazor;
 using WiFiWatch.Data.Enums;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Desktop.Components.Shared.Dialogs;
 using WiFiWatch.Services.Monitoring;
 
@@ -8,13 +10,17 @@ namespace WiFiWatch.Desktop.Components;
 
 public partial class Home : IDisposable
 {
-    private static readonly PageLink[] s_pages =
-    [
-        new(Page.Overview, "Overview", Icons.Material.Rounded.SpaceDashboard),
-        new(Page.Incidents, "Incidents", Icons.Material.Rounded.NotificationsActive),
-        new(Page.History, "History", Icons.Material.Rounded.Insights),
-        new(Page.Settings, "Settings", Icons.Material.Rounded.Settings),
-    ];
+    private static PageLink[] Pages =>
+        [
+            new(Page.Overview, AppText.Get("Overview"), Icons.Material.Rounded.SpaceDashboard),
+            new(
+                Page.Incidents,
+                AppText.Get("Incidents"),
+                Icons.Material.Rounded.NotificationsActive
+            ),
+            new(Page.History, AppText.Get("History"), Icons.Material.Rounded.Insights),
+            new(Page.Settings, AppText.Get("Settings"), Icons.Material.Rounded.Settings),
+        ];
 
     [Inject]
     public required NetworkMonitor Monitor { get; set; }
@@ -25,6 +31,20 @@ public partial class Home : IDisposable
     [Inject]
     public required IDialogService DialogService { get; set; }
 
+    [Inject]
+    public required IJSRuntime JavaScript { get; set; }
+
+    private int _languageVersion;
+    private bool _languageChanged = true;
+
+    private void OnLanguageChanged() =>
+        InvokeAsync(() =>
+        {
+            _languageVersion++;
+            _languageChanged = true;
+            StateHasChanged();
+        });
+
     // Page State
     private MudMessageBox? _closeMessageBox;
     private Page _page = Page.Overview;
@@ -33,14 +53,28 @@ public partial class Home : IDisposable
 
     protected override async Task OnInitializedAsync()
     {
+        AppText.Changed += OnLanguageChanged;
         Monitor.EventRecorded += OnEventRecorded;
         Monitor.UpdateFound += OnUpdateFound;
         Window.CloseRequested += OnCloseRequested;
         await LoadProblemColorAsync();
     }
 
-    protected override Task OnAfterRenderAsync(bool firstRender) =>
-        firstRender ? OfferUpdateAsync() : Task.CompletedTask;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_languageChanged)
+        {
+            _languageChanged = false;
+            await JavaScript.InvokeVoidAsync(
+                "wifiwatch.setLanguage",
+                AppText.Culture.Name,
+                AppText.Get("An Unhandled Error Has Occurred"),
+                AppText.Get("Reload")
+            );
+        }
+        if (firstRender)
+            await OfferUpdateAsync();
+    }
 
     private void OnEventRecorded() => InvokeAsync(LoadProblemColorAsync);
 
@@ -96,6 +130,7 @@ public partial class Home : IDisposable
 
     public void Dispose()
     {
+        AppText.Changed -= OnLanguageChanged;
         Monitor.EventRecorded -= OnEventRecorded;
         Monitor.UpdateFound -= OnUpdateFound;
         Window.CloseRequested -= OnCloseRequested;

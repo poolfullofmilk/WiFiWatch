@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using WiFiWatch.Data.Helpers;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Data.Models;
 using WiFiWatch.Data.ViewModels;
 using WiFiWatch.Desktop.Theming;
@@ -63,9 +64,15 @@ public partial class NowPanel : IDisposable
         if (problems.FirstOrDefault() is { } worst)
         {
             // The Worst Open Problem Speaks For All Of Them
-            var more = problems.Count > 1 ? $", {problems.Count - 1} More Open" : string.Empty;
-            var since =
-                $"Since {Formatter.FormatLocal(worst.OccurredAtUtc, "HH:mm")} ({Formatter.FormatDuration(DateTime.UtcNow - worst.OccurredAtUtc)})";
+            var more =
+                problems.Count > 1
+                    ? AppText.Get(", {0} More Open", problems.Count - 1)
+                    : string.Empty;
+            var since = AppText.Get(
+                "Since {0} ({1})",
+                Formatter.FormatLocal(worst.OccurredAtUtc, "HH:mm"),
+                Formatter.FormatDuration(DateTime.UtcNow - worst.OccurredAtUtc)
+            );
             var color = EventKindColors.For(worst.Kind, worst.Severity);
 
             // One Good Minute In, It Clears After The Next
@@ -77,7 +84,7 @@ public partial class NowPanel : IDisposable
                 EventKindColors.IconFor(worst.Severity),
                 QuickActions.ForEvent(worst.Kind, worst.Scope, status.RouterAdminUrl),
                 isClearing
-                    ? "Looks Fine Again, Clears After One More Good Minute"
+                    ? AppText.Get("Looks Fine Again, Clears After One More Good Minute")
                     : QuickActions.AdviceFor(worst.Kind, worst.Scope),
                 isClearing ? Color.Success : color
             );
@@ -86,18 +93,18 @@ public partial class NowPanel : IDisposable
         if (status.Link == NetworkMonitor.OfflineLink)
         {
             return new(
-                "Offline",
-                "No Wi-Fi Or Cable Connection",
+                AppText.Get("Offline"),
+                AppText.Get("No Wi-Fi Or Cable Connection"),
                 Color.Error,
                 Icons.Material.Rounded.WifiOff,
                 QuickActions.WiFiSettings,
-                "Check The Router, Cables And Powerline Adapters",
+                AppText.Get("Check The Router, Cables And Powerline Adapters"),
                 Color.Error
             );
         }
 
         return new(
-            "All Good",
+            AppText.Get("All Good"),
             DescribeConnection(status),
             Color.Success,
             Icons.Material.Rounded.Check,
@@ -110,12 +117,22 @@ public partial class NowPanel : IDisposable
     private static string DescribeConnection(MonitorStatus status)
     {
         var connection = status.Reading is { IsConnected: true } reading
-            ? $"Connected to {reading.Ssid ?? "Wi-Fi"}, Channel {reading.Channel}{(reading.IsDfs ? " DFS" : string.Empty)} and {reading.Band ?? "-"}"
-            : $"Connected over {status.Link}";
+            ? AppText.Get(
+                "Connected to {0}, Channel {1}{2} and {3}",
+                reading.Ssid ?? AppText.Get("Wi-Fi"),
+                reading.Channel,
+                (reading.IsDfs ? " DFS" : string.Empty),
+                reading.Band ?? "-"
+            )
+            : AppText.Get("Connected over {0}", AppText.Get(status.Link));
 
         // A Radar Eviction Keeps The Router Off DFS For A While
         return status.DfsFreeAtUtc is { } freeAtUtc
-            ? $"{connection}, DFS free at {Formatter.FormatLocal(freeAtUtc, "HH:mm")}"
+            ? AppText.Get(
+                "{0}, DFS free at {1}",
+                connection,
+                Formatter.FormatLocal(freeAtUtc, "HH:mm")
+            )
             : connection;
     }
 
@@ -127,17 +144,17 @@ public partial class NowPanel : IDisposable
             var isWeak = reading.Rssi < settings.WeakSignalRssi;
             readings.Add(
                 new(
-                    "Signal",
+                    AppText.Get("Signal"),
                     Formatter.FormatNumber(reading.Rssi, "dBm"),
-                    isWeak ? "Weak" : "Good",
+                    isWeak ? AppText.Get("Weak") : AppText.Get("Good"),
                     isWeak ? Color.Warning : Color.Default
                 )
             );
             readings.Add(
                 new(
-                    "Wi-Fi Speed",
+                    AppText.Get("Wi-Fi Speed"),
                     Formatter.FormatNumber(reading.ReceiveRateMbps, "Mbps"),
-                    "Link To The Router",
+                    AppText.Get("Link To The Router"),
                     Color.Default
                 )
             );
@@ -146,11 +163,11 @@ public partial class NowPanel : IDisposable
         {
             readings.Add(
                 new(
-                    "Connection",
-                    status.Link,
+                    AppText.Get("Connection"),
+                    AppText.Get(status.Link),
                     status.Link == NetworkMonitor.EthernetLink
-                        ? "Cable Or Powerline"
-                        : "Not Connected",
+                        ? AppText.Get("Cable Or Powerline")
+                        : AppText.Get("Not Connected"),
                     Color.Default
                 )
             );
@@ -159,20 +176,20 @@ public partial class NowPanel : IDisposable
         // Some Routers Never Answer Ping, Yet Pass The Internet On
         readings.Add(
             status.RouterRoundTrip is null && status.InternetRoundTrip is not null
-                ? new("Router", "-", "No Answer", Color.Default)
+                ? new(AppText.Get("Router"), "-", AppText.Get("No Answer"), Color.Default)
                 : RoundTrip(
-                    "Router",
+                    AppText.Get("Router"),
                     status.RouterRoundTrip,
                     settings.RouterPingMilliseconds,
-                    "Home"
+                    AppText.Get("Home")
                 )
         );
         readings.Add(
             RoundTrip(
-                "Internet",
+                AppText.Get("Internet"),
                 status.InternetRoundTrip,
                 settings.InternetPingMilliseconds,
-                "To 1.1.1.1"
+                AppText.Get("To 1.1.1.1")
             )
         );
         return readings;
@@ -186,10 +203,16 @@ public partial class NowPanel : IDisposable
     )
     {
         // Lost Is Broken, Over The Threshold Is Degraded
-        return roundTrip is null ? new(label, "Lost", "No Answer", Color.Error)
+        return roundTrip is null
+                ? new(label, AppText.Get("Lost"), AppText.Get("No Answer"), Color.Error)
             : roundTrip > thresholdMilliseconds
-                ? new(label, $"{roundTrip} ms", $"Over {thresholdMilliseconds} ms", Color.Warning)
-            : new(label, $"{roundTrip} ms", hint, Color.Default);
+                ? new(
+                    label,
+                    $"{roundTrip} {AppText.Get("ms")}",
+                    AppText.Get("Over {0} ms", thresholdMilliseconds),
+                    Color.Warning
+                )
+            : new(label, $"{roundTrip} {AppText.Get("ms")}", hint, Color.Default);
     }
 
     public void Dispose()

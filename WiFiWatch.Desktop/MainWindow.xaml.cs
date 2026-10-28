@@ -5,6 +5,7 @@ using Microsoft.Web.WebView2.Core;
 using MudBlazor.Utilities;
 using WiFiWatch.Data.Enums;
 using WiFiWatch.Data.Helpers;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Desktop.Interop;
 using WiFiWatch.Desktop.Theming;
 using WiFiWatch.Services.Monitoring;
@@ -16,8 +17,6 @@ namespace WiFiWatch.Desktop;
 public partial class MainWindow : Window
 {
     private const int BalloonMilliseconds = 5000;
-    private const string OpenItem = "Open";
-    private const string ExitItem = "Exit";
 
     // A Quick Hide And Show Never Suspends
     private static readonly TimeSpan s_suspendDelay = TimeSpan.FromSeconds(1);
@@ -81,6 +80,14 @@ public partial class MainWindow : Window
             Dispatcher.InvokeAsync(() => _trayIcon.Text = _problemText ?? monitor.Status.TrayText);
         monitor.EventRecorded += () => Dispatcher.InvokeAsync(ShowProblemStateAsync);
         _ = Dispatcher.InvokeAsync(ShowProblemStateAsync);
+        void LanguageChanged() =>
+            Dispatcher.InvokeAsync(async () =>
+            {
+                await ShowProblemStateAsync();
+                _trayIcon.Text = _problemText ?? monitor.Status.TrayText;
+            });
+        AppText.Changed += LanguageChanged;
+        Closed += (_, _) => AppText.Changed -= LanguageChanged;
     }
 
     public event Func<Task>? CloseRequested;
@@ -105,18 +112,20 @@ public partial class MainWindow : Window
 
     private void ShowTrayMenu()
     {
+        var openItem = AppText.Get("Open");
+        var exitItem = AppText.Get("Exit");
         var picked = TrayMenu.Show(
             new WindowInteropHelper(this).EnsureHandle(),
-            OpenItem,
+            openItem,
             null,
-            ExitItem
+            exitItem
         );
 
-        if (picked == OpenItem)
+        if (picked == openItem)
         {
             ShowFromTray();
         }
-        else if (picked == ExitItem)
+        else if (picked == exitItem)
         {
             Exit();
         }

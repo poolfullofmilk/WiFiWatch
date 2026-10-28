@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using WiFiWatch.Data.Enums;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Data.Models;
 using WiFiWatch.Data.ViewModels;
 using WiFiWatch.Services.Monitoring;
@@ -28,11 +29,11 @@ public sealed partial class SpeedTestDialog : IDisposable
     private bool IsRunning => _cancellation is not null;
 
     private string HeadlineLabel =>
-        _result is not null ? "Download"
-        : _progress?.Phase is SpeedTestPhase.Download ? "Download"
-        : _progress?.Phase is SpeedTestPhase.Upload ? "Upload"
-        : IsRunning ? "Measuring Ping"
-        : "Stopped";
+        _result is not null ? AppText.Get("Download")
+        : _progress?.Phase is SpeedTestPhase.Download ? AppText.Get("Download")
+        : _progress?.Phase is SpeedTestPhase.Upload ? AppText.Get("Upload")
+        : IsRunning ? AppText.Get("Measuring Ping")
+        : AppText.Get("Stopped");
 
     private string HeadlineValue =>
         _result is { } result ? $"{result.DownloadMbps:0}"
@@ -64,9 +65,9 @@ public sealed partial class SpeedTestDialog : IDisposable
 
     private List<(string Label, string Value)> Results =>
         [
-            ("Ping", FormatPing(_result?.IdlePingMilliseconds ?? _progress?.IdlePing)),
-            ("Download", FormatMbps(_result?.DownloadMbps ?? _progress?.DownloadMbps)),
-            ("Upload", FormatMbps(_result?.UploadMbps)),
+            (AppText.Get("Ping"), FormatPing(_result?.IdlePingMilliseconds ?? _progress?.IdlePing)),
+            (AppText.Get("Download"), FormatMbps(_result?.DownloadMbps ?? _progress?.DownloadMbps)),
+            (AppText.Get("Upload"), FormatMbps(_result?.UploadMbps)),
         ];
 
     protected override Task OnAfterRenderAsync(bool firstRender) =>
@@ -90,8 +91,8 @@ public sealed partial class SpeedTestDialog : IDisposable
         if (_result is null && !_cancellation.IsCancellationRequested)
         {
             _error = Monitor.Status.IsSpeedTesting
-                ? "Another Speed Test Is Already Running"
-                : "Speed Test Failed, Check The Connection";
+                ? AppText.Get("Another Speed Test Is Already Running")
+                : AppText.Get("Speed Test Failed, Check The Connection");
         }
 
         _cancellation.Dispose();
@@ -100,10 +101,10 @@ public sealed partial class SpeedTestDialog : IDisposable
     }
 
     private static string FormatPing(double? milliseconds) =>
-        milliseconds is { } value ? $"{value:0} ms" : "-";
+        milliseconds is { } value ? $"{value:0} {AppText.Get("ms")}" : "-";
 
     private static string FormatMbps(double? megabits) =>
-        megabits is { } value ? $"{value:0} Mbps" : "-";
+        megabits is { } value ? $"{value:0} {AppText.Get("Mbps")}" : "-";
 
     public static Task ShowAsync(IDialogService dialogService) =>
         dialogService.ShowAsync<SpeedTestDialog>(

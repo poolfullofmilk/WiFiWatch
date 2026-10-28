@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using WiFiWatch.Data;
 using WiFiWatch.Data.Enums;
 using WiFiWatch.Data.Helpers;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Data.ViewModels;
 
 namespace WiFiWatch.Services.Monitoring;
@@ -140,11 +141,11 @@ public static class SummaryWriter
     {
         List<string> parts =
         [
-            $"{summary.OnlinePercent:0.#}% Online",
+            AppText.Get("{0:0.#}% Online", summary.OnlinePercent),
             Formatter.FormatCount(summary.ProblemCount, "Problem"),
             summary.LongestOutage > TimeSpan.Zero
-                ? $"Longest Outage {Formatter.FormatDuration(summary.LongestOutage)}"
-                : "No Outages",
+                ? AppText.Get("Longest Outage {0}", Formatter.FormatDuration(summary.LongestOutage))
+                : AppText.Get("No Outages"),
         ];
         if (summary.EvictionCount > 0)
         {
@@ -153,12 +154,14 @@ public static class SummaryWriter
 
         if (summary.DfsPercent is { } dfsPercent)
         {
-            parts.Add($"{dfsPercent:0}% On DFS");
+            parts.Add(AppText.Get("{0:0}% On DFS", dfsPercent));
         }
 
         if (summary.WorstHour is { } worstHour)
         {
-            parts.Add($"Worst Hour {worstHour:00}h At {summary.WorstHourPing:0.#} ms");
+            parts.Add(
+                AppText.Get("Worst Hour {0:00}h At {1:0.#} ms", worstHour, summary.WorstHourPing)
+            );
         }
 
         return $"{label}: {string.Join(", ", parts)}";
@@ -167,8 +170,16 @@ public static class SummaryWriter
     public static async Task WriteMissingAsync(EventJournal journal, bool isNotified)
     {
         var yesterday = DateTime.Today.AddDays(-1);
-        var label = $"{yesterday:yyyy-MM-dd} {yesterday:dddd}";
-        if (await EventJournal.HasMessageStartingWithAsync(EventKind.DailySummary, label))
+        var label =
+            yesterday.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture)
+            + " "
+            + yesterday.ToString("dddd", AppText.Culture);
+        if (
+            await EventJournal.HasMessageStartingWithAsync(
+                EventKind.DailySummary,
+                yesterday.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture)
+            )
+        )
             return;
 
         var summary = await SummarizeAsync(

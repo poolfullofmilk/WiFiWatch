@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using WiFiWatch.Data.Enums;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Services.Monitoring;
 
 namespace WiFiWatch.Services.Integration;
@@ -40,39 +41,48 @@ public static class QuickActions
     public static string? AdviceFor(EventKind kind, string? scope) =>
         kind switch
         {
-            EventKind.WeakSignal or EventKind.SlowLink =>
-                "Move Closer To The Router Or Use A Cable",
+            EventKind.WeakSignal or EventKind.SlowLink => AppText.Get(
+                "Move Closer To The Router Or Use A Cable"
+            ),
             EventKind.PingSpike or EventKind.JitterSpike or EventKind.PacketLoss => scope switch
             {
-                NetworkMonitor.ProviderScope =>
-                    "Restart The Router, Call Your Provider If It Repeats",
-                NetworkMonitor.HomeNetworkScope =>
-                    "Check Cables And Powerline Adapters, Then Restart The Router",
-                _ => "Move Closer, Or Test With A Cable To Rule Out Wi-Fi",
+                NetworkMonitor.ProviderScope => AppText.Get(
+                    "Restart The Router, Call Your Provider If It Repeats"
+                ),
+                NetworkMonitor.HomeNetworkScope => AppText.Get(
+                    "Check Cables And Powerline Adapters, Then Restart The Router"
+                ),
+                _ => AppText.Get("Move Closer, Or Test With A Cable To Rule Out Wi-Fi"),
             },
-            EventKind.WanDown => "Restart The Router, Call Your Provider If It Stays Down",
-            EventKind.SlowDns => "Set The DNS Server To 1.1.1.1 In The Router",
-            EventKind.Disconnect when scope == NetworkMonitor.HomeNetworkScope =>
-                "Check The Cable Or Powerline Adapter, Then The Router",
-            EventKind.Disconnect or EventKind.ConnectFailed =>
-                "Update The Wi-Fi Driver If This Keeps Happening",
-            EventKind.DfsEviction => "Set The Router To Channels 36 To 48 If This Repeats",
-            EventKind.LocationBlocked => "Turn On Location For Desktop Apps",
-            EventKind.DriverCheck => "Update The Wi-Fi Driver",
+            EventKind.WanDown => AppText.Get(
+                "Restart The Router, Call Your Provider If It Stays Down"
+            ),
+            EventKind.SlowDns => AppText.Get("Set The DNS Server To 1.1.1.1 In The Router"),
+            EventKind.Disconnect when scope == NetworkMonitor.HomeNetworkScope => AppText.Get(
+                "Check The Cable Or Powerline Adapter, Then The Router"
+            ),
+            EventKind.Disconnect or EventKind.ConnectFailed => AppText.Get(
+                "Update The Wi-Fi Driver If This Keeps Happening"
+            ),
+            EventKind.DfsEviction => AppText.Get(
+                "Set The Router To Channels 36 To 48 If This Repeats"
+            ),
+            EventKind.LocationBlocked => AppText.Get("Turn On Location For Desktop Apps"),
+            EventKind.DriverCheck => AppText.Get("Update The Wi-Fi Driver"),
             _ => null,
         };
 
     public static string Describe(string target) =>
         target switch
         {
-            LocationSettings => "Open Location Settings",
-            WiFiSettings => "Open Wi-Fi Settings",
-            EthernetSettings => "Open Ethernet Settings",
-            NetworkStatus => "Open Network Status",
-            WindowsUpdate => "Open Windows Update",
-            DeviceManager => "Open Device Manager",
-            UpdateChecker.LatestReleaseUrl => "Open Release Page",
-            _ => "Open Router Settings",
+            LocationSettings => AppText.Get("Open Location Settings"),
+            WiFiSettings => AppText.Get("Open Wi-Fi Settings"),
+            EthernetSettings => AppText.Get("Open Ethernet Settings"),
+            NetworkStatus => AppText.Get("Open Network Status"),
+            WindowsUpdate => AppText.Get("Open Windows Update"),
+            DeviceManager => AppText.Get("Open Device Manager"),
+            UpdateChecker.LatestReleaseUrl => AppText.Get("Open Release Page"),
+            _ => AppText.Get("Open Router Settings"),
         };
 
     public static void Open(string target)

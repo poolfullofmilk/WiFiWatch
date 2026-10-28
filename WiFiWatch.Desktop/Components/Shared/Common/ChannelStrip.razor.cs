@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using WiFiWatch.Data.Helpers;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Data.ViewModels;
 using WiFiWatch.Services.Monitoring;
 
@@ -45,19 +46,28 @@ public partial class ChannelStrip
 
     private string Describe(int channel)
     {
-        var name = $"Channel {channel}{(WiFiChannels.IsDfs(channel) ? " DFS" : string.Empty)}";
+        var name = AppText.Get(
+            "Channel {0}{1}",
+            channel,
+            (WiFiChannels.IsDfs(channel) ? " DFS" : string.Empty)
+        );
         var networks = On(channel)
             .OrderByDescending(neighbor => neighbor.IsOwn)
             .ThenByDescending(neighbor => neighbor.SignalPercent)
             .Select(neighbor =>
-                $"{(string.IsNullOrEmpty(neighbor.Ssid) ? "Hidden" : neighbor.Ssid)}, {(neighbor.SignalPercent / 2) - 100} dBm{(neighbor.IsOwn ? ", Yours" : string.Empty)}"
+                AppText.Get(
+                    "{0}, {1} dBm{2}",
+                    (string.IsNullOrEmpty(neighbor.Ssid) ? AppText.Get("Hidden") : neighbor.Ssid),
+                    (neighbor.SignalPercent / 2) - 100,
+                    (neighbor.IsOwn ? AppText.Get(", Yours") : string.Empty)
+                )
             )
             .ToList();
 
         // Yours First, Numbered Once There Are Several
         var networkLines = networks.Count switch
         {
-            0 => ["No Other Networks"],
+            0 => [AppText.Get("No Other Networks")],
             1 => networks,
             _ => networks.Select((network, index) => $"{index + 1}. {network}"),
         };
@@ -65,7 +75,7 @@ public partial class ChannelStrip
 
         // Your Channel Before Any Scan Saw Your Network On It
         if (channel == CurrentChannel && !On(channel).Any(neighbor => neighbor.IsOwn))
-            lines.Add("Yours");
+            lines.Add(AppText.Get("Yours"));
 
         lines.AddRange(networkLines);
         return string.Join("\n", lines);

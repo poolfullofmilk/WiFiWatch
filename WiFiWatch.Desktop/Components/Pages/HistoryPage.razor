@@ -16,6 +16,7 @@
                                 DateRangeChanged="SelectRangeAsync"
                                 MaxDate="DateTime.Today"
                                 DateFormat="yyyy-MM-dd"
+                                Culture="@AppText.Culture"
                                 Color="Color.Info"
                                 Variant="Variant.Outlined"
                                 Margin="Margin.Dense"
@@ -24,7 +25,7 @@
                                 NextIcon="@Icons.Material.Rounded.ChevronRight"
                                 SeparatorIcon="@Icons.Material.Rounded.ArrowRightAlt">
                 <PickerActions>
-                    @foreach (var (label, dayCount) in s_presets)
+                    @foreach (var (label, dayCount) in Presets)
                     {
                         @* Preset Button *@
                         <MudButton Variant="Variant.Filled"
@@ -38,14 +39,14 @@
                     <MudButton Variant="Variant.Filled"
                                Size="Size.Small"
                                OnClick="() => _rangePicker!.CloseAsync(false)">
-                        Cancel
+                        @AppText.Get("Cancel")
                     </MudButton>
                     @* OK Button *@
                     <MudButton Variant="Variant.Filled"
                                Color="Color.Info"
                                Size="Size.Small"
                                OnClick="() => _rangePicker!.CloseAsync()">
-                        OK
+                        @AppText.Get("OK")
                     </MudButton>
                 </PickerActions>
             </MudDateRangePicker>
@@ -96,7 +97,7 @@
                       Class="pa-4 rounded-panel">
                 <MudText Typo="Typo.subtitle1"
                          Class="mx-2 mb-3">
-                    <b>@(_isDaily ? "Day By Day" : "Hour By Hour")</b>
+                    <b>@(_isDaily ? AppText.Get("Day By Day") : AppText.Get("Hour By Hour"))</b>
                 </MudText>
                 @if (_isLoading)
                 {
@@ -119,7 +120,7 @@
                       Class="pa-4 rounded-panel">
                 <MudText Typo="Typo.subtitle1"
                          Class="mx-2 mb-3">
-                    <b>@(_isDaily ? "Ping Per Day" : "Ping Per Hour")</b>
+                    <b>@(_isDaily ? AppText.Get("Ping Per Day") : AppText.Get("Ping Per Hour"))</b>
                 </MudText>
                 @if (_isLoading)
                 {
@@ -137,19 +138,19 @@
                                Height="@("280")">
                         <ApexPointSeries TItem="ChartPoint"
                                          Items="_routerPingPoints"
-                                         Name="Router"
+                                         Name="@AppText.Get("Router")"
                                          SeriesType="SeriesType.Line"
                                          XValue="@(point => point.Label)"
                                          YValue="@(point => point.Value)" />
                         <ApexPointSeries TItem="ChartPoint"
                                          Items="_internetPingPoints"
-                                         Name="Internet"
+                                         Name="@AppText.Get("Internet")"
                                          SeriesType="SeriesType.Line"
                                          XValue="@(point => point.Label)"
                                          YValue="@(point => point.Value)" />
                         <ApexPointSeries TItem="ChartPoint"
                                          Items="_dnsPoints"
-                                         Name="DNS"
+                                         Name="@AppText.Get("DNS")"
                                          SeriesType="SeriesType.Line"
                                          XValue="@(point => point.Label)"
                                          YValue="@(point => point.Value)" />
@@ -170,7 +171,7 @@
                               Spacing="1"
                               Class="mx-2 mb-3">
                         <MudText Typo="Typo.subtitle1">
-                            <b>Wi-Fi Channel</b>
+                            <b>@AppText.Get("Wi-Fi Channel")</b>
                         </MudText>
                         <MudSpacer />
                         @* Eviction Chip *@
@@ -181,7 +182,7 @@
                         @if (_airtimePercent is { } airtimePercent)
                         {
                             <ActionChip Icon="@Icons.Material.Rounded.DataUsage"
-                                        Text="@($"Airtime Busy {airtimePercent:0}%")"
+                                        Text="@(AppText.Get("Airtime Busy {0:0}%", airtimePercent))"
                                         Color="@(airtimePercent >= BusyAirtimePercent ? Color.Warning : Color.Default)" />
                         }
                     </MudStack>
@@ -214,13 +215,13 @@
                       Class="pa-4 rounded-panel mud-height-full">
                 <MudText Typo="Typo.subtitle1"
                          Class="mx-2 mb-3">
-                    <b>Speed Tests</b>
+                    <b>@AppText.Get("Speed Tests")</b>
                 </MudText>
                 @if (_speedTests.Count == 0)
                 {
                     <MudText Typo="Typo.body2"
                              Class="mx-2 mud-text-secondary">
-                        None In This Range, Start One From Overview
+                        @AppText.Get("None In This Range, Start One From Overview")
                     </MudText>
                 }
                 else
@@ -231,11 +232,11 @@
                                     Style="background:transparent">
                         <thead>
                             <tr>
-                                <th>When</th>
-                                <th>Down</th>
-                                <th>Up</th>
-                                <th>Lag Under Load</th>
-                                <th>Grade</th>
+                                <th>@AppText.Get("When")</th>
+                                <th>@AppText.Get("Down")</th>
+                                <th>@AppText.Get("Up")</th>
+                                <th>@AppText.Get("Lag Under Load")</th>
+                                <th>@AppText.Get("Grade")</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -243,8 +244,8 @@
                             {
                                 <tr>
                                     <td>@Formatter.FormatWhen(test.TestedAtUtc)</td>
-                                    <td>@($"{test.DownloadMbps:0} Mbps")</td>
-                                    <td>@($"{test.UploadMbps:0} Mbps")</td>
+                                    <td>@($"{test.DownloadMbps:0} {AppText.Get("Mbps")}")</td>
+                                    <td>@($"{test.UploadMbps:0} {AppText.Get("Mbps")}")</td>
                                     <td>@Formatter.FormatLagUnderLoad(test)</td>
                                     <td>
                                         <MudChip T="string"

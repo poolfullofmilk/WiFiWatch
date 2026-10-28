@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using WiFiWatch.Data;
 using WiFiWatch.Data.Helpers;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Data.Models;
 using WiFiWatch.Data.ViewModels;
 using WiFiWatch.Services.Integration;
@@ -35,10 +36,18 @@ public partial class IncidentDialog : IDisposable
 
     private string TimeRange =>
         Current.EndedAtUtc is not { } endedAtUtc
-            ? $"{Formatter.FormatLocal(Current.OccurredAtUtc, TimeFormat)}, Still Going"
+            ? AppText.Get(
+                "{0}, Still Going",
+                Formatter.FormatLocal(Current.OccurredAtUtc, TimeFormat)
+            )
         : endedAtUtc == Current.OccurredAtUtc
             ? Formatter.FormatLocal(Current.OccurredAtUtc, TimeFormat)
-        : $"{Formatter.FormatLocal(Current.OccurredAtUtc, TimeFormat)} To {Formatter.FormatLocal(endedAtUtc, "HH:mm:ss")}, {Formatter.FormatDuration(endedAtUtc - Current.OccurredAtUtc)}";
+        : AppText.Get(
+            "{0} To {1}, {2}",
+            Formatter.FormatLocal(Current.OccurredAtUtc, TimeFormat),
+            Formatter.FormatLocal(endedAtUtc, "HH:mm:ss"),
+            Formatter.FormatDuration(endedAtUtc - Current.OccurredAtUtc)
+        );
 
     private List<(string Label, string Value)> DetailLines
     {
@@ -47,19 +56,19 @@ public partial class IncidentDialog : IDisposable
             var details = Details;
             List<(string Label, string Value)> lines = [];
             if (QuickActions.AdviceFor(Current.Kind, Current.Scope) is { } advice)
-                lines.Add(("What To Do", advice));
+                lines.Add((AppText.Get("What To Do"), advice));
 
             if (Current.Scope is { } scope)
-                lines.Add(("Where", DescribeScope(scope)));
+                lines.Add((AppText.Get("Where"), DescribeScope(scope)));
 
             if (details.Reason is { } reason)
-                lines.Add(("Windows Reason", reason));
+                lines.Add((AppText.Get("Windows Reason"), reason));
 
             if (details.Context is { } context)
-                lines.Add(("At That Moment", context));
+                lines.Add((AppText.Get("At That Moment"), context));
 
             if (details.TraceSummary is { } traceSummary)
-                lines.Add(("Trace", traceSummary));
+                lines.Add((AppText.Get("Trace"), traceSummary));
 
             return lines;
         }
@@ -68,11 +77,12 @@ public partial class IncidentDialog : IDisposable
     private static string DescribeScope(string scope) =>
         scope switch
         {
-            NetworkMonitor.WiFiScope => "Wi-Fi, Between This PC And Your Router",
-            NetworkMonitor.HomeNetworkScope =>
-                "Home Network, Your Router, Cables Or Powerline Adapters",
-            NetworkMonitor.ProviderScope => "Internet Provider, Past Your Router",
-            NetworkMonitor.DnsScope => "DNS, Looking Up Names, Not The Line Itself",
+            NetworkMonitor.WiFiScope => AppText.Get("Wi-Fi, Between This PC And Your Router"),
+            NetworkMonitor.HomeNetworkScope => AppText.Get(
+                "Home Network, Your Router, Cables Or Powerline Adapters"
+            ),
+            NetworkMonitor.ProviderScope => AppText.Get("Internet Provider, Past Your Router"),
+            NetworkMonitor.DnsScope => AppText.Get("DNS, Looking Up Names, Not The Line Itself"),
             _ => scope,
         };
 

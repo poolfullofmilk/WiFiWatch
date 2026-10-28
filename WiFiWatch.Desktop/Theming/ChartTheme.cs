@@ -1,5 +1,6 @@
 using ApexCharts;
 using MudBlazor.Utilities;
+using WiFiWatch.Data.Localization;
 
 namespace WiFiWatch.Desktop.Theming;
 
@@ -40,6 +41,23 @@ public static class ChartTheme
             Chart = new Chart
             {
                 FontFamily = string.Join(", ", AppTheme.FontFamily),
+                DefaultLocale = AppText.Culture.TwoLetterISOLanguageName,
+                Locales =
+                [
+                    new ChartLocale
+                    {
+                        Name = AppText.Culture.TwoLetterISOLanguageName,
+                        Options = new LocaleOptions
+                        {
+                            Days = AppText.Culture.DateTimeFormat.DayNames.ToList(),
+                            ShortDays = AppText.Culture.DateTimeFormat.AbbreviatedDayNames.ToList(),
+                            Months = AppText.Culture.DateTimeFormat.MonthNames.Take(12).ToList(),
+                            ShortMonths = AppText
+                                .Culture.DateTimeFormat.AbbreviatedMonthNames.Take(12)
+                                .ToList(),
+                        },
+                    },
+                ],
                 Toolbar = new Toolbar { Show = false },
                 Zoom = new Zoom { Enabled = false },
                 Selection = new Selection { Enabled = false },
@@ -55,5 +73,6 @@ public static class ChartTheme
                 },
             },
             DataLabels = new DataLabels { Enabled = false },
+            NoData = new NoData { Text = AppText.Get("No Measurements") },
         };
 }

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using WiFiWatch.Data.Enums;
 using WiFiWatch.Data.Helpers;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Data.ViewModels;
 
 namespace WiFiWatch.Desktop.Components.Shared.Common;
@@ -38,7 +39,7 @@ public partial class HealthStrip
         return localStart.Hour % LabelStep != 0 ? string.Empty
             : localStart.Hour == 0 && Buckets.Count > 24
                 ? Formatter.FormatLocal(bucket.StartUtc, "ddd")
-            : Formatter.FormatLocal(bucket.StartUtc, "HH'h'");
+            : Formatter.FormatLocal(bucket.StartUtc, "HH:mm");
     }
 
     private static string CellClass(HealthState state) =>
@@ -48,13 +49,17 @@ public partial class HealthStrip
     {
         var when = IsDaily
             ? Formatter.FormatLocal(bucket.StartUtc, "yyyy-MM-dd dddd")
-            : $"{Formatter.FormatWhen(bucket.StartUtc)} To {Formatter.FormatLocal(bucket.EndUtc, "HH:mm")}";
+            : AppText.Get(
+                "{0} To {1}",
+                Formatter.FormatWhen(bucket.StartUtc),
+                Formatter.FormatLocal(bucket.EndUtc, "HH:mm")
+            );
         var what =
-            bucket.State == HealthState.NoData ? "Not Watched"
-            : bucket.ProblemCount == 0 ? "No Problems"
+            bucket.State == HealthState.NoData ? AppText.Get("Not Watched")
+            : bucket.ProblemCount == 0 ? AppText.Get("No Problems")
             : Formatter.FormatCount(bucket.ProblemCount, "Problem");
         var ping = bucket.InternetPing is { } internetPing
-            ? $", Internet {Formatter.FormatNumber(Math.Round(internetPing), "ms")}"
+            ? AppText.Get(", Internet {0}", Formatter.FormatNumber(Math.Round(internetPing), "ms"))
             : string.Empty;
         return $"{when}, {what}{ping}";
     }

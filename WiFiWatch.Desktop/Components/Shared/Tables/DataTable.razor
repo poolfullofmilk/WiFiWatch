@@ -3,7 +3,7 @@
 <MudTable @ref="_mudTable"
           T="TItem"
           ServerData="ServerDataWrapper"
-          SortLabel="Sort By"
+          SortLabel="@AppText.Get("Sort By")"
           Dense
           Hover
           Bordered
@@ -22,7 +22,7 @@
         @* Search *@
         <SearchTextField Value="@SearchTerm"
                          ValueChanged="OnSearchTermChangedAsync"
-                         PlaceHolder="Search"
+                         PlaceHolder="@AppText.Get("Search")"
                          OnDebounceIntervalElapsed="ReloadAsync" />
 
         <MudSpacer />
@@ -37,7 +37,7 @@
                 @ToolBarExtra
             }
             @* Refresh *@
-            <Tooltip Text="Refresh">
+            <Tooltip Text="@AppText.Get("Refresh")">
                 <MudIconButton Icon="@Icons.Material.Rounded.Refresh"
                                Size="Size.Small"
                                OnClick="ReloadAsync" />
@@ -59,7 +59,9 @@
     <PagerContent>
         <MudTablePager HorizontalAlignment="HorizontalAlignment.Center"
                        PageSizeOptions="new int[] { 50, 100, int.MaxValue }"
-                       RowsPerPageString="Rows Per Page"
+                       RowsPerPageString="@AppText.Get("Rows Per Page")"
+                       InfoFormat="@AppText.Get("MudPagerInfo")"
+                       AllItemsText="@AppText.Get("All")"
                        FirstIcon="@Icons.Material.Rounded.FirstPage"
                        BeforeIcon="@Icons.Material.Rounded.NavigateBefore"
                        NextIcon="@Icons.Material.Rounded.NavigateNext"
