@@ -6,13 +6,13 @@
 
     <TitleContent>
         <MudText Typo="Typo.h6">
-            @(AppText.Get("Version {0} Available", Version.ToString(2)))
+            @(AppText.Get("Version {0} Available", AppInfo.ShortText(Version)))
         </MudText>
     </TitleContent>
     <DialogContent>
         <MudStack Spacing="2">
             <MudText Typo="Typo.body1">
-                @(AppText.Get("Installed Version Is {0}, Updating Restarts {1}", AppInfo.Version.ToString(2), AppInfo.DisplayName))
+                @(AppText.Get("Installed Version Is {0}, Updating Restarts {1}", AppInfo.VersionText, AppInfo.DisplayName))
             </MudText>
             @* Hide Checkbox *@
             <MudCheckBox T="bool"

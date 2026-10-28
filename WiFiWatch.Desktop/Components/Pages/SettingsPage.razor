@@ -151,12 +151,12 @@
                       Spacing="2">
                 <MudText Typo="Typo.body2"
                          Class="mud-text-secondary">
-                    @AppText.Get("AppName") @AppInfo.Version.ToString(2)
+                    @AppText.Get("AppName") @AppInfo.VersionText
                 </MudText>
                 @if (Monitor.AvailableUpdate is { } availableUpdate)
                 {
                     <ActionChip Icon="@Icons.Material.Rounded.NewReleases"
-                                Text="@AppText.Get("VersionAvailable", availableUpdate.ToString(2))"
+                                Text="@AppText.Get("VersionAvailable", AppInfo.ShortText(availableUpdate))"
                                 Color="Color.Info"
                                 Target="@UpdateChecker.LatestReleaseUrl" />
                     <MudSpacer />

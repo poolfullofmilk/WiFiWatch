@@ -1,4 +1,5 @@
 using System.Net.Http;
+using WiFiWatch.Data.Helpers;
 
 namespace WiFiWatch.Services.Integration;
 
@@ -24,9 +25,7 @@ public static class UpdateChecker
                 HttpCompletionOption.ResponseHeadersRead
             );
             var location = response.Headers.Location?.ToString() ?? string.Empty;
-            var tag = location[(location.LastIndexOf('/') + 1)..].TrimStart('v', 'V');
-
-            return Version.TryParse(tag, out var latest) ? latest : null;
+            return AppInfo.ParseTag(location[(location.LastIndexOf('/') + 1)..]);
         }
         catch
         {

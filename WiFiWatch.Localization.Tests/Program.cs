@@ -46,6 +46,7 @@ internal static class Program
             TestSettings(Path.Combine(directory, "settings.json"));
             await TestResourcesAsync();
             TestNetshParsingIgnoresLanguage();
+            TestVersions();
             await TestIncidentsAsync();
             await TestFullAppAsync();
             TestSourceCoverage();
@@ -269,6 +270,47 @@ internal static class Program
         AppText.Select("fr");
         Check(AppText.Get("General") == "General", "Unsupported language falls back to English");
         Check(AppText.Get("UnknownKey") == "UnknownKey", "Unknown key stays readable");
+    }
+
+    private static void TestVersions()
+    {
+        // Tags Drop Trailing Zeros, The Assembly Always Has Four Parts
+        Check(
+            AppInfo.ParseTag("v2") < AppInfo.ParseTag("v2.0.1")
+                && AppInfo.ParseTag("v2.0.1") < AppInfo.ParseTag("v2.1")
+                && AppInfo.ParseTag("v2.1") < AppInfo.ParseTag("v10")
+                && AppInfo.ParseTag("v1.10") < AppInfo.ParseTag("v2"),
+            "Tags order 1.10 < 2 < 2.0.1 < 2.1 < 10"
+        );
+        Check(
+            AppInfo.ParseTag("v2") <= new Version(2, 0, 0, 0)
+                && AppInfo.ParseTag("v2.0.1") <= new Version(2, 0, 1, 0)
+                && AppInfo.ParseTag("v2.0.1") > new Version(2, 0, 0, 0),
+            "A tag is never newer than its own build"
+        );
+        Check(
+            AppInfo.ParseTag("latest") is null && AppInfo.ParseTag("") is null,
+            "A tag without a number is unknown"
+        );
+        foreach (var tag in new[] { "v2", "v2.0.1", "v2.1", "v10", "v1.10" })
+            Check(
+                "v" + AppInfo.ShortText(AppInfo.ParseTag(tag)!) == tag,
+                "Updater rebuilds the tag " + tag
+            );
+        Check(AppInfo.ShortText(new Version(2, 0, 0, 0)) == "2", "Assembly 2.0.0.0 shows 2");
+
+        // v1.10 Parses With Version.TryParse And Downloads v<Major>.<Minor>
+        static string? OldAsset(string tag) =>
+            Version.TryParse(tag.TrimStart('v'), out var version) && version > new Version(1, 10)
+                ? $"v{version.ToString(2)}/WiFiWatch_v{version.ToString(2)}.exe"
+                : null;
+        Check(OldAsset("v2") is null, "v1.10 cannot read a one part tag");
+        Check(OldAsset("v2.0") == "v2.0/WiFiWatch_v2.0.exe", "v1.10 reaches the v2.0 bridge");
+        Check(OldAsset("v2.0.1") == "v2.0/WiFiWatch_v2.0.exe", "v1.10 takes a patch from vX.Y");
+        Check(
+            AppInfo.ParseTag("v2.0") <= new Version(2, 0, 0, 0),
+            "The v2.0 bridge is no update for itself"
+        );
     }
 
     private static void TestNetshParsingIgnoresLanguage()
