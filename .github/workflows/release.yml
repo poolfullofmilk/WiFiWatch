@@ -27,6 +27,9 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      - name: Localization Regression Tests
+        run: dotnet run --project WiFiWatch.Localization.Tests -c Release
+
       - name: Publish Exe
         run: dotnet publish WiFiWatch.Desktop -c Release
 

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using WiFiWatch.Data.Enums;
 using WiFiWatch.Data.Helpers;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Data.ViewModels;
 
 namespace WiFiWatch.Services.Monitoring;
@@ -118,7 +119,7 @@ public sealed class ConditionTracker(EventJournal journal)
             {
                 await journal.UpdateAsync(
                     check.Key,
-                    $"{check.Title} {Format(value, check.Unit)}",
+                    CurrentMessage(check, value),
                     EventSeverity.Critical
                 );
             }
@@ -136,7 +137,7 @@ public sealed class ConditionTracker(EventJournal journal)
             check.Key,
             check.Kind,
             severity,
-            $"{check.Title} {Format(value, check.Unit)}",
+            CurrentMessage(check, value),
             check.Scope,
             new EventDetails(Context: check.Context),
             condition.StartedAtUtc
@@ -148,10 +149,19 @@ public sealed class ConditionTracker(EventJournal journal)
         }
     }
 
+    private static string CurrentMessage(Check check, double value) =>
+        check.Kind == EventKind.SlowDns
+            ? AppText.Get("SlowDnsValue", value)
+            : $"{check.Title} {Format(value, check.Unit)}";
+
     private static string Summarize(Check check, Condition condition, TimeSpan duration)
     {
         var values = condition.IncidentValues.Count > 0 ? condition.IncidentValues : [0];
         var worst = check.IsHigherWorse ? values.Max() : values.Min();
+        if (check.Kind == EventKind.SlowDns)
+        {
+            return AppText.SlowDnsSummary(duration, worst, values.Average());
+        }
         var worstLabel = check.IsHigherWorse ? "Peak" : "Lowest";
 
         return $"{check.Title} For {Formatter.FormatDuration(duration)}, {worstLabel} {Format(worst, check.Unit)}, Average {Format(values.Average(), check.Unit)}";

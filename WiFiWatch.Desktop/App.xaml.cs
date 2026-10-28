@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO;
 using System.Windows;
 using ApexCharts;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MudBlazor;
 using MudBlazor.Services;
 using WiFiWatch.Data;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Services.Integration;
 using WiFiWatch.Services.Monitoring;
 using WiFiWatch.Services.Storage;
@@ -49,6 +51,7 @@ public partial class App : Application
         }
 
         var settings = UserSettings.Load();
+        AppText.Initialize(settings.Language, CultureInfo.CurrentUICulture);
         StartupRegistration.Apply(settings.StartWithWindows);
 
         var monitor = new NetworkMonitor(settings, eventArgs.Args.Contains("--tray"));

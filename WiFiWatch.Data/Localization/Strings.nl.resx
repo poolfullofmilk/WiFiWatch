@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+    <resheader name="version"><value>2.0</value></resheader>
+    <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+    <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+    <data name="General" xml:space="preserve"><value>Algemeen</value></data>
+    <data name="StartWithWindows" xml:space="preserve"><value>Starten met Windows</value></data>
+    <data name="StartDescription" xml:space="preserve"><value>Draait na aanmelden verborgen in het systeemvak</value></data>
+    <data name="DailySummary" xml:space="preserve"><value>Dagelijkse samenvatting</value></data>
+    <data name="SummaryDescription" xml:space="preserve"><value>Meldt elke ochtend problemen van de vorige dag</value></data>
+    <data name="NightlySpeedTest" xml:space="preserve"><value>Nachtelijke snelheidstest</value></data>
+    <data name="SpeedDescription" xml:space="preserve"><value>Meet snelheid en vertraging onder belasting om 03:00</value></data>
+    <data name="NativeWiFi" xml:space="preserve"><value>Wifi rechtstreeks uitlezen</value></data>
+    <data name="NativeDescription" xml:space="preserve"><value>Vraagt Windows rechtstreeks in plaats van netsh, werkt in elke taal</value></data>
+    <data name="UpdatePopup" xml:space="preserve"><value>Updatevenster</value></data>
+    <data name="UpdateDescription" xml:space="preserve"><value>Vraagt om bij te werken als een nieuwe versie beschikbaar is</value></data>
+    <data name="ProblemLimits" xml:space="preserve"><value>Probleemgrenzen</value></data>
+    <data name="LimitsDescription" xml:space="preserve"><value>2 slechte minuten openen een incident; driemaal de grens geeft direct een melding</value></data>
+    <data name="WeakSignal" xml:space="preserve"><value>Zwak signaal onder dBm</value></data>
+    <data name="SignalDescription" xml:space="preserve"><value>Dichter bij nul is sterker; -70 is geschikt voor gesprekken</value></data>
+    <data name="RouterPing" xml:space="preserve"><value>Routerping boven ms</value></data>
+    <data name="RouterDescription" xml:space="preserve"><value>Vertraging tussen deze pc en uw router</value></data>
+    <data name="InternetPing" xml:space="preserve"><value>Internetping boven ms</value></data>
+    <data name="InternetDescription" xml:space="preserve"><value>Vertraging naar 1.1.1.1 terwijl de router goed werkt</value></data>
+    <data name="WiFiAdapter" xml:space="preserve"><value>Wifi-adapter</value></data>
+    <data name="About" xml:space="preserve"><value>Over</value></data>
+    <data name="PluggedIn" xml:space="preserve"><value>Netvoeding {0}</value></data>
+    <data name="OnBattery" xml:space="preserve"><value>Op accu {0}</value></data>
+    <data name="Roaming" xml:space="preserve"><value>Roaming {0}</value></data>
+    <data name="VersionAvailable" xml:space="preserve"><value>Versie {0} beschikbaar</value></data>
+    <data name="Downloading" xml:space="preserve"><value>Downloaden</value></data>
+    <data name="UpdateNow" xml:space="preserve"><value>Nu bijwerken</value></data>
+    <data name="CheckUpdates" xml:space="preserve"><value>Controleren op updates</value></data>
+    <data name="GitHubUnavailable" xml:space="preserve"><value>GitHub niet bereikbaar</value></data>
+    <data name="VersionLatest" xml:space="preserve"><value>Versie {0} is de nieuwste</value></data>
+    <data name="DriverFrom" xml:space="preserve"><value>Stuurprogramma {0} van {1:yyyy-MM-dd}</value></data>
+    <data name="Driver" xml:space="preserve"><value>Stuurprogramma {0}</value></data>
+    <data name="Language" xml:space="preserve"><value>Taal</value></data>
+    <data name="SystemLanguage" xml:space="preserve"><value>Windows-taal (automatisch)</value></data>
+    <data name="LanguageDescription" xml:space="preserve"><value>Geldt direct voor instellingen en nieuwe trage-DNS-meldingen; andere schermen blijven Engels</value></data>
+    <data name="SlowDnsValue" xml:space="preserve"><value>Trage DNS {0:0.#} ms</value></data>
+    <data name="SlowDnsSummary" xml:space="preserve"><value>Trage DNS gedurende {0}, piek {1:0.#} ms, gemiddeld {2:0.#} ms</value></data>
+    <data name="MinuteOne" xml:space="preserve"><value>{0} minuut</value></data>
+    <data name="MinuteFew" xml:space="preserve"><value>{0} minuten</value></data>
+    <data name="MinuteMany" xml:space="preserve"><value>{0} minuten</value></data>
+    <data name="SecondOne" xml:space="preserve"><value>{0} seconde</value></data>
+    <data name="SecondFew" xml:space="preserve"><value>{0} seconden</value></data>
+    <data name="SecondMany" xml:space="preserve"><value>{0} seconden</value></data>
+</root>

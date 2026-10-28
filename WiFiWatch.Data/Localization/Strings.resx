@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+    <resheader name="version"><value>2.0</value></resheader>
+    <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+    <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+    <data name="General" xml:space="preserve"><value>General</value></data>
+    <data name="StartWithWindows" xml:space="preserve"><value>Start With Windows</value></data>
+    <data name="StartDescription" xml:space="preserve"><value>Runs hidden in the tray after sign in</value></data>
+    <data name="DailySummary" xml:space="preserve"><value>Daily Summary Notification</value></data>
+    <data name="SummaryDescription" xml:space="preserve"><value>Notifies each morning after a day with problems</value></data>
+    <data name="NightlySpeedTest" xml:space="preserve"><value>Nightly Speed Test</value></data>
+    <data name="SpeedDescription" xml:space="preserve"><value>Measures speed and lag under load at 03:00</value></data>
+    <data name="NativeWiFi" xml:space="preserve"><value>Read Wi-Fi Natively</value></data>
+    <data name="NativeDescription" xml:space="preserve"><value>Asks Windows directly instead of netsh, works in any language</value></data>
+    <data name="UpdatePopup" xml:space="preserve"><value>Update Popup</value></data>
+    <data name="UpdateDescription" xml:space="preserve"><value>Asks to update when a new version is out</value></data>
+    <data name="ProblemLimits" xml:space="preserve"><value>Problem Limits</value></data>
+    <data name="LimitsDescription" xml:space="preserve"><value>2 bad minutes open a problem, triple the limit notifies at once</value></data>
+    <data name="WeakSignal" xml:space="preserve"><value>Weak Signal Below dBm</value></data>
+    <data name="SignalDescription" xml:space="preserve"><value>Closer to zero is stronger, -70 suits calls</value></data>
+    <data name="RouterPing" xml:space="preserve"><value>Router Ping Above ms</value></data>
+    <data name="RouterDescription" xml:space="preserve"><value>Lag between this PC and your router</value></data>
+    <data name="InternetPing" xml:space="preserve"><value>Internet Ping Above ms</value></data>
+    <data name="InternetDescription" xml:space="preserve"><value>Lag to 1.1.1.1 while the router is fine</value></data>
+    <data name="WiFiAdapter" xml:space="preserve"><value>Wi-Fi Adapter</value></data>
+    <data name="About" xml:space="preserve"><value>About</value></data>
+    <data name="PluggedIn" xml:space="preserve"><value>Plugged In {0}</value></data>
+    <data name="OnBattery" xml:space="preserve"><value>On Battery {0}</value></data>
+    <data name="Roaming" xml:space="preserve"><value>Roaming {0}</value></data>
+    <data name="VersionAvailable" xml:space="preserve"><value>Version {0} Available</value></data>
+    <data name="Downloading" xml:space="preserve"><value>Downloading</value></data>
+    <data name="UpdateNow" xml:space="preserve"><value>Update Now</value></data>
+    <data name="CheckUpdates" xml:space="preserve"><value>Check For Updates</value></data>
+    <data name="GitHubUnavailable" xml:space="preserve"><value>Could not reach GitHub</value></data>
+    <data name="VersionLatest" xml:space="preserve"><value>Version {0} is the latest</value></data>
+    <data name="DriverFrom" xml:space="preserve"><value>Driver {0} From {1:yyyy-MM-dd}</value></data>
+    <data name="Driver" xml:space="preserve"><value>Driver {0}</value></data>
+    <data name="Language" xml:space="preserve"><value>Language</value></data>
+    <data name="SystemLanguage" xml:space="preserve"><value>Windows Language (Automatic)</value></data>
+    <data name="LanguageDescription" xml:space="preserve"><value>Applies immediately to Settings and new Slow DNS messages; other screens remain in English</value></data>
+    <data name="SlowDnsValue" xml:space="preserve"><value>Slow DNS {0:0.#} ms</value></data>
+    <data name="SlowDnsSummary" xml:space="preserve"><value>Slow DNS for {0}, peak {1:0.#} ms, average {2:0.#} ms</value></data>
+    <data name="MinuteOne" xml:space="preserve"><value>{0} minute</value></data>
+    <data name="MinuteFew" xml:space="preserve"><value>{0} minutes</value></data>
+    <data name="MinuteMany" xml:space="preserve"><value>{0} minutes</value></data>
+    <data name="SecondOne" xml:space="preserve"><value>{0} second</value></data>
+    <data name="SecondFew" xml:space="preserve"><value>{0} seconds</value></data>
+    <data name="SecondMany" xml:space="preserve"><value>{0} seconds</value></data>
+    <data name="AppName" xml:space="preserve"><value>Wi-Fi Watch</value></data>
+</root>

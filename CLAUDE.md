@@ -10,7 +10,7 @@ The global `~/.claude/CLAUDE.md` holds every shared convention (git, releases, c
 
 | Path | Holds |
 |---|---|
-| `WiFiWatch.slnx` | The three projects |
+| `WiFiWatch.slnx` | The application projects and localization regression executable |
 | `WiFiWatch.Data` | `net10.0`, no Windows dependencies. EF context, models, migrations, view models, enums, small helpers |
 | `WiFiWatch.Services` | `net10.0-windows`. Everything that watches, measures, stores or talks to Windows |
 | `WiFiWatch.Desktop` | WPF exe, `Microsoft.NET.Sdk.Razor`, `net10.0-windows10.0.17763.0`. Window, tray, Blazor UI, theming |
@@ -27,6 +27,7 @@ The global `~/.claude/CLAUDE.md` holds every shared convention (git, releases, c
 | `Enums/` | `EventKind`, `EventSeverity`, `HealthState`, `SpeedTestPhase` |
 | `Helpers/` | `AppInfo` (display name, version), `WiFiChannels` (DFS and weather radar ranges, timers), `Formatter` (durations without a zero second part, local times, numbers with units, `FormatCount` for 1 Problem or 2 Problems), `EventKindExtensions.ToLabel`, `QueryableExtensions.OrderByColumn`, `HealthBuckets` (worst state per hour or day, self-test), `Problems.IsProblem` |
 | `Migrations/` | `Initial`, `AddNeighborSamples`, `AddIncidentsSpeedTestsAndDns` |
+| `Localization/` | `AppText`, English resources and Dutch, Turkish, German, Spanish and Russian satellites |
 
 ### WiFiWatch.Services
 
@@ -81,7 +82,7 @@ Publish writes one file, `WiFiWatch.Desktop\bin\Release\net10.0-windows10.0.1776
 
 Installing is copying that exe to `%LocalAppData%\Programs\WiFiWatch` and running it once. Every Release launch rewrites the `Run` value (with `--tray`) and `Start Menu\Programs\01 Apps\Wi-Fi Watch.lnk` to point at itself. A release on GitHub carries exactly one asset named `WiFiWatch_v<version>.exe` under the tag `v<version>`, because the updater builds that URL.
 
-**Releases come from `.github/workflows/release.yml`, not from this PC**, which replaces the global `gh release create` step: bump `<Version>`, commit and push, then `git tag v1.8` and `git push origin v1.8`. The workflow publishes on `windows-latest`, uploads the exe as the `unsigned` artifact, signs it through SignPath once the `SIGNPATH_API_TOKEN` secret and the `SIGNPATH_ORGANIZATION_ID` variable exist (waiting up to an hour for the approval in SignPath), and creates the release with the exe as its only asset, unsigned until SignPath is set up. A tag that does not match `<Version>` fails the release step, because no `WiFiWatch_<tag>.exe` exists. A manual run only builds and uploads. `IncludeSourceRevisionInInformationalVersion` is off so the product version is exactly the `<Version>`, which SignPath's metadata check compares, and `Company` replaces the default, which was the assembly name.
+**Releases come from `.github/workflows/release.yml`, not from this PC**, which replaces the global `gh release create` step: bump `<Version>`, commit and push, then `git tag v1.9` and `git push origin v1.9`. The workflow publishes on `windows-latest`, uploads the exe as the `unsigned` artifact, signs it through SignPath once the `SIGNPATH_API_TOKEN` secret and the `SIGNPATH_ORGANIZATION_ID` variable exist (waiting up to an hour for the approval in SignPath), and creates the release with the exe as its only asset, unsigned until SignPath is set up. A tag that does not match `<Version>` fails the release step, because no `WiFiWatch_<tag>.exe` exists. A manual run only builds and uploads. `IncludeSourceRevisionInInformationalVersion` is off so the product version is exactly the `<Version>`, which SignPath's metadata check compares, and `Company` replaces the default, which was the assembly name.
 
 The workflow uses `actions/checkout@v7`, `actions/setup-dotnet@v6` (SDK `10.0.x`), `actions/upload-artifact@v7` (zipped, which the `<zip-file>` root of the artifact configuration expects) and `signpath/github-action-submit-signing-request@v3`, with `actions: read` and `contents: write`, all bash steps on the Windows runner. `gh workflow run release.yml` is the dry run and `gh run watch` follows it. Only the newest release is kept: once a new one is live, `gh release delete v<old> --yes --cleanup-tag`; old installs still find the new one through `releases/latest`. The global rule to launch the exe alone in an empty folder is met by installing the release asset outside the Claude container (an `explorer.exe` script copying it into `%LocalAppData%\Programs\WiFiWatch`), or by Update Now in the installed app, which tests the updater on the way.
 
@@ -224,7 +225,29 @@ The look follows LetsWatch: navigation in the app bar, section titles above pane
 - The project was `WifiWatch` (shown as "Wifi Watch") up to v1.5. Windows paths, the registry, GitHub repository URLs and release asset names all ignore case, so the data folder, the `Run` value and v1.5's updater (which asks for `WifiWatch_v1.6.exe`) carry over untouched. `Updater.CanInstall` compares the exe prefix ignoring case for the same reason, settings load case-insensitively because old files say `ReadWifiNatively`, and writing the shortcut deletes the old `Wifi Watch.lnk`. The single-instance event is now `WiFiWatch.Show`; kernel names are case-sensitive, but an update waits for the old process before it checks.
 - `EventJournal.HasMessageStartingWithAsync`, `OpenProblemsAsync` and `CloseLeftoversAsync` are static; they only touch the database. Severity is stored as text, so `OpenProblemsAsync` ranks it in memory.
 
+## Localization
+
+Settings and new Slow DNS messages are localized; the other pages, shell and
+remaining event kinds are still English. `AppText.Culture` selects resources
+explicitly so existing monitor tasks see a language change. Numeric formatting
+keeps `CultureInfo.CurrentCulture` (the Windows number format). The language
+selector is outlined and saves `UserSettings.Language`; null uses the Windows
+user UI culture captured at startup. Missing translations use neutral English.
+Russian duration resources use one/few/many forms. Stored historical messages
+are never translated or rewritten by a language switch; an open incident's next
+update or close uses the current language. Russian strings need wporgru's review.
+
+`VerifyLocalizationBundle` checks all five satellite assemblies before bundling
+the single EXE. The release workflow runs the regression executable first.
+See `docs/LOCALIZATION.md` for the verified results and remaining Windows checks.
+
 ## Verifying
+
+- **Localization regressions:** `dotnet run --project WiFiWatch.Localization.Tests`.
+  Before loading any store the test sets AppContext data `WiFiWatch.TestDirectory`
+  to a unique temporary directory, then exercises settings, resources, migrations,
+  the actual tracker/journal lifecycle and unchanged historical rows. Never set
+  that override to a real user data folder.
 
 - **Self-tests** run from static constructors with `Debug.Assert`: `WiFiReader`, `ChannelAdvice`, `ConditionTracker`, `DnsProbe`, `HealthBuckets`, `Formatter`. A failing one kills a Debug launch with `FailFast` and the message `SelfTestPasses()` in the Application event log. To run them all headless, a file-based app with `#:project` pointing at `WiFiWatch.Services.csproj` and `#:property TargetFramework=net10.0-windows` can invoke every `SelfTestPasses` through reflection.
 - **Analyzers** per project: `dotnet format analyzers <project>.csproj --verify-no-changes --severity info` and the same with `style`, for all three projects.

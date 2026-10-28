@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+    <resheader name="version"><value>2.0</value></resheader>
+    <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+    <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+    <data name="General" xml:space="preserve"><value>Allgemein</value></data>
+    <data name="StartWithWindows" xml:space="preserve"><value>Mit Windows starten</value></data>
+    <data name="StartDescription" xml:space="preserve"><value>Läuft nach der Anmeldung im Infobereich</value></data>
+    <data name="DailySummary" xml:space="preserve"><value>Tägliche Zusammenfassung</value></data>
+    <data name="SummaryDescription" xml:space="preserve"><value>Meldet morgens Probleme des Vortags</value></data>
+    <data name="NightlySpeedTest" xml:space="preserve"><value>Nächtlicher Geschwindigkeitstest</value></data>
+    <data name="SpeedDescription" xml:space="preserve"><value>Misst Geschwindigkeit und Latenz unter Last um 03:00</value></data>
+    <data name="NativeWiFi" xml:space="preserve"><value>WLAN nativ auslesen</value></data>
+    <data name="NativeDescription" xml:space="preserve"><value>Fragt Windows direkt statt netsh, funktioniert in jeder Sprache</value></data>
+    <data name="UpdatePopup" xml:space="preserve"><value>Updatefenster</value></data>
+    <data name="UpdateDescription" xml:space="preserve"><value>Fragt nach einem Update, sobald eine neue Version verfügbar ist</value></data>
+    <data name="ProblemLimits" xml:space="preserve"><value>Problemgrenzen</value></data>
+    <data name="LimitsDescription" xml:space="preserve"><value>2 schlechte Minuten öffnen einen Vorfall; der dreifache Grenzwert meldet sofort</value></data>
+    <data name="WeakSignal" xml:space="preserve"><value>Schwaches Signal unter dBm</value></data>
+    <data name="SignalDescription" xml:space="preserve"><value>Näher an null ist stärker; -70 eignet sich für Anrufe</value></data>
+    <data name="RouterPing" xml:space="preserve"><value>Router-Ping über ms</value></data>
+    <data name="RouterDescription" xml:space="preserve"><value>Latenz zwischen diesem PC und Ihrem Router</value></data>
+    <data name="InternetPing" xml:space="preserve"><value>Internet-Ping über ms</value></data>
+    <data name="InternetDescription" xml:space="preserve"><value>Latenz zu 1.1.1.1 bei normaler Router-Verbindung</value></data>
+    <data name="WiFiAdapter" xml:space="preserve"><value>WLAN-Adapter</value></data>
+    <data name="About" xml:space="preserve"><value>Über</value></data>
+    <data name="PluggedIn" xml:space="preserve"><value>Netzbetrieb {0}</value></data>
+    <data name="OnBattery" xml:space="preserve"><value>Akkubetrieb {0}</value></data>
+    <data name="Roaming" xml:space="preserve"><value>Roaming {0}</value></data>
+    <data name="VersionAvailable" xml:space="preserve"><value>Version {0} verfügbar</value></data>
+    <data name="Downloading" xml:space="preserve"><value>Wird heruntergeladen</value></data>
+    <data name="UpdateNow" xml:space="preserve"><value>Jetzt aktualisieren</value></data>
+    <data name="CheckUpdates" xml:space="preserve"><value>Nach Updates suchen</value></data>
+    <data name="GitHubUnavailable" xml:space="preserve"><value>GitHub nicht erreichbar</value></data>
+    <data name="VersionLatest" xml:space="preserve"><value>Version {0} ist aktuell</value></data>
+    <data name="DriverFrom" xml:space="preserve"><value>Treiber {0} vom {1:yyyy-MM-dd}</value></data>
+    <data name="Driver" xml:space="preserve"><value>Treiber {0}</value></data>
+    <data name="Language" xml:space="preserve"><value>Sprache</value></data>
+    <data name="SystemLanguage" xml:space="preserve"><value>Windows-Sprache (automatisch)</value></data>
+    <data name="LanguageDescription" xml:space="preserve"><value>Gilt sofort für Einstellungen und neue Meldungen zu langsamem DNS; andere Seiten bleiben Englisch</value></data>
+    <data name="SlowDnsValue" xml:space="preserve"><value>Langsames DNS {0:0.#} ms</value></data>
+    <data name="SlowDnsSummary" xml:space="preserve"><value>Langsames DNS für {0}, Spitze {1:0.#} ms, Durchschnitt {2:0.#} ms</value></data>
+    <data name="MinuteOne" xml:space="preserve"><value>{0} Minute</value></data>
+    <data name="MinuteFew" xml:space="preserve"><value>{0} Minuten</value></data>
+    <data name="MinuteMany" xml:space="preserve"><value>{0} Minuten</value></data>
+    <data name="SecondOne" xml:space="preserve"><value>{0} Sekunde</value></data>
+    <data name="SecondFew" xml:space="preserve"><value>{0} Sekunden</value></data>
+    <data name="SecondMany" xml:space="preserve"><value>{0} Sekunden</value></data>
+</root>

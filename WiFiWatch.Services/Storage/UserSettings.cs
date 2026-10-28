@@ -12,7 +12,8 @@ public sealed record UserSettings(
     bool DailySummaryNotification = true,
     bool NightlySpeedTest = false,
     bool ReadWiFiNatively = false,
-    bool ShowUpdatePopup = true
+    bool ShowUpdatePopup = true,
+    string? Language = null
 )
 {
     private static readonly string s_filePath = Path.Combine(
