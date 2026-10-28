@@ -149,7 +149,6 @@
     <data name="Measured Against Fast.com Servers, 8 Seconds Each Way" xml:space="preserve"><value>An Fast.com-Servern gemessen, 8 Sekunden je Richtung</value></data>
     <data name="Test Again" xml:space="preserve"><value>Erneut Testen</value></data>
     <data name="Don't Show Again" xml:space="preserve"><value>Nicht Mehr Anzeigen</value></data>
-    <data name="Later" xml:space="preserve"><value>Später</value></data>
     <data name="Update Now" xml:space="preserve"><value>Jetzt Aktualisieren</value></data>
     <data name="Hidden" xml:space="preserve"><value>Versteckt</value></data>
     <data name="Yours" xml:space="preserve"><value>Ihr Netzwerk</value></data>
@@ -390,4 +389,6 @@
     <data name="No Measurements" xml:space="preserve"><value>Keine Messungen</value></data>
     <data name="ConditionValue" xml:space="preserve"><value>{0} {1}</value></data>
     <data name="What Changed" xml:space="preserve"><value>Was Sich Geändert Hat</value></data>
+    <data name="Nothing Found" xml:space="preserve"><value>Nichts gefunden</value></data>
+    <data name="ChannelLegend" xml:space="preserve"><value>Blau: Ihr Kanal&#10;Orange: ein Nachbar mit 30% Signal oder mehr in Ihrem 80-MHz-Block, der die Sendezeit mit Ihnen teilt&#10;Grau: andere Netze in Reichweite&#10;Sendezeit belegt: wie oft Ihr Access Point den Kanal als belegt meldet</value></data>
 </root>

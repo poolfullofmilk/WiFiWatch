@@ -150,7 +150,6 @@
     <data name="Measured Against Fast.com Servers, 8 Seconds Each Way" xml:space="preserve"><value>Measured against Fast.com servers, 8 seconds each way</value></data>
     <data name="Test Again" xml:space="preserve"><value>Test Again</value></data>
     <data name="Don't Show Again" xml:space="preserve"><value>Don't Show Again</value></data>
-    <data name="Later" xml:space="preserve"><value>Later</value></data>
     <data name="Update Now" xml:space="preserve"><value>Update Now</value></data>
     <data name="Hidden" xml:space="preserve"><value>Hidden</value></data>
     <data name="Yours" xml:space="preserve"><value>Yours</value></data>
@@ -391,4 +390,6 @@
     <data name="No Measurements" xml:space="preserve"><value>No measurements</value></data>
     <data name="ConditionValue" xml:space="preserve"><value>{0} {1}</value></data>
     <data name="What Changed" xml:space="preserve"><value>What Changed</value></data>
+    <data name="Nothing Found" xml:space="preserve"><value>Nothing found</value></data>
+    <data name="ChannelLegend" xml:space="preserve"><value>Blue: your channel&#10;Amber: a neighbor at 30% signal or more on your 80 MHz block, sharing your airtime&#10;Grey: other networks in range&#10;Airtime busy: how often your access point reports the channel in use</value></data>
 </root>

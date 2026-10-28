@@ -14,9 +14,6 @@ public sealed partial class SpeedTestDialog : IDisposable
     private const double PingShare = 0.1;
     private const double DownloadShare = 0.45;
 
-    [CascadingParameter]
-    public required IMudDialogInstance Dialog { get; set; }
-
     [Inject]
     public required NetworkMonitor Monitor { get; set; }
 
@@ -112,11 +109,6 @@ public sealed partial class SpeedTestDialog : IDisposable
             options: new DialogOptions { BackdropClick = false, MaxWidth = MaxWidth.Small }
         );
 
-    private void Close()
-    {
-        _cancellation?.Cancel();
-        Dialog.Close();
-    }
-
+    // The Corner X Disposes The Dialog, Which Cancels A Running Test
     public void Dispose() => _cancellation?.Cancel();
 }

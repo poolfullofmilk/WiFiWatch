@@ -7,8 +7,8 @@
     @foreach (var option in Options)
     {
         @* Option Button *@
-        <MudButton Variant="@(IsSelected(option.Value) ? Variant.Filled : Variant.Outlined)"
-                   Color="Color.Info"
+        <MudButton Variant="Variant.Filled"
+                   Color="@(IsSelected(option.Value) ? Color.Info : Color.Default)"
                    Size="Size.Small"
                    OnClick="@(() => SelectAsync(option.Value))">
             @option.Label

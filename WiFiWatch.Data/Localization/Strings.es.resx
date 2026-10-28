@@ -149,7 +149,6 @@
     <data name="Measured Against Fast.com Servers, 8 Seconds Each Way" xml:space="preserve"><value>Medido con servidores Fast.com, 8 segundos en cada dirección</value></data>
     <data name="Test Again" xml:space="preserve"><value>Repetir Prueba</value></data>
     <data name="Don't Show Again" xml:space="preserve"><value>No Mostrar de Nuevo</value></data>
-    <data name="Later" xml:space="preserve"><value>Más Tarde</value></data>
     <data name="Update Now" xml:space="preserve"><value>Actualizar Ahora</value></data>
     <data name="Hidden" xml:space="preserve"><value>Oculta</value></data>
     <data name="Yours" xml:space="preserve"><value>Su Red</value></data>
@@ -390,4 +389,6 @@
     <data name="No Measurements" xml:space="preserve"><value>Sin mediciones</value></data>
     <data name="ConditionValue" xml:space="preserve"><value>{0} {1}</value></data>
     <data name="What Changed" xml:space="preserve"><value>Qué Ha Cambiado</value></data>
+    <data name="Nothing Found" xml:space="preserve"><value>No se encontró nada</value></data>
+    <data name="ChannelLegend" xml:space="preserve"><value>Azul: su canal&#10;Naranja: un vecino con 30% de señal o más en su bloque de 80 MHz, que comparte su tiempo de emisión&#10;Gris: otras redes al alcance&#10;Tiempo de emisión ocupado: con qué frecuencia su punto de acceso indica el canal en uso</value></data>
 </root>

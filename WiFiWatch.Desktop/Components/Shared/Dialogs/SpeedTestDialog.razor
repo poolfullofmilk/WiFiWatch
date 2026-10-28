@@ -77,26 +77,14 @@
         </MudStack>
     </DialogContent>
     <DialogActions>
-        <MudStack Row
-                  Justify="Justify.SpaceBetween"
-                  Spacing="4"
-                  Class="px-3 py-2 mud-width-full">
-            @* Close Button *@
-            <MudButton Variant="Variant.Filled"
-                       Size="Size.Small"
-                       OnClick="Close">
-                @(IsRunning ? AppText.Get("Cancel") : AppText.Get("Close"))
-            </MudButton>
-            @* Again Button *@
-            <MudButton Variant="Variant.Filled"
-                       Color="Color.Info"
-                       Size="Size.Small"
-                       StartIcon="@Icons.Material.Rounded.Refresh"
-                       Disabled="IsRunning"
-                       OnClick="RunAsync">
-                @AppText.Get("Test Again")
-            </MudButton>
-        </MudStack>
+        @* Again Button, The Corner X Closes And Cancels A Running Test *@
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Info"
+                   StartIcon="@Icons.Material.Rounded.Refresh"
+                   Disabled="IsRunning"
+                   OnClick="RunAsync">
+            @AppText.Get("Test Again")
+        </MudButton>
     </DialogActions>
 
 </MudDialog>

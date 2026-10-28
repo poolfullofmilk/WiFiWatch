@@ -149,7 +149,6 @@
     <data name="Measured Against Fast.com Servers, 8 Seconds Each Way" xml:space="preserve"><value>Fast.com sunucularıyla her yönde 8 saniye ölçülür</value></data>
     <data name="Test Again" xml:space="preserve"><value>Yeniden Test Et</value></data>
     <data name="Don't Show Again" xml:space="preserve"><value>Bir Daha Gösterme</value></data>
-    <data name="Later" xml:space="preserve"><value>Daha Sonra</value></data>
     <data name="Update Now" xml:space="preserve"><value>Şimdi Güncelle</value></data>
     <data name="Hidden" xml:space="preserve"><value>Gizli</value></data>
     <data name="Yours" xml:space="preserve"><value>Sizin</value></data>
@@ -390,4 +389,6 @@
     <data name="No Measurements" xml:space="preserve"><value>Ölçüm yok</value></data>
     <data name="ConditionValue" xml:space="preserve"><value>{0} {1}</value></data>
     <data name="What Changed" xml:space="preserve"><value>Neler Değişti</value></data>
+    <data name="Nothing Found" xml:space="preserve"><value>Hiçbir şey bulunamadı</value></data>
+    <data name="ChannelLegend" xml:space="preserve"><value>Mavi: kanalınız&#10;Turuncu: 80 MHz bloğunuzda %30 veya daha güçlü sinyalli bir komşu, yayın süresini sizinle paylaşır&#10;Gri: menzildeki diğer ağlar&#10;Yayın süresi meşgul: erişim noktanızın kanalı ne sıklıkla dolu bildirdiği</value></data>
 </root>

@@ -27,7 +27,6 @@
             {
                 @* Detail Table *@
                 <MudSimpleTable Dense
-                                Bordered
                                 Outlined
                                 Elevation="0"
                                 Class="rounded-inner">
@@ -46,8 +45,6 @@
             {
                 @* Trace Table *@
                 <MudSimpleTable Dense
-                                Striped
-                                Bordered
                                 Outlined
                                 Elevation="0"
                                 Class="rounded-inner">
@@ -77,29 +74,16 @@
         </MudStack>
     </DialogContent>
     <DialogActions>
-        <MudStack Row
-                  Spacing="4"
-                  Class="px-3 py-2"
-                  Style="width:100%">
-            @if (FixTarget is { } fixTarget)
-            {
-                @* Fix Button *@
-                <MudButton Variant="Variant.Filled"
-                           Size="Size.Small"
-                           StartIcon="@Icons.Material.Rounded.Build"
-                           OnClick="() => QuickActions.Open(fixTarget)">
-                    @QuickActions.Describe(fixTarget)
-                </MudButton>
-            }
-            <MudSpacer />
-            @* Close Button *@
+        @if (FixTarget is { } fixTarget)
+        {
+            @* Fix Button *@
             <MudButton Variant="Variant.Filled"
                        Color="Color.Info"
-                       Size="Size.Small"
-                       OnClick="Close">
-                @AppText.Get("Close")
+                       StartIcon="@Icons.Material.Rounded.Build"
+                       OnClick="() => QuickActions.Open(fixTarget)">
+                @QuickActions.Describe(fixTarget)
             </MudButton>
-        </MudStack>
+        }
     </DialogActions>
 
 </MudDialog>
