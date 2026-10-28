@@ -43,7 +43,7 @@
             @if (RouterButtonUrl is { } routerAdminUrl)
             {
                 @* Router Button *@
-                <Tooltip Text="Open Router Settings">
+                <Tooltip Text="@AppText.Get("Open Router Settings")">
                     <MudIconButton Icon="@Icons.Material.Rounded.Router"
                                    Variant="Variant.Filled"
                                    Size="Size.Small"
@@ -51,7 +51,7 @@
                 </Tooltip>
             }
             @* Refresh Button *@
-            <Tooltip Text="Refresh">
+            <Tooltip Text="@AppText.Get("Refresh")">
                 <MudIconButton Icon="@Icons.Material.Rounded.Refresh"
                                Variant="Variant.Filled"
                                Size="Size.Small"
@@ -64,7 +64,7 @@
                        StartIcon="@Icons.Material.Rounded.Speed"
                        Disabled="Monitor.Status.IsSpeedTesting"
                        OnClick="() => SpeedTestDialog.ShowAsync(DialogService)">
-                @(Monitor.Status.IsSpeedTesting ? "Testing Speed" : "Speed Test")
+                @(Monitor.Status.IsSpeedTesting ? AppText.Get("Testing Speed") : AppText.Get("Speed Test"))
             </MudButton>
         </MudStack>
 

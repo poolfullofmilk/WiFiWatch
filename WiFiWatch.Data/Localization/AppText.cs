@@ -49,18 +49,25 @@ public static class AppText
         Select(language);
     }
 
-    public static void Select(string? language) =>
-        Volatile.Write(ref s_culture, Resolve(language, s_systemCulture));
+    public static event Action? Changed;
 
-    public static string Get(string key, params object[] arguments) =>
+    public static void Select(string? language)
+    {
+        var culture = Resolve(language, s_systemCulture);
+        if (Interlocked.Exchange(ref s_culture, culture).Name != culture.Name)
+            Changed?.Invoke();
+    }
+
+    public static string Get(string key, params object?[] arguments) =>
         Format(Culture, key, arguments);
 
-    private static string Format(CultureInfo culture, string key, params object[] arguments) =>
-        string.Format(
-            CultureInfo.CurrentCulture,
-            s_resources.GetString(key, culture) ?? key,
-            arguments
-        );
+    public static string Format(CultureInfo culture, string key, params object?[] arguments)
+    {
+        var template = s_resources.GetString(key, culture) ?? key;
+        return arguments.Length == 0
+            ? template
+            : string.Format(CultureInfo.CurrentCulture, template, arguments);
+    }
 
     public static string SlowDnsSummary(TimeSpan duration, double peak, double average)
     {
@@ -78,6 +85,23 @@ public static class AppText
         return minutes == 0 ? Count(seconds, "Second", culture)
             : seconds % 60 == 0 ? Count(minutes, "Minute", culture)
             : $"{Count(minutes, "Minute", culture)} {Count(seconds % 60, "Second", culture)}";
+    }
+
+    public static string FormatCount(int count, string noun)
+    {
+        var key = noun switch
+        {
+            "Problem" => "CountProblem",
+            "Attempt" => "CountAttempt",
+            "Neighbor" => "CountNeighbor",
+            "Speed Test" => "CountSpeedTest",
+            "DFS Eviction" => "CountDfsEviction",
+            "Radar Eviction" => "CountRadarEviction",
+            _ => null,
+        };
+        return key is null
+            ? $"{count} {noun}{(count == 1 ? string.Empty : "s")}"
+            : Count(count, key, Culture);
     }
 
     private static string Count(int count, string unit, CultureInfo culture)

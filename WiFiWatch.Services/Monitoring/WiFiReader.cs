@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using WiFiWatch.Data.Enums;
 using WiFiWatch.Data.Helpers;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Data.ViewModels;
 
 namespace WiFiWatch.Services.Monitoring;
@@ -35,14 +36,15 @@ public static partial class WiFiReader
             );
 
         // Older Builds Print No Rssi, Estimate It From Signal
-        var rssi = ReadNumber(values, "Rssi") ?? (ReadNumber(values, "Signal") / 2 - 100);
+        var rssi =
+            ReadNumber(values, "Rssi") ?? (ReadNumber(values, AppText.Get("Signal")) / 2 - 100);
 
         return new(
             false,
             values.GetValueOrDefault("State") == "connected",
             values.GetValueOrDefault("SSID"),
-            values.GetValueOrDefault("Band"),
-            ReadNumber(values, "Channel"),
+            values.GetValueOrDefault(AppText.Get("Band")),
+            ReadNumber(values, AppText.Get("Channel")),
             rssi,
             ReadNumber(values, "Receive rate (Mbps)"),
             ReadNumber(values, "Transmit rate (Mbps)")
@@ -57,14 +59,17 @@ public static partial class WiFiReader
 
         void AddPendingBssid()
         {
-            if (bssidValues is not null && ReadNumber(bssidValues, "Channel") is { } channel)
+            if (
+                bssidValues is not null
+                && ReadNumber(bssidValues, AppText.Get("Channel")) is { } channel
+            )
             {
                 neighbors.Add(
                     new(
                         ssid,
                         bssidValues["BSSID"],
                         channel,
-                        ReadNumber(bssidValues, "Signal") ?? 0,
+                        ReadNumber(bssidValues, AppText.Get("Signal")) ?? 0,
                         bssidValues.TryGetValue("Channel Utilization", out var utilization)
                         && UtilizationPercent().Match(utilization) is { Success: true } match
                             ? int.Parse(match.Groups["percent"].Value)
@@ -114,9 +119,15 @@ public static partial class WiFiReader
     public static (EventKind Kind, string Message) DescribeChannelChange(int? from, int? to) =>
         (WiFiChannels.IsDfs(from), WiFiChannels.IsDfs(to)) switch
         {
-            (true, false) => (EventKind.DfsEviction, $"Channel {from} To {to} Left DFS"),
-            (false, true) => (EventKind.DfsReturn, $"Channel {from} To {to} Back On DFS"),
-            _ => (EventKind.ChannelChange, $"Channel {from} To {to}"),
+            (true, false) => (
+                EventKind.DfsEviction,
+                AppText.Get("Channel {0} To {1} Left DFS", from, to)
+            ),
+            (false, true) => (
+                EventKind.DfsReturn,
+                AppText.Get("Channel {0} To {1} Back On DFS", from, to)
+            ),
+            _ => (EventKind.ChannelChange, AppText.Get("Channel {0} To {1}", from, to)),
         };
 
     private static bool SelfTestPasses()

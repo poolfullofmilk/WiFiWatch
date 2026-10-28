@@ -53,11 +53,11 @@
                                 Class="rounded-inner">
                     <thead>
                         <tr>
-                            <th>Hop</th>
-                            <th>Address</th>
-                            <th>Name</th>
-                            <th>Loss</th>
-                            <th>Average</th>
+                            <th>@AppText.Get("Hop")</th>
+                            <th>@AppText.Get("Address")</th>
+                            <th>@AppText.Get("Name")</th>
+                            <th>@AppText.Get("Loss")</th>
+                            <th>@AppText.Get("Average")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -65,7 +65,7 @@
                         {
                             <tr>
                                 <td>@hop.Number</td>
-                                <td>@(hop.Address ?? "No Answer")</td>
+                                <td>@(hop.Address ?? AppText.Get("No Answer"))</td>
                                 <td>@(hop.Name ?? "-")</td>
                                 <td>@($"{hop.LossPercent:0}%")</td>
                                 <td>@Formatter.FormatNumber(hop.AverageMilliseconds, "ms")</td>
@@ -97,7 +97,7 @@
                        Color="Color.Info"
                        Size="Size.Small"
                        OnClick="Close">
-                Close
+                @AppText.Get("Close")
             </MudButton>
         </MudStack>
     </DialogActions>

@@ -1,8 +1,11 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using WiFiWatch.Data;
+using WiFiWatch.Data.Enums;
 using WiFiWatch.Data.Helpers;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Data.Models;
 using WiFiWatch.Data.ViewModels;
 using WiFiWatch.Desktop.Components.Shared.Common;
@@ -15,11 +18,8 @@ namespace WiFiWatch.Desktop.Components.Pages;
 
 public partial class IncidentsPage : IDisposable
 {
-    private static readonly List<SegmentedButtonOption<bool>> s_scopeOptions =
-    [
-        new(false, "Problems"),
-        new(true, "Everything"),
-    ];
+    private static List<SegmentedButtonOption<bool>> ScopeOptions =>
+        [new(false, AppText.Get("Problems")), new(true, AppText.Get("Everything"))];
 
     [Inject]
     public required NetworkMonitor Monitor { get; set; }
@@ -61,9 +61,35 @@ public partial class IncidentsPage : IDisposable
         if (!string.IsNullOrWhiteSpace(_searchTerm))
         {
             var pattern = $"%{_searchTerm}%";
+            var scopes = new[]
+            {
+                NetworkMonitor.WiFiScope,
+                NetworkMonitor.HomeNetworkScope,
+                NetworkMonitor.ProviderScope,
+                NetworkMonitor.DnsScope,
+            }
+                .Where(scope =>
+                    AppText.Culture.CompareInfo.IndexOf(
+                        AppText.Get(scope),
+                        _searchTerm,
+                        CompareOptions.IgnoreCase
+                    ) >= 0
+                )
+                .ToArray();
+            var kinds = Enum.GetValues<EventKind>()
+                .Where(kind =>
+                    AppText.Culture.CompareInfo.IndexOf(
+                        kind.ToLabel(),
+                        _searchTerm,
+                        CompareOptions.IgnoreCase
+                    ) >= 0
+                )
+                .ToArray();
             query = query.Where(wifiEvent =>
                 EF.Functions.Like(wifiEvent.Message, pattern)
                 || EF.Functions.Like(wifiEvent.Scope, pattern)
+                || scopes.Contains(wifiEvent.Scope!)
+                || kinds.Contains(wifiEvent.Kind)
             );
         }
 
@@ -101,20 +127,20 @@ public partial class IncidentsPage : IDisposable
             .ToListAsync();
 
         CsvExport.Save(
-            "Events",
+            AppText.Get("Events"),
             day,
             [
                 [
-                    "Start",
-                    "End",
-                    "Duration",
-                    "Kind",
-                    "Severity",
-                    "Where",
-                    "Message",
-                    "Windows Reason",
-                    "Trace",
-                    "Context",
+                    AppText.Get("Start"),
+                    AppText.Get("End"),
+                    AppText.Get("Duration"),
+                    AppText.Get("Kind"),
+                    AppText.Get("Severity"),
+                    AppText.Get("Where"),
+                    AppText.Get("Message"),
+                    AppText.Get("Windows Reason"),
+                    AppText.Get("Trace"),
+                    AppText.Get("Context"),
                 ],
                 .. events.Select(wifiEvent =>
                 {
@@ -130,8 +156,8 @@ public partial class IncidentsPage : IDisposable
                             wifiEvent.EndedAtUtc
                         ),
                         wifiEvent.Kind.ToLabel(),
-                        wifiEvent.Severity,
-                        wifiEvent.Scope,
+                        AppText.Get(wifiEvent.Severity.ToString()),
+                        wifiEvent.Scope is { } scope ? AppText.Get(scope) : null,
                         wifiEvent.Message,
                         details.Reason,
                         details.TraceSummary,

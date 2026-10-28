@@ -6,19 +6,19 @@
 
     <TitleContent>
         <MudText Typo="Typo.h6">
-            @($"Version {Version.ToString(2)} Available")
+            @(AppText.Get("Version {0} Available", Version.ToString(2)))
         </MudText>
     </TitleContent>
     <DialogContent>
         <MudStack Spacing="2">
             <MudText Typo="Typo.body1">
-                @($"Installed Version Is {AppInfo.Version.ToString(2)}, Updating Restarts {AppInfo.DisplayName}")
+                @(AppText.Get("Installed Version Is {0}, Updating Restarts {1}", AppInfo.Version.ToString(2), AppInfo.DisplayName))
             </MudText>
             @* Hide Checkbox *@
             <MudCheckBox T="bool"
                          Value="!Monitor.Settings.ShowUpdatePopup"
                          ValueChanged="SetHidden"
-                         Label="Don't Show Again"
+                         Label="@AppText.Get("Don't Show Again")"
                          Color="Color.Info"
                          CheckedIcon="@Icons.Material.Rounded.CheckBox"
                          UncheckedIcon="@Icons.Material.Rounded.CheckBoxOutlineBlank" />
@@ -33,7 +33,7 @@
             <MudButton Variant="Variant.Filled"
                        Size="Size.Small"
                        OnClick="Close">
-                Later
+                @AppText.Get("Later")
             </MudButton>
             @* Update Button *@
             <MudButton Variant="Variant.Filled"
@@ -48,7 +48,7 @@
                                          Class="mr-2"
                                          Style="width:16px; height:16px" />
                 }
-                @(_isInstalling ? "Downloading" : "Update Now")
+                @(_isInstalling ? AppText.Get("Downloading") : AppText.Get("Update Now"))
             </MudButton>
         </MudStack>
     </DialogActions>

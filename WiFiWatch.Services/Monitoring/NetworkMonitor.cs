@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using WiFiWatch.Data;
 using WiFiWatch.Data.Enums;
 using WiFiWatch.Data.Helpers;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Data.Models;
 using WiFiWatch.Data.ViewModels;
 using WiFiWatch.Services.Integration;
@@ -55,6 +56,7 @@ public sealed class NetworkMonitor
     private readonly EventJournal _journal = new();
     private readonly ConditionTracker _conditions;
     private readonly bool _isStartedAtSignIn;
+    private readonly Func<Task<AdapterInfo?>> _inspectAdapter;
 
     // Ping State
     private readonly Ping _routerPing = new();
@@ -97,12 +99,19 @@ public sealed class NetworkMonitor
     private bool _isFailing;
     private volatile bool _isLinkStale = true;
 
-    public NetworkMonitor(UserSettings settings, bool isStartedAtSignIn)
+    public NetworkMonitor(
+        UserSettings settings,
+        bool isStartedAtSignIn,
+        bool subscribeToNetworkChanges = true,
+        Func<Task<AdapterInfo?>>? inspectAdapter = null
+    )
     {
         Settings = settings;
         _isStartedAtSignIn = isStartedAtSignIn;
+        _inspectAdapter = inspectAdapter ?? AdapterInspector.InspectAsync;
         _conditions = new(_journal);
-        NetworkChange.NetworkAddressChanged += (_, _) => _isLinkStale = true;
+        if (subscribeToNetworkChanges)
+            NetworkChange.NetworkAddressChanged += (_, _) => _isLinkStale = true;
         _conditions.IncidentOpened += TraceIncidentAsync;
         _journal.Alerted += (title, message) => Alerted?.Invoke(title, message);
         _journal.EventRecorded += () => EventRecorded?.Invoke();
@@ -173,7 +182,10 @@ public sealed class NetworkMonitor
                     await _journal.RecordAsync(
                         EventKind.Resumed,
                         EventSeverity.Info,
-                        $"Resumed After Sleep Of {Formatter.FormatDuration(nowUtc - lastTickUtc)}"
+                        AppText.Get(
+                            "Resumed After Sleep Of {0}",
+                            Formatter.FormatDuration(nowUtc - lastTickUtc)
+                        )
                     );
                 }
 
@@ -218,7 +230,7 @@ public sealed class NetworkMonitor
                     await _journal.TryRecordAsync(
                         EventKind.MonitorFailed,
                         EventSeverity.Critical,
-                        $"Monitor Failed {exception.GetType().Name}"
+                        AppText.Get("Monitor Failed {0}", exception.GetType().Name)
                     );
                 }
             }
@@ -253,14 +265,23 @@ public sealed class NetworkMonitor
             (DateTime?)sample.MinuteUtc
         );
         var bootUtc = DateTime.UtcNow - TimeSpan.FromMilliseconds(Environment.TickCount64);
-        var start = _isStartedAtSignIn ? "Started At Sign In" : "Started";
+        var start = _isStartedAtSignIn ? AppText.Get("Started At Sign In") : AppText.Get("Started");
         var gap = lastDataUtc is { } last
-            ? $", Off Since {Formatter.FormatLocal(last, "yyyy-MM-dd HH:mm")} ({Formatter.FormatDuration(DateTime.UtcNow - last)})"
-            : ", First Run";
+            ? AppText.Get(
+                ", Off Since {0} ({1})",
+                Formatter.FormatLocal(last, "yyyy-MM-dd HH:mm"),
+                Formatter.FormatDuration(DateTime.UtcNow - last)
+            )
+            : AppText.Get(", First Run");
         await _journal.RecordAsync(
             EventKind.Started,
             EventSeverity.Info,
-            $"{start}{gap}, PC Booted {Formatter.FormatLocal(bootUtc, "yyyy-MM-dd HH:mm")}"
+            AppText.Get(
+                "{0}{1}, PC Booted {2}",
+                start,
+                gap,
+                Formatter.FormatLocal(bootUtc, "yyyy-MM-dd HH:mm")
+            )
         );
     }
 
@@ -330,7 +351,7 @@ public sealed class NetworkMonitor
             new(
                 "WeakSignal",
                 EventKind.WeakSignal,
-                "Weak Signal",
+                AppText.Get("Weak Signal"),
                 "dBm",
                 isOnWiFi ? sample.Rssi : null,
                 settings.WeakSignalRssi,
@@ -343,7 +364,7 @@ public sealed class NetworkMonitor
             new(
                 "LocalPing",
                 EventKind.PingSpike,
-                $"Ping Spike On {localScope}",
+                AppText.Get("Ping Spike On {0}", AppText.Get(localScope)),
                 "ms",
                 sample.RouterPingMilliseconds,
                 settings.RouterPingMilliseconds,
@@ -356,7 +377,7 @@ public sealed class NetworkMonitor
             new(
                 "ProviderPing",
                 EventKind.PingSpike,
-                "Ping Spike At Internet Provider",
+                AppText.Get("Ping Spike At Internet Provider"),
                 "ms",
                 isRouterFine ? sample.InternetPingMilliseconds : null,
                 settings.InternetPingMilliseconds,
@@ -369,7 +390,7 @@ public sealed class NetworkMonitor
             new(
                 "LocalLoss",
                 EventKind.PacketLoss,
-                $"Packet Loss On {localScope}",
+                AppText.Get("Packet Loss On {0}", AppText.Get(localScope)),
                 "%",
                 isOnline && !isRouterSilent ? sample.RouterLossPercent : null,
                 PacketLossPercent,
@@ -382,7 +403,7 @@ public sealed class NetworkMonitor
             new(
                 "ProviderLoss",
                 EventKind.PacketLoss,
-                "Packet Loss At Internet Provider",
+                AppText.Get("Packet Loss At Internet Provider"),
                 "%",
                 isOnline
                 && (isRouterSilent || sample.RouterLossPercent < PacketLossPercent)
@@ -399,14 +420,18 @@ public sealed class NetworkMonitor
             new(
                 "SlowDns",
                 EventKind.SlowDns,
-                "Slow DNS",
+                AppText.Get("Slow DNS"),
                 "ms",
                 sample.DnsMilliseconds,
                 SlowDnsMilliseconds,
                 true,
                 false,
                 DnsScope,
-                $"{context}, Reference 1.1.1.1 {Formatter.FormatNumber(sample.ReferenceDnsMilliseconds, "ms")}",
+                AppText.Get(
+                    "{0}, Reference 1.1.1.1 {1}",
+                    context,
+                    Formatter.FormatNumber(sample.ReferenceDnsMilliseconds, "ms")
+                ),
                 minuteUtc
             ),
         ];
@@ -422,25 +447,31 @@ public sealed class NetworkMonitor
 
     private string DescribeContext(MinuteSample sample)
     {
-        List<string> parts = [$"Link {sample.Link}"];
+        List<string> parts = [AppText.Get("Link {0}", AppText.Get(sample.Link))];
         if (sample.Rssi is { } rssi)
         {
-            parts.Add($"Signal {rssi} dBm");
+            parts.Add(AppText.Get("Signal {0} dBm", rssi));
         }
 
         if (sample.ReceiveRateMbps is { } rate)
         {
-            parts.Add($"Rate {rate} Mbps");
+            parts.Add(AppText.Get("Rate {0} Mbps", rate));
         }
 
         if (sample.Channel is { } channel)
         {
-            parts.Add($"Channel {channel}{(WiFiChannels.IsDfs(channel) ? " DFS" : string.Empty)}");
+            parts.Add(
+                AppText.Get(
+                    "Channel {0}{1}",
+                    channel,
+                    (WiFiChannels.IsDfs(channel) ? " DFS" : string.Empty)
+                )
+            );
         }
 
         if (_ownAirtimePercent is { } airtime)
         {
-            parts.Add($"Airtime Busy {airtime}%");
+            parts.Add(AppText.Get("Airtime Busy {0}%", airtime));
         }
 
         return string.Join(", ", parts);
@@ -517,7 +548,7 @@ public sealed class NetworkMonitor
         await _journal.RecordAsync(
             EventKind.LinkChange,
             EventSeverity.Info,
-            $"Switched From {previousLink} To {link}"
+            AppText.Get("Switched From {0} To {1}", AppText.Get(previousLink), AppText.Get(link))
         );
 
         // A Cable Took Over, So Wi-Fi Problems End Here
@@ -525,7 +556,10 @@ public sealed class NetworkMonitor
         {
             await _journal.CloseAsync(
                 WiFiDisconnectKey,
-                $"Wi-Fi Lost For {Formatter.FormatDuration(DateTime.UtcNow - lostAtUtc)}, Back On Ethernet"
+                AppText.Get(
+                    "Wi-Fi Lost For {0}, Back On Ethernet",
+                    Formatter.FormatDuration(DateTime.UtcNow - lostAtUtc)
+                )
             );
         }
 
@@ -533,7 +567,7 @@ public sealed class NetworkMonitor
         {
             await _journal.CloseAsync(
                 LocationKey,
-                "Location Access Was Off, Not Needed On Ethernet"
+                AppText.Get("Location Access Was Off, Not Needed On Ethernet")
             );
         }
 
@@ -544,7 +578,7 @@ public sealed class NetworkMonitor
                 WiredOfflineKey,
                 EventKind.Disconnect,
                 EventSeverity.Critical,
-                "Ethernet Lost, PC Offline",
+                AppText.Get("Ethernet Lost, PC Offline"),
                 HomeNetworkScope,
                 null
             );
@@ -553,7 +587,11 @@ public sealed class NetworkMonitor
         {
             await _journal.CloseAsync(
                 WiredOfflineKey,
-                $"Offline For {Formatter.FormatDuration(DateTime.UtcNow - offlineSinceUtc)}, Back On {link}"
+                AppText.Get(
+                    "Offline For {0}, Back On {1}",
+                    Formatter.FormatDuration(DateTime.UtcNow - offlineSinceUtc),
+                    AppText.Get(link)
+                )
             );
         }
     }
@@ -583,7 +621,10 @@ public sealed class NetworkMonitor
             {
                 await _journal.CloseAsync(
                     WanDownKey,
-                    $"Internet Down For {Formatter.FormatDuration(DateTime.UtcNow - wanDownSinceUtc)}, Router Kept Answering"
+                    AppText.Get(
+                        "Internet Down For {0}, Router Kept Answering",
+                        Formatter.FormatDuration(DateTime.UtcNow - wanDownSinceUtc)
+                    )
                 );
             }
         }
@@ -594,7 +635,7 @@ public sealed class NetworkMonitor
                 WanDownKey,
                 EventKind.WanDown,
                 EventSeverity.Critical,
-                "Internet Down, Router Still Answers",
+                AppText.Get("Internet Down, Router Still Answers"),
                 ProviderScope,
                 null,
                 DateTime.UtcNow.AddSeconds(-WanDownAfterFailures)
@@ -636,7 +677,7 @@ public sealed class NetworkMonitor
                 LocationKey,
                 EventKind.LocationBlocked,
                 EventSeverity.Critical,
-                "Location Access Off So Wi-Fi Details Are Hidden",
+                AppText.Get("Location Access Off So Wi-Fi Details Are Hidden"),
                 WiFiScope,
                 null
             );
@@ -645,7 +686,10 @@ public sealed class NetworkMonitor
         {
             await _journal.CloseAsync(
                 LocationKey,
-                $"Location Access Was Off For {Formatter.FormatDuration(DateTime.UtcNow - blockedSinceUtc)}"
+                AppText.Get(
+                    "Location Access Was Off For {0}",
+                    Formatter.FormatDuration(DateTime.UtcNow - blockedSinceUtc)
+                )
             );
         }
 
@@ -683,7 +727,7 @@ public sealed class NetworkMonitor
                 WiFiDisconnectKey,
                 EventKind.Disconnect,
                 EventSeverity.Critical,
-                $"Wi-Fi Lost On {previous.Ssid}",
+                AppText.Get("Wi-Fi Lost On {0}", previous.Ssid),
                 WiFiScope,
                 null
             );
@@ -696,11 +740,17 @@ public sealed class NetworkMonitor
         // Reconnecting Onto A New DFS Channel Waited Out Radar Check
         var isDfsCheck = current.IsDfs && current.Channel != _lastConnected?.Channel;
         var check = isDfsCheck
-            ? ", Router Was Checking The New DFS Channel For Radar"
+            ? AppText.Get(", Router Was Checking The New DFS Channel For Radar")
             : string.Empty;
         await _journal.CloseAsync(
             WiFiDisconnectKey,
-            $"Wi-Fi Lost For {Formatter.FormatDuration(DateTime.UtcNow - lostAtUtc)}, Back On {current.Ssid} Channel {current.Channel}{check}"
+            AppText.Get(
+                "Wi-Fi Lost For {0}, Back On {1} Channel {2}{3}",
+                Formatter.FormatDuration(DateTime.UtcNow - lostAtUtc),
+                current.Ssid,
+                current.Channel,
+                check
+            )
         );
     }
 
@@ -711,7 +761,7 @@ public sealed class NetworkMonitor
             await _journal.RecordAsync(
                 EventKind.BandChange,
                 current.Band == FiveGigahertz ? EventSeverity.Info : EventSeverity.Warning,
-                $"Band {previous.Band} To {current.Band} On {current.Ssid}",
+                AppText.Get("Band {0} To {1} On {2}", previous.Band, current.Band, current.Ssid),
                 WiFiScope
             );
             return;
@@ -729,13 +779,21 @@ public sealed class NetworkMonitor
                 await _journal.RecordAsync(
                     kind,
                     EventSeverity.Critical,
-                    $"{message}, Radar Heard On {previous.Channel}, Router May Return From {Formatter.FormatLocal(_dfsFreeAtUtc.Value, "HH:mm")}",
+                    AppText.Get(
+                        "{0}, Radar Heard On {1}, Router May Return From {2}",
+                        message,
+                        previous.Channel,
+                        Formatter.FormatLocal(_dfsFreeAtUtc.Value, "HH:mm")
+                    ),
                     WiFiScope
                 );
                 break;
             case EventKind.DfsReturn:
                 var away = _evictedAtUtc is { } evictedAtUtc
-                    ? $" After {Formatter.FormatDuration(DateTime.UtcNow - evictedAtUtc)} Away"
+                    ? AppText.Get(
+                        " After {0} Away",
+                        Formatter.FormatDuration(DateTime.UtcNow - evictedAtUtc)
+                    )
                     : string.Empty;
                 await _journal.RecordAsync(kind, EventSeverity.Info, $"{message}{away}", WiFiScope);
                 break;
@@ -754,7 +812,11 @@ public sealed class NetworkMonitor
         await _journal.RecordAsync(
             EventKind.ChannelChange,
             EventSeverity.Warning,
-            $"Channel {reading.Channel} Shares The Weather Radar Band, Every Move Onto It Waits {WiFiChannels.WeatherChannelCheck.TotalMinutes:0} Minutes Silent",
+            AppText.Get(
+                "Channel {0} Shares The Weather Radar Band, Every Move Onto It Waits {1:0} Minutes Silent",
+                reading.Channel,
+                WiFiChannels.WeatherChannelCheck.TotalMinutes
+            ),
             WiFiScope
         );
     }
@@ -781,13 +843,17 @@ public sealed class NetworkMonitor
                         ConnectFailedKey,
                         EventKind.ConnectFailed,
                         EventSeverity.Warning,
-                        $"Could Not Connect To {notice.Ssid}",
+                        AppText.Get("Could Not Connect To {0}", notice.Ssid),
                         WiFiScope,
                         new EventDetails(Reason: notice.Reason)
                     );
                     await _journal.UpdateAsync(
                         ConnectFailedKey,
-                        $"Could Not Connect To {notice.Ssid}, {Formatter.FormatCount(_connectFailures, "Attempt")}",
+                        AppText.Get(
+                            "Could Not Connect To {0}, {1}",
+                            notice.Ssid,
+                            Formatter.FormatCount(_connectFailures, "Attempt")
+                        ),
                         changeDetails: details => details with { Reason = notice.Reason }
                     );
                     break;
@@ -795,7 +861,12 @@ public sealed class NetworkMonitor
                     when _journal.OpenedAtUtc(ConnectFailedKey) is { } failingSinceUtc:
                     await _journal.CloseAsync(
                         ConnectFailedKey,
-                        $"Could Not Connect To {notice.Ssid} For {Formatter.FormatDuration(notice.TimeUtc - failingSinceUtc)}, {Formatter.FormatCount(_connectFailures, "Attempt")}, Then Connected"
+                        AppText.Get(
+                            "Could Not Connect To {0} For {1}, {2}, Then Connected",
+                            notice.Ssid,
+                            Formatter.FormatDuration(notice.TimeUtc - failingSinceUtc),
+                            Formatter.FormatCount(_connectFailures, "Attempt")
+                        )
                     );
                     _connectFailures = 0;
                     break;
@@ -819,7 +890,7 @@ public sealed class NetworkMonitor
             await _journal.RecordAsync(
                 EventKind.Disconnect,
                 EventSeverity.Warning,
-                $"Wi-Fi Dropped Briefly On {notice.Ssid}",
+                AppText.Get("Wi-Fi Dropped Briefly On {0}", notice.Ssid),
                 WiFiScope,
                 new EventDetails(Reason: notice.Reason)
             );
@@ -934,25 +1005,24 @@ public sealed class NetworkMonitor
 
     public async Task InspectAdapterAsync()
     {
-        Adapter = await AdapterInspector.InspectAsync();
+        Adapter = await _inspectAdapter();
         if (Adapter is not { IsDriverOld: true, DriverVersion: { } version })
             return;
 
         // Each Old Driver Version Is Mentioned Once
-        var message =
-            $"Wi-Fi Driver {version} Dates From {Adapter.DriverDate:yyyy-MM-dd}, Check Windows Update Or The Maker's Site";
-        if (
-            !await EventJournal.HasMessageStartingWithAsync(
-                EventKind.DriverCheck,
-                $"Wi-Fi Driver {version} "
-            )
-        )
+        var message = AppText.Get(
+            "Wi-Fi Driver {0} Dates From {1:yyyy-MM-dd}, Check Windows Update Or The Maker's Site",
+            version,
+            Adapter.DriverDate
+        );
+        if (!await EventJournal.HasDriverVersionAsync(version))
         {
             await _journal.RecordAsync(
                 EventKind.DriverCheck,
                 EventSeverity.Warning,
                 message,
                 WiFiScope,
+                new EventDetails(DriverVersion: version),
                 isAlwaysAlerted: true
             );
         }
@@ -972,7 +1042,7 @@ public sealed class NetworkMonitor
         await _journal.RecordAsync(
             EventKind.UpdateAvailable,
             EventSeverity.Info,
-            $"Version {latest.ToString(2)} Is Available"
+            AppText.Get("Version {0} Is Available", latest.ToString(2))
         );
         UpdateFound?.Invoke();
         return latest;
@@ -1007,7 +1077,13 @@ public sealed class NetworkMonitor
             await _journal.RecordAsync(
                 EventKind.SpeedTest,
                 EventSeverity.Info,
-                $"Speed Test {result.DownloadMbps:0} Mbps Down, {result.UploadMbps:0} Mbps Up, Ping Under Load +{Math.Max(0, addedLatency):0} ms, Grade {result.Grade}"
+                AppText.Get(
+                    "Speed Test {0:0} Mbps Down, {1:0} Mbps Up, Ping Under Load +{2:0} ms, Grade {3}",
+                    result.DownloadMbps,
+                    result.UploadMbps,
+                    Math.Max(0, addedLatency),
+                    result.Grade
+                )
             );
             return result;
         }
@@ -1021,7 +1097,7 @@ public sealed class NetworkMonitor
             await _journal.TryRecordAsync(
                 EventKind.SpeedTest,
                 EventSeverity.Warning,
-                $"Speed Test Failed {exception.GetType().Name}"
+                AppText.Get("Speed Test Failed {0}", exception.GetType().Name)
             );
             return null;
         }

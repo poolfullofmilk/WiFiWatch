@@ -1,7 +1,7 @@
 @* Export *@
 <MudElement HtmlTag="div">
     @* Export Button *@
-    <Tooltip Text="Export">
+    <Tooltip Text="@AppText.Get("Export")">
         <MudIconButton Icon="@Icons.Material.Rounded.FileDownload"
                        Size="Size.Small"
                        OnClick="Open" />
@@ -16,7 +16,8 @@
         <MudDatePicker PickerVariant="PickerVariant.Static"
                        @bind-Date="_day"
                        MaxDate="DateTime.Today"
-                       Color="Color.Info"
+                       Culture="@AppText.Culture"
+                                Color="Color.Info"
                        Elevation="0">
             <PickerActions>
                 @* All Button *@
@@ -24,7 +25,7 @@
                            Size="Size.Small"
                            StartIcon="@Icons.Material.Rounded.SelectAll"
                            OnClick="ExportAllAsync">
-                    All
+                    @AppText.Get("All")
                 </MudButton>
                 <MudSpacer />
                 @* Day Button *@
@@ -33,7 +34,7 @@
                            Size="Size.Small"
                            StartIcon="@Icons.Material.Rounded.FileDownload"
                            OnClick="ExportDayAsync">
-                    Export Day
+                    @AppText.Get("Export Day")
                 </MudButton>
             </PickerActions>
         </MudDatePicker>

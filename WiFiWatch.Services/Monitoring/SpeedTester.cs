@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Text.Json;
 using WiFiWatch.Data.Enums;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Data.Models;
 using WiFiWatch.Data.ViewModels;
 
@@ -115,7 +116,7 @@ public static class SpeedTester
         ];
         return servers.Count > 0
             ? servers
-            : throw new InvalidOperationException("No Speed Test Servers");
+            : throw new InvalidOperationException(AppText.Get("No Speed Test Servers"));
     }
 
     private static async Task<(double Mbps, double? Ping)> MeasureUnderLoadAsync(

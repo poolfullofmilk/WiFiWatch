@@ -38,7 +38,7 @@
     <data name="Driver" xml:space="preserve"><value>Stuurprogramma {0}</value></data>
     <data name="Language" xml:space="preserve"><value>Taal</value></data>
     <data name="SystemLanguage" xml:space="preserve"><value>Windows-taal (automatisch)</value></data>
-    <data name="LanguageDescription" xml:space="preserve"><value>Geldt direct voor instellingen en nieuwe trage-DNS-meldingen; andere schermen blijven Engels</value></data>
+    <data name="LanguageDescription" xml:space="preserve"><value>Wijzigt de taal in de hele app</value></data>
     <data name="SlowDnsValue" xml:space="preserve"><value>Trage DNS {0:0.#} ms</value></data>
     <data name="SlowDnsSummary" xml:space="preserve"><value>Trage DNS gedurende {0}, piek {1:0.#} ms, gemiddeld {2:0.#} ms</value></data>
     <data name="MinuteOne" xml:space="preserve"><value>{0} minuut</value></data>
@@ -47,4 +47,346 @@
     <data name="SecondOne" xml:space="preserve"><value>{0} seconde</value></data>
     <data name="SecondFew" xml:space="preserve"><value>{0} seconden</value></data>
     <data name="SecondMany" xml:space="preserve"><value>{0} seconden</value></data>
+    <data name="Overview" xml:space="preserve"><value>Overzicht</value></data>
+    <data name="Incidents" xml:space="preserve"><value>Incidenten</value></data>
+    <data name="History" xml:space="preserve"><value>Geschiedenis</value></data>
+    <data name="Settings" xml:space="preserve"><value>Instellingen</value></data>
+    <data name="Open" xml:space="preserve"><value>Openen</value></data>
+    <data name="Exit" xml:space="preserve"><value>Afsluiten</value></data>
+    <data name="Close" xml:space="preserve"><value>Sluiten</value></data>
+    <data name="Close {0}" xml:space="preserve"><value>{0} sluiten</value></data>
+    <data name="Keep Watching From The Tray Or Exit Completely" xml:space="preserve"><value>Blijven volgen vanuit het systeemvak of volledig afsluiten</value></data>
+    <data name="Keep Running" xml:space="preserve"><value>Blijven draaien</value></data>
+    <data name="Last 24 Hours" xml:space="preserve"><value>Laatste 24 uur</value></data>
+    <data name="Recent Problems" xml:space="preserve"><value>Recente problemen</value></data>
+    <data name="All Incidents" xml:space="preserve"><value>Alle incidenten</value></data>
+    <data name="No Problems Recorded" xml:space="preserve"><value>Geen problemen vastgelegd</value></data>
+    <data name="Problems" xml:space="preserve"><value>Problemen</value></data>
+    <data name="Everything" xml:space="preserve"><value>Alles</value></data>
+    <data name="When" xml:space="preserve"><value>Wanneer</value></data>
+    <data name="What" xml:space="preserve"><value>Wat</value></data>
+    <data name="Where" xml:space="preserve"><value>Waar</value></data>
+    <data name="Length" xml:space="preserve"><value>Duur</value></data>
+    <data name="Details" xml:space="preserve"><value>Details</value></data>
+    <data name="Today" xml:space="preserve"><value>Vandaag</value></data>
+    <data name="Yesterday" xml:space="preserve"><value>Gisteren</value></data>
+    <data name="7 Days" xml:space="preserve"><value>7 dagen</value></data>
+    <data name="30 Days" xml:space="preserve"><value>30 dagen</value></data>
+    <data name="Cancel" xml:space="preserve"><value>Annuleren</value></data>
+    <data name="OK" xml:space="preserve"><value>OK</value></data>
+    <data name="Day By Day" xml:space="preserve"><value>Per dag</value></data>
+    <data name="Hour By Hour" xml:space="preserve"><value>Per uur</value></data>
+    <data name="Ping Per Day" xml:space="preserve"><value>Ping per dag</value></data>
+    <data name="Ping Per Hour" xml:space="preserve"><value>Ping per uur</value></data>
+    <data name="Router" xml:space="preserve"><value>Router</value></data>
+    <data name="Internet" xml:space="preserve"><value>Internet</value></data>
+    <data name="DNS" xml:space="preserve"><value>DNS</value></data>
+    <data name="Wi-Fi Channel" xml:space="preserve"><value>Wifi-kanaal</value></data>
+    <data name="Speed Tests" xml:space="preserve"><value>Snelheidstests</value></data>
+    <data name="None In This Range, Start One From Overview" xml:space="preserve"><value>Geen in deze periode, start een test vanuit Overzicht</value></data>
+    <data name="Down" xml:space="preserve"><value>Download</value></data>
+    <data name="Up" xml:space="preserve"><value>Upload</value></data>
+    <data name="Lag Under Load" xml:space="preserve"><value>Vertraging onder belasting</value></data>
+    <data name="Grade" xml:space="preserve"><value>Beoordeling</value></data>
+    <data name="Refresh" xml:space="preserve"><value>Vernieuwen</value></data>
+    <data name="Testing Speed" xml:space="preserve"><value>Snelheid testen</value></data>
+    <data name="Speed Test" xml:space="preserve"><value>Snelheidstest</value></data>
+    <data name="Signal" xml:space="preserve"><value>Signaal</value></data>
+    <data name="Weak" xml:space="preserve"><value>Zwak</value></data>
+    <data name="Good" xml:space="preserve"><value>Goed</value></data>
+    <data name="Wi-Fi Speed" xml:space="preserve"><value>Wifi-snelheid</value></data>
+    <data name="Link To The Router" xml:space="preserve"><value>Verbinding met de router</value></data>
+    <data name="Connection" xml:space="preserve"><value>Verbinding</value></data>
+    <data name="Cable Or Powerline" xml:space="preserve"><value>Kabel of powerline</value></data>
+    <data name="Not Connected" xml:space="preserve"><value>Niet verbonden</value></data>
+    <data name="No Answer" xml:space="preserve"><value>Geen antwoord</value></data>
+    <data name="Home" xml:space="preserve"><value>Thuis</value></data>
+    <data name="To 1.1.1.1" xml:space="preserve"><value>Naar 1.1.1.1</value></data>
+    <data name="Lost" xml:space="preserve"><value>Verloren</value></data>
+    <data name="Offline" xml:space="preserve"><value>Offline</value></data>
+    <data name="Ethernet" xml:space="preserve"><value>Ethernet</value></data>
+    <data name="Wi-Fi" xml:space="preserve"><value>Wifi</value></data>
+    <data name="Home Network" xml:space="preserve"><value>Thuisnetwerk</value></data>
+    <data name="Internet Provider" xml:space="preserve"><value>Internetprovider</value></data>
+    <data name="No Wi-Fi Or Cable Connection" xml:space="preserve"><value>Geen wifi- of kabelverbinding</value></data>
+    <data name="Check The Router, Cables And Powerline Adapters" xml:space="preserve"><value>Controleer router, kabels en powerline-adapters</value></data>
+    <data name="All Good" xml:space="preserve"><value>Alles goed</value></data>
+    <data name="Looks Fine Again, Clears After One More Good Minute" xml:space="preserve"><value>Lijkt weer goed, verdwijnt na nog een goede minuut</value></data>
+    <data name="Nothing Watched Yet" xml:space="preserve"><value>Nog niets gevolgd</value></data>
+    <data name="No Problems" xml:space="preserve"><value>Geen problemen</value></data>
+    <data name="Online" xml:space="preserve"><value>Online</value></data>
+    <data name="Not Watched" xml:space="preserve"><value>Niet gevolgd</value></data>
+    <data name="Warnings And Outages" xml:space="preserve"><value>Waarschuwingen en uitval</value></data>
+    <data name="Longest Outage" xml:space="preserve"><value>Langste uitval</value></data>
+    <data name="Internet Or Connection Down" xml:space="preserve"><value>Internet of verbinding uitgevallen</value></data>
+    <data name="Fastest Download" xml:space="preserve"><value>Snelste download</value></data>
+    <data name="From Speed Tests" xml:space="preserve"><value>Uit snelheidstests</value></data>
+    <data name="None" xml:space="preserve"><value>Geen</value></data>
+    <data name="No Speed Test" xml:space="preserve"><value>Geen snelheidstest</value></data>
+    <data name="No Wi-Fi Scans In This Range" xml:space="preserve"><value>Geen wifi-scans in deze periode</value></data>
+    <data name="Export" xml:space="preserve"><value>Exporteren</value></data>
+    <data name="All" xml:space="preserve"><value>Alles</value></data>
+    <data name="Export Day" xml:space="preserve"><value>Dag exporteren</value></data>
+    <data name="Sort By" xml:space="preserve"><value>Sorteren op</value></data>
+    <data name="Search" xml:space="preserve"><value>Zoeken</value></data>
+    <data name="Rows Per Page" xml:space="preserve"><value>Rijen per pagina</value></data>
+    <data name="Hop" xml:space="preserve"><value>Hop</value></data>
+    <data name="Address" xml:space="preserve"><value>Adres</value></data>
+    <data name="Name" xml:space="preserve"><value>Naam</value></data>
+    <data name="Loss" xml:space="preserve"><value>Verlies</value></data>
+    <data name="Average" xml:space="preserve"><value>Gemiddeld</value></data>
+    <data name="What To Do" xml:space="preserve"><value>Wat te doen</value></data>
+    <data name="Windows Reason" xml:space="preserve"><value>Windows-redencode</value></data>
+    <data name="At That Moment" xml:space="preserve"><value>Op dat moment</value></data>
+    <data name="Trace" xml:space="preserve"><value>Tracering</value></data>
+    <data name="Download" xml:space="preserve"><value>Download</value></data>
+    <data name="Upload" xml:space="preserve"><value>Upload</value></data>
+    <data name="Measuring Ping" xml:space="preserve"><value>Ping meten</value></data>
+    <data name="Stopped" xml:space="preserve"><value>Gestopt</value></data>
+    <data name="Ping" xml:space="preserve"><value>Ping</value></data>
+    <data name="Another Speed Test Is Already Running" xml:space="preserve"><value>Er draait al een andere snelheidstest</value></data>
+    <data name="Speed Test Failed, Check The Connection" xml:space="preserve"><value>Snelheidstest mislukt, controleer de verbinding</value></data>
+    <data name="Measured Against Fast.com Servers, 8 Seconds Each Way" xml:space="preserve"><value>Gemeten met Fast.com-servers, 8 seconden per richting</value></data>
+    <data name="Test Again" xml:space="preserve"><value>Opnieuw testen</value></data>
+    <data name="Don't Show Again" xml:space="preserve"><value>Niet meer tonen</value></data>
+    <data name="Later" xml:space="preserve"><value>Later</value></data>
+    <data name="Update Now" xml:space="preserve"><value>Nu bijwerken</value></data>
+    <data name="Hidden" xml:space="preserve"><value>Verborgen</value></data>
+    <data name="Yours" xml:space="preserve"><value>Van jou</value></data>
+    <data name="No Other Networks" xml:space="preserve"><value>Geen andere netwerken</value></data>
+    <data name="Ongoing" xml:space="preserve"><value>Bezig</value></data>
+    <data name="Start" xml:space="preserve"><value>Begin</value></data>
+    <data name="End" xml:space="preserve"><value>Einde</value></data>
+    <data name="Duration" xml:space="preserve"><value>Duur</value></data>
+    <data name="Kind" xml:space="preserve"><value>Soort</value></data>
+    <data name="Severity" xml:space="preserve"><value>Ernst</value></data>
+    <data name="Message" xml:space="preserve"><value>Melding</value></data>
+    <data name="Context" xml:space="preserve"><value>Context</value></data>
+    <data name="Events" xml:space="preserve"><value>Gebeurtenissen</value></data>
+    <data name="Minutes" xml:space="preserve"><value>Minuten</value></data>
+    <data name="Time" xml:space="preserve"><value>Tijd</value></data>
+    <data name="Link" xml:space="preserve"><value>Verbinding</value></data>
+    <data name="Network" xml:space="preserve"><value>Netwerk</value></data>
+    <data name="Band" xml:space="preserve"><value>Band</value></data>
+    <data name="Channel" xml:space="preserve"><value>Kanaal</value></data>
+    <data name="DFS" xml:space="preserve"><value>DFS</value></data>
+    <data name="Signal dBm" xml:space="preserve"><value>Signaal dBm</value></data>
+    <data name="Receive Mbps" xml:space="preserve"><value>Ontvangen Mbps</value></data>
+    <data name="Transmit Mbps" xml:space="preserve"><value>Verzenden Mbps</value></data>
+    <data name="Router Ping ms" xml:space="preserve"><value>Routerping ms</value></data>
+    <data name="Router Jitter ms" xml:space="preserve"><value>Routerjitter ms</value></data>
+    <data name="Router Loss %" xml:space="preserve"><value>Routerverlies %</value></data>
+    <data name="Internet Ping ms" xml:space="preserve"><value>Internetping ms</value></data>
+    <data name="Internet Jitter ms" xml:space="preserve"><value>Internetjitter ms</value></data>
+    <data name="Internet Loss %" xml:space="preserve"><value>Internetverlies %</value></data>
+    <data name="DNS ms" xml:space="preserve"><value>DNS ms</value></data>
+    <data name="Reference DNS ms" xml:space="preserve"><value>Referentie-DNS ms</value></data>
+    <data name="Yes" xml:space="preserve"><value>Ja</value></data>
+    <data name="No" xml:space="preserve"><value>Nee</value></data>
+    <data name="Peak" xml:space="preserve"><value>Piek</value></data>
+    <data name="Lowest" xml:space="preserve"><value>Laagste</value></data>
+    <data name="Weak Signal" xml:space="preserve"><value>Zwak signaal</value></data>
+    <data name="Ping Spike At Internet Provider" xml:space="preserve"><value>Pingpiek bij internetprovider</value></data>
+    <data name="Packet Loss At Internet Provider" xml:space="preserve"><value>Pakketverlies bij internetprovider</value></data>
+    <data name="Slow DNS" xml:space="preserve"><value>Trage DNS</value></data>
+    <data name="No Outages" xml:space="preserve"><value>Geen uitval</value></data>
+    <data name="Move Closer To The Router Or Use A Cable" xml:space="preserve"><value>Ga dichter bij de router staan of gebruik een kabel</value></data>
+    <data name="Restart The Router, Call Your Provider If It Repeats" xml:space="preserve"><value>Herstart de router, bel uw provider als het terugkomt</value></data>
+    <data name="Check Cables And Powerline Adapters, Then Restart The Router" xml:space="preserve"><value>Controleer kabels en powerline-adapters en herstart de router</value></data>
+    <data name="Move Closer, Or Test With A Cable To Rule Out Wi-Fi" xml:space="preserve"><value>Ga dichterbij of test met een kabel om wifi uit te sluiten</value></data>
+    <data name="Restart The Router, Call Your Provider If It Stays Down" xml:space="preserve"><value>Herstart de router, bel uw provider als de uitval aanhoudt</value></data>
+    <data name="Set The DNS Server To 1.1.1.1 In The Router" xml:space="preserve"><value>Stel de DNS-server in de router in op 1.1.1.1</value></data>
+    <data name="Check The Cable Or Powerline Adapter, Then The Router" xml:space="preserve"><value>Controleer de kabel of powerline-adapter en daarna de router</value></data>
+    <data name="Update The Wi-Fi Driver If This Keeps Happening" xml:space="preserve"><value>Werk het wifi-stuurprogramma bij als dit blijft gebeuren</value></data>
+    <data name="Set The Router To Channels 36 To 48 If This Repeats" xml:space="preserve"><value>Stel de router bij herhaling in op kanalen 36 tot 48</value></data>
+    <data name="Turn On Location For Desktop Apps" xml:space="preserve"><value>Schakel locatie voor desktop-apps in</value></data>
+    <data name="Update The Wi-Fi Driver" xml:space="preserve"><value>Werk het wifi-stuurprogramma bij</value></data>
+    <data name="Open Location Settings" xml:space="preserve"><value>Locatie-instellingen openen</value></data>
+    <data name="Open Wi-Fi Settings" xml:space="preserve"><value>Wifi-instellingen openen</value></data>
+    <data name="Open Ethernet Settings" xml:space="preserve"><value>Ethernet-instellingen openen</value></data>
+    <data name="Open Network Status" xml:space="preserve"><value>Netwerkstatus openen</value></data>
+    <data name="Open Windows Update" xml:space="preserve"><value>Windows Update openen</value></data>
+    <data name="Open Device Manager" xml:space="preserve"><value>Apparaatbeheer openen</value></data>
+    <data name="Open Release Page" xml:space="preserve"><value>Releasepagina openen</value></data>
+    <data name="Open Router Settings" xml:space="preserve"><value>Routerinstellingen openen</value></data>
+    <data name="Wi-Fi, Between This PC And Your Router" xml:space="preserve"><value>Wifi, tussen deze pc en uw router</value></data>
+    <data name="Home Network, Your Router, Cables Or Powerline Adapters" xml:space="preserve"><value>Thuisnetwerk, uw router, kabels of powerline-adapters</value></data>
+    <data name="Internet Provider, Past Your Router" xml:space="preserve"><value>Internetprovider, voorbij uw router</value></data>
+    <data name="DNS, Looking Up Names, Not The Line Itself" xml:space="preserve"><value>DNS, namen opzoeken, niet de verbinding zelf</value></data>
+    <data name="Not On A 5 GHz 80 MHz Channel" xml:space="preserve"><value>Niet op een 5 GHz-kanaal van 80 MHz</value></data>
+    <data name=", {0} More Open" xml:space="preserve"><value>, nog {0} open</value></data>
+    <data name="Since {0} ({1})" xml:space="preserve"><value>Sinds {0} ({1})</value></data>
+    <data name="Connected to {0}, Channel {1}{2} and {3}" xml:space="preserve"><value>Verbonden met {0}, kanaal {1}{2} en {3}</value></data>
+    <data name="Connected over {0}" xml:space="preserve"><value>Verbonden via {0}</value></data>
+    <data name="{0}, DFS free at {1}" xml:space="preserve"><value>{0}, DFS beschikbaar om {1}</value></data>
+    <data name="Over {0} ms" xml:space="preserve"><value>Meer dan {0} ms</value></data>
+    <data name="Watched {0}, {1:0.#}% Online, {2}" xml:space="preserve"><value>{0} gevolgd, {1:0.#}% online, {2}</value></data>
+    <data name="Of {0} Watched" xml:space="preserve"><value>Van {0} gevolgd</value></data>
+    <data name="Airtime Busy {0:0}%" xml:space="preserve"><value>Zendertijd bezet {0:0}%</value></data>
+    <data name="Airtime Busy {0}%" xml:space="preserve"><value>Zendertijd bezet {0}%</value></data>
+    <data name="Grade {0}" xml:space="preserve"><value>Beoordeling {0}</value></data>
+    <data name="Lag Under Load {0}" xml:space="preserve"><value>Vertraging onder belasting {0}</value></data>
+    <data name="Installed Version Is {0}, Updating Restarts {1}" xml:space="preserve"><value>Geïnstalleerde versie is {0}, bijwerken herstart {1}</value></data>
+    <data name="Version {0} Available" xml:space="preserve"><value>Versie {0} beschikbaar</value></data>
+    <data name="Update Failed {0}" xml:space="preserve"><value>Bijwerken mislukt: {0}</value></data>
+    <data name="{0}, Still Going" xml:space="preserve"><value>{0}, nog bezig</value></data>
+    <data name="{0} To {1}, {2}" xml:space="preserve"><value>{0} tot {1}, {2}</value></data>
+    <data name="{0} To {1}" xml:space="preserve"><value>{0} tot {1}</value></data>
+    <data name=", Internet {0}" xml:space="preserve"><value>, internet {0}</value></data>
+    <data name="Channel {0}{1}" xml:space="preserve"><value>Kanaal {0}{1}</value></data>
+    <data name="{0}, {1} dBm{2}" xml:space="preserve"><value>{0}, {1} dBm{2}</value></data>
+    <data name=", Yours" xml:space="preserve"><value>, van jou</value></data>
+    <data name=" Channel {0}{1}" xml:space="preserve"><value> kanaal {0}{1}</value></data>
+    <data name="{0} To {1} Weather Radar" xml:space="preserve"><value>{0} tot {1} weerradar</value></data>
+    <data name="{0} To {1} DFS" xml:space="preserve"><value>{0} tot {1} DFS</value></data>
+    <data name="Radar Moved You {0} Times, 36 To 48 Never Sees Radar" xml:space="preserve"><value>Radar verplaatste u {0} keer, 36 tot 48 kent geen radar</value></data>
+    <data name="Channel {0} Sits On The Quietest Block, Stay" xml:space="preserve"><value>Kanaal {0} zit op het rustigste blok, blijf daar</value></data>
+    <data name="{0} Has {1}, Yours Has {2}" xml:space="preserve"><value>{0} heeft {1}, uw blok heeft er {2}</value></data>
+    <data name="{0:0.#}% Online" xml:space="preserve"><value>{0:0.#}% online</value></data>
+    <data name="Longest Outage {0}" xml:space="preserve"><value>Langste uitval {0}</value></data>
+    <data name="{0:0}% On DFS" xml:space="preserve"><value>{0:0}% op DFS</value></data>
+    <data name="Worst Hour {0:00}h At {1:0.#} ms" xml:space="preserve"><value>Slechtste uur {0:00}u met {1:0.#} ms</value></data>
+    <data name="Path Clear To The Internet In {0} Hops" xml:space="preserve"><value>Pad naar internet vrij via {0} hops</value></data>
+    <data name="No Hop Answered, This PC Is Offline" xml:space="preserve"><value>Geen hop antwoordde, deze pc is offline</value></data>
+    <data name="Stops At Your Router, The Line To The Provider Is Down" xml:space="preserve"><value>Stopt bij uw router, de lijn naar de provider is uitgevallen</value></data>
+    <data name="Stops After Hop {0} {1}, Inside The Provider Network" xml:space="preserve"><value>Stopt na hop {0} {1}, binnen het netwerk van de provider</value></data>
+    <data name="Resumed After Sleep Of {0}" xml:space="preserve"><value>Hervat na slaapstand van {0}</value></data>
+    <data name="Monitor Failed {0}" xml:space="preserve"><value>Monitorfout: {0}</value></data>
+    <data name="App Failed {0}" xml:space="preserve"><value>App-fout: {0}</value></data>
+    <data name="Started At Sign In" xml:space="preserve"><value>Gestart bij aanmelden</value></data>
+    <data name="Started" xml:space="preserve"><value>Gestart</value></data>
+    <data name=", Off Since {0} ({1})" xml:space="preserve"><value>, uit sinds {0} ({1})</value></data>
+    <data name=", First Run" xml:space="preserve"><value>, eerste start</value></data>
+    <data name="{0}{1}, PC Booted {2}" xml:space="preserve"><value>{0}{1}, pc opgestart {2}</value></data>
+    <data name="Ping Spike On {0}" xml:space="preserve"><value>Pingpiek op {0}</value></data>
+    <data name="Packet Loss On {0}" xml:space="preserve"><value>Pakketverlies op {0}</value></data>
+    <data name="{0}, Reference 1.1.1.1 {1}" xml:space="preserve"><value>{0}, referentie 1.1.1.1 {1}</value></data>
+    <data name="Link {0}" xml:space="preserve"><value>Verbinding {0}</value></data>
+    <data name="Signal {0} dBm" xml:space="preserve"><value>Signaal {0} dBm</value></data>
+    <data name="Rate {0} Mbps" xml:space="preserve"><value>Snelheid {0} Mbps</value></data>
+    <data name="Switched From {0} To {1}" xml:space="preserve"><value>Overgeschakeld van {0} naar {1}</value></data>
+    <data name="Wi-Fi Lost For {0}, Back On Ethernet" xml:space="preserve"><value>Wifi weg gedurende {0}, terug via Ethernet</value></data>
+    <data name="Location Access Was Off, Not Needed On Ethernet" xml:space="preserve"><value>Locatietoegang stond uit, niet nodig bij Ethernet</value></data>
+    <data name="Ethernet Lost, PC Offline" xml:space="preserve"><value>Ethernet weg, pc offline</value></data>
+    <data name="Offline For {0}, Back On {1}" xml:space="preserve"><value>Offline gedurende {0}, terug via {1}</value></data>
+    <data name="Internet Down For {0}, Router Kept Answering" xml:space="preserve"><value>Internet uit gedurende {0}, router bleef antwoorden</value></data>
+    <data name="Internet Down, Router Still Answers" xml:space="preserve"><value>Internet uitgevallen, router antwoordt nog</value></data>
+    <data name="Location Access Off So Wi-Fi Details Are Hidden" xml:space="preserve"><value>Locatietoegang uit, daarom zijn wifi-details verborgen</value></data>
+    <data name="Location Access Was Off For {0}" xml:space="preserve"><value>Locatietoegang stond {0} uit</value></data>
+    <data name="Wi-Fi Lost On {0}" xml:space="preserve"><value>Wifi weg op {0}</value></data>
+    <data name=", Router Was Checking The New DFS Channel For Radar" xml:space="preserve"><value>, router controleerde het nieuwe DFS-kanaal op radar</value></data>
+    <data name="Wi-Fi Lost For {0}, Back On {1} Channel {2}{3}" xml:space="preserve"><value>Wifi weg gedurende {0}, terug op {1} kanaal {2}{3}</value></data>
+    <data name="Band {0} To {1} On {2}" xml:space="preserve"><value>Band van {0} naar {1} op {2}</value></data>
+    <data name="{0}, Radar Heard On {1}, Router May Return From {2}" xml:space="preserve"><value>{0}, radar gehoord op {1}, router mag terug vanaf {2}</value></data>
+    <data name=" After {0} Away" xml:space="preserve"><value> na {0} afwezigheid</value></data>
+    <data name="Channel {0} Shares The Weather Radar Band, Every Move Onto It Waits {1:0} Minutes Silent" xml:space="preserve"><value>Kanaal {0} deelt de band met weerradar, elke overstap wacht {1:0} minuten in stilte</value></data>
+    <data name="Could Not Connect To {0}" xml:space="preserve"><value>Kon geen verbinding maken met {0}</value></data>
+    <data name="Could Not Connect To {0}, {1}" xml:space="preserve"><value>Kon geen verbinding maken met {0}, {1}</value></data>
+    <data name="Could Not Connect To {0} For {1}, {2}, Then Connected" xml:space="preserve"><value>Kon {1} geen verbinding maken met {0}, {2}, daarna verbonden</value></data>
+    <data name="Wi-Fi Dropped Briefly On {0}" xml:space="preserve"><value>Wifi viel kort weg op {0}</value></data>
+    <data name="Wi-Fi Driver {0} Dates From {1:yyyy-MM-dd}, Check Windows Update Or The Maker's Site" xml:space="preserve"><value>Wifi-stuurprogramma {0} dateert van {1:yyyy-MM-dd}, controleer Windows Update of de fabrikant</value></data>
+    <data name="Version {0} Is Available" xml:space="preserve"><value>Versie {0} is beschikbaar</value></data>
+    <data name="Speed Test {0:0} Mbps Down, {1:0} Mbps Up, Ping Under Load +{2:0} ms, Grade {3}" xml:space="preserve"><value>Snelheidstest {0:0} Mbps download, {1:0} Mbps upload, ping onder belasting +{2:0} ms, beoordeling {3}</value></data>
+    <data name="Speed Test Failed {0}" xml:space="preserve"><value>Snelheidstest mislukt: {0}</value></data>
+    <data name="{0} For {1}, {2} {3}, Average {4}" xml:space="preserve"><value>{0} gedurende {1}, {2} {3}, gemiddeld {4}</value></data>
+    <data name="{0}, Cut Short By Sleep" xml:space="preserve"><value>{0}, afgebroken door slaapstand</value></data>
+    <data name="{0}, Still Going After {1}" xml:space="preserve"><value>{0}, nog bezig na {1}</value></data>
+    <data name=", Cut Short When Monitoring Stopped" xml:space="preserve"><value>, afgebroken toen monitoring stopte</value></data>
+    <data name="Channel {0} To {1} Left DFS" xml:space="preserve"><value>Kanaal {0} naar {1}, DFS verlaten</value></data>
+    <data name="Channel {0} To {1} Back On DFS" xml:space="preserve"><value>Kanaal {0} naar {1}, terug op DFS</value></data>
+    <data name="Channel {0} To {1}" xml:space="preserve"><value>Kanaal {0} naar {1}</value></data>
+    <data name="Maximum Performance" xml:space="preserve"><value>Maximale prestaties</value></data>
+    <data name="Low Power Saving" xml:space="preserve"><value>Lage energiebesparing</value></data>
+    <data name="Medium Power Saving" xml:space="preserve"><value>Gemiddelde energiebesparing</value></data>
+    <data name="Maximum Power Saving" xml:space="preserve"><value>Maximale energiebesparing</value></data>
+    <data name="No Speed Test Servers" xml:space="preserve"><value>Geen snelheidstestservers</value></data>
+    <data name="An Unhandled Error Has Occurred" xml:space="preserve"><value>Er is een onverwachte fout opgetreden</value></data>
+    <data name="Reload" xml:space="preserve"><value>Herladen</value></data>
+    <data name="Resumed" xml:space="preserve"><value>Hervat</value></data>
+    <data name="DFS Eviction" xml:space="preserve"><value>DFS-verdrijving</value></data>
+    <data name="DFS Return" xml:space="preserve"><value>DFS-terugkeer</value></data>
+    <data name="Channel Change" xml:space="preserve"><value>Kanaalwijziging</value></data>
+    <data name="Band Change" xml:space="preserve"><value>Bandwijziging</value></data>
+    <data name="Disconnect" xml:space="preserve"><value>Verbinding verbroken</value></data>
+    <data name="Reconnect" xml:space="preserve"><value>Opnieuw verbonden</value></data>
+    <data name="Connect Failed" xml:space="preserve"><value>Verbinden mislukt</value></data>
+    <data name="Link Change" xml:space="preserve"><value>Verbindingswijziging</value></data>
+    <data name="Slow Link" xml:space="preserve"><value>Trage verbinding</value></data>
+    <data name="Ping Spike" xml:space="preserve"><value>Pingpiek</value></data>
+    <data name="Jitter Spike" xml:space="preserve"><value>Jitterpiek</value></data>
+    <data name="Packet Loss" xml:space="preserve"><value>Pakketverlies</value></data>
+    <data name="Internet Down" xml:space="preserve"><value>Internet uitgevallen</value></data>
+    <data name="Internet Back" xml:space="preserve"><value>Internet hersteld</value></data>
+    <data name="Fault Trace" xml:space="preserve"><value>Fouttracering</value></data>
+    <data name="Recovered" xml:space="preserve"><value>Hersteld</value></data>
+    <data name="Location Blocked" xml:space="preserve"><value>Locatie geblokkeerd</value></data>
+    <data name="Driver Check" xml:space="preserve"><value>Stuurprogrammacontrole</value></data>
+    <data name="Daily Summary" xml:space="preserve"><value>Dagelijkse samenvatting</value></data>
+    <data name="Weekly Summary" xml:space="preserve"><value>Wekelijkse samenvatting</value></data>
+    <data name="Monitor Failed" xml:space="preserve"><value>Monitorfout</value></data>
+    <data name="Update Available" xml:space="preserve"><value>Update beschikbaar</value></data>
+    <data name="Info" xml:space="preserve"><value>Informatie</value></data>
+    <data name="Warning" xml:space="preserve"><value>Waarschuwing</value></data>
+    <data name="Critical" xml:space="preserve"><value>Kritiek</value></data>
+    <data name="CountProblemOne" xml:space="preserve"><value>{0} probleem</value></data>
+    <data name="CountProblemFew" xml:space="preserve"><value>{0} problemen</value></data>
+    <data name="CountProblemMany" xml:space="preserve"><value>{0} problemen</value></data>
+    <data name="CountAttemptOne" xml:space="preserve"><value>{0} poging</value></data>
+    <data name="CountAttemptFew" xml:space="preserve"><value>{0} pogingen</value></data>
+    <data name="CountAttemptMany" xml:space="preserve"><value>{0} pogingen</value></data>
+    <data name="CountNeighborOne" xml:space="preserve"><value>{0} buur</value></data>
+    <data name="CountNeighborFew" xml:space="preserve"><value>{0} buren</value></data>
+    <data name="CountNeighborMany" xml:space="preserve"><value>{0} buren</value></data>
+    <data name="CountSpeedTestOne" xml:space="preserve"><value>{0} snelheidstest</value></data>
+    <data name="CountSpeedTestFew" xml:space="preserve"><value>{0} snelheidstests</value></data>
+    <data name="CountSpeedTestMany" xml:space="preserve"><value>{0} snelheidstests</value></data>
+    <data name="CountDfsEvictionOne" xml:space="preserve"><value>{0} DFS-verdrijving</value></data>
+    <data name="CountDfsEvictionFew" xml:space="preserve"><value>{0} DFS-verdrijvingen</value></data>
+    <data name="CountDfsEvictionMany" xml:space="preserve"><value>{0} DFS-verdrijvingen</value></data>
+    <data name="CountRadarEvictionOne" xml:space="preserve"><value>{0} radarverdrijving</value></data>
+    <data name="CountRadarEvictionFew" xml:space="preserve"><value>{0} radarverdrijvingen</value></data>
+    <data name="CountRadarEvictionMany" xml:space="preserve"><value>{0} radarverdrijvingen</value></data>
+    <data name="DurationDay" xml:space="preserve"><value>{0}d</value></data>
+    <data name="DurationHour" xml:space="preserve"><value>{0}u</value></data>
+    <data name="DurationMinute" xml:space="preserve"><value>{0}m</value></data>
+    <data name="DurationSecond" xml:space="preserve"><value>{0}s</value></data>
+    <data name="ms" xml:space="preserve"><value>ms</value></data>
+    <data name="Mbps" xml:space="preserve"><value>Mbps</value></data>
+    <data name="dBm" xml:space="preserve"><value>dBm</value></data>
+    <data name="MudFirst" xml:space="preserve"><value>Eerste pagina</value></data>
+    <data name="MudLast" xml:space="preserve"><value>Laatste pagina</value></data>
+    <data name="MudNext" xml:space="preserve"><value>Volgende pagina</value></data>
+    <data name="MudPrevious" xml:space="preserve"><value>Vorige pagina</value></data>
+    <data name="MudPagerInfo" xml:space="preserve"><value>{first_item}-{last_item} van {all_items}</value></data>
+    <data name="MudChooseDate" xml:space="preserve"><value>Datum kiezen</value></data>
+    <data name="MudPreviousMonth" xml:space="preserve"><value>Vorige maand</value></data>
+    <data name="MudNextMonth" xml:space="preserve"><value>Volgende maand</value></data>
+    <data name="MudClear" xml:space="preserve"><value>Wissen</value></data>
+    <data name="Previous year {0}" xml:space="preserve"><value>Vorig jaar {0}</value></data>
+    <data name="Next year {0}" xml:space="preserve"><value>Volgend jaar {0}</value></data>
+    <data name="Previous month {0}" xml:space="preserve"><value>Vorige maand {0}</value></data>
+    <data name="Next month {0}" xml:space="preserve"><value>Volgende maand {0}</value></data>
+    <data name="Increment" xml:space="preserve"><value>Verhogen</value></data>
+    <data name="Decrement" xml:space="preserve"><value>Verlagen</value></data>
+    <data name="Start date" xml:space="preserve"><value>Begindatum</value></data>
+    <data name="End date" xml:space="preserve"><value>Einddatum</value></data>
+    <data name="Loading…" xml:space="preserve"><value>Laden…</value></data>
+    <data name="Required" xml:space="preserve"><value>Verplicht</value></data>
+    <data name="Not a valid number" xml:space="preserve"><value>Geen geldig getal</value></data>
+    <data name="Not a valid date time" xml:space="preserve"><value>Geen geldige datum of tijd</value></data>
+    <data name="Not a valid boolean" xml:space="preserve"><value>Geen geldige booleaanse waarde</value></data>
+    <data name="Not a valid {0}" xml:space="preserve"><value>Geen geldige {0}</value></data>
+    <data name="Conversion error: {0}" xml:space="preserve"><value>Conversiefout: {0}</value></data>
+    <data name="Select row" xml:space="preserve"><value>Rij selecteren</value></data>
+    <data name="Select all rows" xml:space="preserve"><value>Alle rijen selecteren</value></data>
+    <data name="Select group" xml:space="preserve"><value>Groep selecteren</value></data>
+    <data name="Expand group" xml:space="preserve"><value>Groep uitvouwen</value></data>
+    <data name="Collapse group" xml:space="preserve"><value>Groep invouwen</value></data>
+    <data name="Edit row" xml:space="preserve"><value>Rij bewerken</value></data>
+    <data name="Cancel edit" xml:space="preserve"><value>Bewerken annuleren</value></data>
+    <data name="Commit edit" xml:space="preserve"><value>Bewerking opslaan</value></data>
+    <data name="Start Typing To Search" xml:space="preserve"><value>Begin te typen om te zoeken</value></data>
+    <data name="{0} {1} {2} Exported {3:yyyy-MM-dd HH-mm-ss}.csv" xml:space="preserve"><value>{0} {1} {2} Geëxporteerd {3:yyyy-MM-dd HH-mm-ss}.csv</value></data>
+    <data name="No Measurements" xml:space="preserve"><value>Geen metingen</value></data>
+    <data name="ConditionValue" xml:space="preserve"><value>{0} {1}</value></data>
 </root>

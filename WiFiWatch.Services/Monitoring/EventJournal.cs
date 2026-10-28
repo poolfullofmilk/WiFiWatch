@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using WiFiWatch.Data;
 using WiFiWatch.Data.Enums;
 using WiFiWatch.Data.Helpers;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Data.Models;
 using WiFiWatch.Data.ViewModels;
 
@@ -96,6 +97,19 @@ public sealed class EventJournal
         await using var context = new WiFiDbContext();
         return await context.Events.AnyAsync(wifiEvent =>
             wifiEvent.Kind == kind && wifiEvent.Message.StartsWith(prefix)
+        );
+    }
+
+    public static async Task<bool> HasDriverVersionAsync(string version)
+    {
+        await using var context = new WiFiDbContext();
+        var rows = await context
+            .Events.Where(row => row.Kind == EventKind.DriverCheck)
+            .Select(row => new { row.Message, row.Details })
+            .ToListAsync();
+        return rows.Any(row =>
+            EventDetails.Parse(row.Details).DriverVersion == version
+            || row.Message.StartsWith($"Wi-Fi Driver {version} ", StringComparison.Ordinal)
         );
     }
 
@@ -206,7 +220,11 @@ public sealed class EventJournal
     {
         foreach (var (key, incident) in _openIncidents.ToList())
         {
-            await CloseAsync(key, $"{incident.Message}, Cut Short By Sleep", endedAtUtc);
+            await CloseAsync(
+                key,
+                AppText.Get("{0}, Cut Short By Sleep", incident.Message),
+                endedAtUtc
+            );
         }
     }
 
@@ -259,7 +277,11 @@ public sealed class EventJournal
             {
                 incident.HasAlerted = Alert(
                     incident.Kind,
-                    $"{incident.Message}, Still Going After {Formatter.FormatDuration(DateTime.UtcNow - incident.StartedAtUtc)}",
+                    AppText.Get(
+                        "{0}, Still Going After {1}",
+                        incident.Message,
+                        Formatter.FormatDuration(DateTime.UtcNow - incident.StartedAtUtc)
+                    ),
                     false
                 );
             }
@@ -280,6 +302,7 @@ public sealed class EventJournal
         var lastDataUtc =
             await context.MinuteSamples.MaxAsync(sample => (DateTime?)sample.MinuteUtc)
             ?? DateTime.UtcNow;
+        var stoppedSuffix = AppText.Get(", Cut Short When Monitoring Stopped");
         await context
             .Events.Where(wifiEvent => wifiEvent.EndedAtUtc == null)
             .ExecuteUpdateAsync(setters =>
@@ -287,7 +310,7 @@ public sealed class EventJournal
                     .SetProperty(wifiEvent => wifiEvent.EndedAtUtc, lastDataUtc)
                     .SetProperty(
                         wifiEvent => wifiEvent.Message,
-                        wifiEvent => wifiEvent.Message + ", Cut Short When Monitoring Stopped"
+                        wifiEvent => wifiEvent.Message + stoppedSuffix
                     )
             );
     }

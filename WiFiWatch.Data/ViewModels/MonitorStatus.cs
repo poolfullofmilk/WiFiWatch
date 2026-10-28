@@ -1,5 +1,6 @@
 using System.Net;
 using WiFiWatch.Data.Helpers;
+using WiFiWatch.Data.Localization;
 
 namespace WiFiWatch.Data.ViewModels;
 
@@ -15,11 +16,15 @@ public sealed record MonitorStatus(
 )
 {
     public string TrayText =>
-        $"{AppInfo.DisplayName} {Link}"
+        $"{AppInfo.DisplayName} {AppText.Get(Link)}"
         + (
             Reading is { IsConnected: true } reading
-                ? $" Channel {reading.Channel}{(reading.IsDfs ? " DFS" : string.Empty)}"
+                ? AppText.Get(
+                    " Channel {0}{1}",
+                    reading.Channel,
+                    (reading.IsDfs ? " DFS" : string.Empty)
+                )
                 : string.Empty
         )
-        + (RouterRoundTrip is { } roundTrip ? $" {roundTrip} ms" : string.Empty);
+        + (RouterRoundTrip is { } roundTrip ? $" {roundTrip} {AppText.Get("ms")}" : string.Empty);
 }

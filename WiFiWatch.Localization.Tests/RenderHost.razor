@@ -1,0 +1,17 @@
+@using Microsoft.AspNetCore.Components
+@using MudBlazor
+@if (Component != typeof(WiFiWatch.Desktop.Components.Home))
+{
+<MudThemeProvider />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+}
+<CascadingValue Value="Dialog">
+    <DynamicComponent Type="Component" Parameters="Parameters" />
+</CascadingValue>
+@code {
+    [Parameter] public required Type Component { get; set; }
+    [Parameter] public IDictionary<string, object>? Parameters { get; set; }
+    [Parameter] public IMudDialogInstance? Dialog { get; set; }
+}

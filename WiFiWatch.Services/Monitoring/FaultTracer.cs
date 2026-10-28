@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Data.ViewModels;
 
 namespace WiFiWatch.Services.Monitoring;
@@ -75,14 +76,18 @@ public static class FaultTracer
     {
         var lastAnswer = hops.LastOrDefault(hop => hop.Address is not null);
         if (isReached)
-            return $"Path Clear To The Internet In {hops.Count} Hops";
+            return AppText.Get("Path Clear To The Internet In {0} Hops", hops.Count);
 
         if (lastAnswer is null)
-            return "No Hop Answered, This PC Is Offline";
+            return AppText.Get("No Hop Answered, This PC Is Offline");
 
         return lastAnswer.Address == routerAddress?.ToString()
-            ? "Stops At Your Router, The Line To The Provider Is Down"
-            : $"Stops After Hop {lastAnswer.Number} {lastAnswer.Name ?? lastAnswer.Address}, Inside The Provider Network";
+            ? AppText.Get("Stops At Your Router, The Line To The Provider Is Down")
+            : AppText.Get(
+                "Stops After Hop {0} {1}, Inside The Provider Network",
+                lastAnswer.Number,
+                lastAnswer.Name ?? lastAnswer.Address
+            );
     }
 
     private static async Task<string?> ResolveNameAsync(IPAddress? address)

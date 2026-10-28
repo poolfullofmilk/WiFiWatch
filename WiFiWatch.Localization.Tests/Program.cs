@@ -1,12 +1,29 @@
 using System.Globalization;
+using System.Reflection;
 using System.Resources;
+using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
+using ApexCharts;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.JSInterop;
+using MudBlazor;
+using MudBlazor.Services;
 using WiFiWatch.Data;
 using WiFiWatch.Data.Enums;
+using WiFiWatch.Data.Helpers;
 using WiFiWatch.Data.Localization;
 using WiFiWatch.Data.Models;
 using WiFiWatch.Data.ViewModels;
+using WiFiWatch.Desktop;
+using WiFiWatch.Desktop.Components;
+using WiFiWatch.Desktop.Components.Pages;
+using WiFiWatch.Desktop.Components.Shared.Dialogs;
+using WiFiWatch.Desktop.Localization;
+using WiFiWatch.Services.Integration;
 using WiFiWatch.Services.Monitoring;
 using WiFiWatch.Services.Storage;
 
@@ -29,6 +46,8 @@ internal static class Program
             TestSettings(Path.Combine(directory, "settings.json"));
             await TestResourcesAsync();
             await TestIncidentsAsync();
+            await TestFullAppAsync();
+            TestSourceCoverage();
             Console.WriteLine($"PASS: {s_checks} localization regression checks");
         }
         finally
@@ -119,6 +138,12 @@ internal static class Program
             foreach (System.Collections.DictionaryEntry entry in english)
             {
                 var key = (string)entry.Key;
+                if (language != "en" && key != "AppName")
+                    Check(
+                        resources.GetResourceSet(AppText.Culture, true, false)!.GetString(key)
+                            is not null,
+                        "Translation present: " + language + ": " + key
+                    );
                 var template = resources.GetString(key, AppText.Culture)!;
                 Check(!string.IsNullOrEmpty(template), language + ": " + key);
                 var expectedIndices = Regex
@@ -133,19 +158,27 @@ internal static class Program
                     expectedIndices.SequenceEqual(actualIndices),
                     "Placeholder parity: " + language + ": " + key
                 );
-                // Every Template Must Accept The Same Typed Dynamic Values
-                object[] arguments =
-                    key == "DriverFrom" ? ["1.2", new DateTime(2026, 10, 28)]
-                    : key == "SlowDnsSummary" ? ["duration", 12.5, 8.5]
-                    : key == "SlowDnsValue" ? [12.5]
-                    : key.StartsWith("Minute") || key.StartsWith("Second") ? [21]
-                    : ["1.2"];
-                Check(
-                    !string.IsNullOrEmpty(
-                        string.Format(CultureInfo.CurrentCulture, template, arguments)
-                    ),
-                    "Format " + key
-                );
+                if (key == "MudPagerInfo")
+                {
+                    Check(
+                        new[] { "{first_item}", "{last_item}", "{all_items}" }.All(token =>
+                            AppText.Get(key).Contains(token)
+                        ),
+                        "Pager template preserves all named placeholders"
+                    );
+                    continue;
+                }
+                var indices = Regex
+                    .Matches((string)entry.Value!, @"\{(\d+)")
+                    .Select(match => int.Parse(match.Groups[1].Value))
+                    .ToArray();
+                object[] arguments = Enumerable
+                    .Repeat<object>(
+                        new FormattingProbe(),
+                        indices.Length == 0 ? 0 : indices.Max() + 1
+                    )
+                    .ToArray();
+                Check(!string.IsNullOrEmpty(AppText.Get(key, arguments)), "Format " + key);
             }
             Check(
                 AppText.Get("AppName") == "Wi-Fi Watch",
@@ -346,5 +379,415 @@ internal static class Program
                 "Legacy plain-text details remain readable"
             );
         }
+    }
+
+    private static void TestSourceCoverage()
+    {
+        var root = new DirectoryInfo(AppContext.BaseDirectory);
+        while (root is not null && !File.Exists(Path.Combine(root.FullName, "WiFiWatch.slnx")))
+            root = root.Parent;
+        Check(root is not null, "Repository found for source coverage");
+        var resources = new ResourceManager(
+            "WiFiWatch.Data.Localization.Strings",
+            typeof(AppText).Assembly
+        );
+        foreach (
+            var project in new[] { "WiFiWatch.Data", "WiFiWatch.Services", "WiFiWatch.Desktop" }
+        )
+        foreach (
+            var file in Directory
+                .EnumerateFiles(
+                    Path.Combine(root!.FullName, project),
+                    "*",
+                    SearchOption.AllDirectories
+                )
+                .Where(file =>
+                    (file.EndsWith(".cs") || file.EndsWith(".razor"))
+                    && !file.Contains(
+                        Path.DirectorySeparatorChar + "obj" + Path.DirectorySeparatorChar
+                    )
+                    && !file.Contains(
+                        Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar
+                    )
+                )
+        )
+        {
+            var source = File.ReadAllText(file);
+            foreach (
+                Match match in Regex.Matches(
+                    source,
+                    @"AppText\.Get\(\s*""(?<key>(?:[^""\\]|\\.)*)"""
+                )
+            )
+            {
+                var key = Regex.Unescape(match.Groups["key"].Value);
+                Check(
+                    resources.GetString(key, CultureInfo.GetCultureInfo("en")) is not null,
+                    "Resource key exists: " + key + " in " + file
+                );
+            }
+            if (!file.EndsWith(".razor"))
+                continue;
+            source = Regex.Replace(source, @"@\*.*?\*@", "", RegexOptions.Singleline);
+            var literalAttributes = Regex.Matches(
+                source,
+                "(?:Title|Label|Description|Text|DataLabel|PlaceHolder|SortLabel|RowsPerPageString|Name)=\"[A-Za-z][A-Za-z0-9 -]*\""
+            );
+            Check(literalAttributes.Count == 0, "No hardcoded human labels: " + file);
+            var literalText = Regex.Matches(source, @">\s*[A-Za-z][A-Za-z .,!?'-]{2,}\s*<");
+            Check(literalText.Count == 0, "No hardcoded visible text: " + file);
+        }
+    }
+
+    private sealed class FormattingProbe : IFormattable
+    {
+        public string ToString(string? format, IFormatProvider? provider) => "42";
+    }
+
+    private static async Task TestFullAppAsync()
+    {
+        await using (var context = new WiFiDbContext())
+        {
+            context.MinuteSamples.Add(
+                new MinuteSample
+                {
+                    MinuteUtc = DateTime.UtcNow.AddMinutes(-1),
+                    Link = NetworkMonitor.WiFiLink,
+                    Channel = 100,
+                    Rssi = -55,
+                    InternetLossPercent = 0,
+                    InternetPingMilliseconds = 12,
+                }
+            );
+            await context.SaveChangesAsync();
+        }
+        var settings = new UserSettings();
+        var monitor = new NetworkMonitor(
+            settings,
+            false,
+            subscribeToNetworkChanges: false,
+            inspectAdapter: () =>
+                Task.FromResult<AdapterInfo?>(
+                    new AdapterInfo(
+                        "Test Wi-Fi",
+                        "99.0",
+                        DateTime.Today,
+                        "Maximum Performance",
+                        "Medium Power Saving",
+                        "Test roaming"
+                    )
+                )
+        );
+        var interceptor = new AppLocalizationInterceptor();
+        foreach (
+            var (language, overview) in new[]
+            {
+                ("en", "Overview"),
+                ("nl", "Overzicht"),
+                ("tr", "Genel Bakış"),
+                ("de", "Übersicht"),
+                ("es", "Resumen"),
+                ("ru", "Обзор"),
+            }
+        )
+        {
+            AppText.Select(language);
+            Check(AppText.Get("Overview") == overview, "Navigation " + language);
+            Check(
+                EventKind.PacketLoss.ToLabel() == AppText.Get("Packet Loss"),
+                "Event kind " + language
+            );
+            foreach (var kind in Enum.GetValues<EventKind>())
+                Check(
+                    !string.IsNullOrEmpty(kind.ToLabel()),
+                    "Event label: " + kind + " in " + language
+                );
+            var changed = WiFiReader.DescribeChannelChange(100, 36);
+            Check(
+                changed.Item1 == EventKind.DfsEviction
+                    && changed.Item2 == AppText.Get("Channel {0} To {1} Left DFS", 100, 36),
+                "Channel-change template " + language
+            );
+            Check(
+                ChannelAdvice.Advise(
+                    6,
+                    ChannelAdvice.Blocks.ToDictionary(block => block, _ => 0),
+                    0
+                ) == AppText.Get("Not On A 5 GHz 80 MHz Channel"),
+                "Channel advice " + language
+            );
+            Check(
+                QuickActions.ForEvent(EventKind.LocationBlocked, NetworkMonitor.WiFiScope, null)
+                    == QuickActions.LocationSettings,
+                "Stable fix URI " + language
+            );
+            Check(
+                interceptor.Handle("MudTablePager_NextPage").Value == AppText.Get("MudNext"),
+                "Built-in pager " + language
+            );
+            Check(
+                interceptor.Handle("MudInput_Clear").Value == AppText.Get("MudClear"),
+                "Built-in input " + language
+            );
+            var services = new ServiceCollection();
+            services.AddLogging();
+            services.AddSingleton<CapturingActivator>();
+            services.AddSingleton<IComponentActivator>(provider =>
+                provider.GetRequiredService<CapturingActivator>()
+            );
+            services.AddSingleton<NavigationManager, TestNavigation>();
+            services.AddSingleton<IJSRuntime, NoJavaScript>();
+            services.AddMudServices(options =>
+                options.PopoverOptions.CheckForPopoverProvider = false
+            );
+            services.AddLocalization();
+            services.AddLocalizationInterceptor<AppLocalizationInterceptor>();
+            services.AddApexCharts();
+            services.AddSingleton(monitor);
+            services.AddSingleton(new MainWindow());
+            await using var provider = services.BuildServiceProvider();
+            foreach (
+                var (component, expected) in new[]
+                {
+                    (typeof(Home), "Overview"),
+                    (typeof(OverviewPage), "Recent Problems"),
+                    (typeof(IncidentsPage), "Details"),
+                    (typeof(HistoryPage), "Speed Tests"),
+                    (typeof(SettingsPage), "General"),
+                    (typeof(IncidentDialog), "Close"),
+                    (typeof(SpeedTestDialog), "Test Again"),
+                    (typeof(UpdateDialog), "Don't Show Again"),
+                }
+            )
+            {
+                await using var renderer = new HtmlRenderer(
+                    provider,
+                    provider.GetRequiredService<ILoggerFactory>()
+                );
+                provider.GetRequiredService<CapturingActivator>().LastDialog = null;
+                var html = await renderer.Dispatcher.InvokeAsync(async () =>
+                {
+                    IDictionary<string, object>? parameters =
+                        component == typeof(IncidentDialog)
+                            ? new Dictionary<string, object>
+                            {
+                                ["Event"] = new WiFiEvent
+                                {
+                                    Kind = EventKind.PacketLoss,
+                                    Message = "Legacy incident text",
+                                    EndedAtUtc = DateTime.UtcNow,
+                                },
+                            }
+                        : component == typeof(UpdateDialog)
+                            ? new Dictionary<string, object> { ["Version"] = new Version(99, 0) }
+                        : null;
+                    var proxy = DispatchProxy.Create<IMudDialogInstance, DialogProxy>();
+                    var result = await renderer.RenderComponentAsync<RenderHost>(
+                        ParameterView.FromDictionary(
+                            new Dictionary<string, object?>
+                            {
+                                ["Component"] = component,
+                                ["Parameters"] = parameters,
+                                ["Dialog"] = proxy,
+                            }
+                        )
+                    );
+                    if (
+                        component != typeof(Home)
+                        && provider.GetRequiredService<CapturingActivator>().LastDialog
+                            is { } dialog
+                    )
+                    {
+                        var fragments = await renderer.RenderComponentAsync<DialogFragments>(
+                            ParameterView.FromDictionary(
+                                new Dictionary<string, object?>
+                                {
+                                    ["Title"] = dialog.TitleContent,
+                                    ["Content"] = dialog.DialogContent,
+                                    ["Actions"] = dialog.DialogActions,
+                                }
+                            )
+                        );
+                        return fragments.ToHtmlString();
+                    }
+                    if (component == typeof(IncidentsPage))
+                    {
+                        var page = provider.GetRequiredService<CapturingActivator>().IncidentPage!;
+                        typeof(IncidentsPage)
+                            .GetField(
+                                "_searchTerm",
+                                BindingFlags.Instance | BindingFlags.NonPublic
+                            )!
+                            .SetValue(page, AppText.Get("Slow DNS"));
+                        var load =
+                            (Task<TableData<WiFiEvent>>)
+                                typeof(IncidentsPage)
+                                    .GetMethod(
+                                        "LoadIncidentsAsync",
+                                        BindingFlags.Instance | BindingFlags.NonPublic
+                                    )!
+                                    .Invoke(
+                                        page,
+                                        [
+                                            new TableState
+                                            {
+                                                Page = 0,
+                                                PageSize = 50,
+                                                SortDirection = SortDirection.Descending,
+                                            },
+                                            CancellationToken.None,
+                                        ]
+                                    )!;
+                        Check(
+                            (await load).Items!.Any(row => row.Kind == EventKind.SlowDns),
+                            "Localized search finds historical incidents in " + language
+                        );
+                    }
+                    if (component == typeof(Home))
+                    {
+                        AppText.Select(language == "en" ? "ru" : "en");
+                        Check(
+                            System
+                                .Net.WebUtility.HtmlDecode(result.ToHtmlString())
+                                .Contains(AppText.Get("Overview")),
+                            "Live navigation language switch from " + language
+                        );
+                        AppText.Select(language);
+                    }
+                    return result.ToHtmlString();
+                });
+                Check(
+                    System.Net.WebUtility.HtmlDecode(html).Contains(AppText.Get(expected)),
+                    "Rendered " + component.Name + " in " + language
+                );
+            }
+        }
+        AppText.Select("ru");
+        Check(Formatter.FormatCount(21, "Problem") == "21 проблема", "Russian count ending in one");
+        Check(Formatter.FormatCount(22, "Problem") == "22 проблемы", "Russian count ending in two");
+        Check(Formatter.FormatCount(11, "Attempt") == "11 попыток", "Russian count teens");
+        Check(Formatter.FormatDuration(TimeSpan.FromMinutes(2)) == "2мин", "Compact duration");
+        Check(
+            Formatter.FormatNumber(12.5, "ms") == "12.5 мс",
+            "Localized units preserve Windows numbers"
+        );
+        var journal = new EventJournal();
+        await journal.RecordAsync(
+            EventKind.DriverCheck,
+            EventSeverity.Warning,
+            AppText.Get("Driver", "1.2"),
+            details: new EventDetails(DriverVersion: "1.2")
+        );
+        AppText.Select("de");
+        Check(
+            await EventJournal.HasDriverVersionAsync("1.2"),
+            "Driver deduplication survives language changes"
+        );
+        await journal.RecordAsync(
+            EventKind.DriverCheck,
+            EventSeverity.Warning,
+            "Wi-Fi Driver 0.9 Dates From 2020-01-01"
+        );
+        Check(await EventJournal.HasDriverVersionAsync("0.9"), "Legacy driver deduplication");
+        await using (var context = new WiFiDbContext())
+        {
+            context.MinuteSamples.Add(
+                new MinuteSample
+                {
+                    MinuteUtc = DateTime.Today.AddDays(-1).AddHours(12).ToUniversalTime(),
+                    Link = NetworkMonitor.EthernetLink,
+                    InternetLossPercent = 0,
+                }
+            );
+            await context.SaveChangesAsync();
+        }
+        AppText.Select("en");
+        await SummaryWriter.WriteMissingAsync(journal, false);
+        AppText.Select("ru");
+        await SummaryWriter.WriteMissingAsync(journal, false);
+        await using (var context = new WiFiDbContext())
+            Check(
+                await context.Events.CountAsync(row => row.Kind == EventKind.DailySummary) == 1,
+                "Daily summary deduplication survives a language change"
+            );
+        var tracker = new ConditionTracker(journal);
+        var minute = DateTime.UtcNow;
+        var signal = new ConditionTracker.Check(
+            "signal",
+            EventKind.WeakSignal,
+            "Weak Signal",
+            "dBm",
+            -80,
+            -70,
+            false,
+            false,
+            NetworkMonitor.WiFiScope,
+            "Test",
+            minute
+        );
+        AppText.Select("en");
+        await tracker.EvaluateAsync(signal);
+        await tracker.EvaluateAsync(signal with { MinuteUtc = minute.AddMinutes(1) });
+        AppText.Select("ru");
+        await tracker.EvaluateAsync(signal with { Value = -50, MinuteUtc = minute.AddMinutes(2) });
+        await tracker.EvaluateAsync(signal with { Value = -50, MinuteUtc = minute.AddMinutes(3) });
+        await using (var context = new WiFiDbContext())
+        {
+            var row = await context.Events.SingleAsync(row => row.Kind == EventKind.WeakSignal);
+            Check(
+                row.Message.StartsWith(EventKind.WeakSignal.ToLabel())
+                    && row.Message.Contains("-80 дБм")
+                    && !row.Message.Contains("Weak Signal"),
+                "Generic incident closing uses the current language and localized units"
+            );
+        }
+    }
+
+    public class DialogProxy : DispatchProxy
+    {
+        protected override object? Invoke(MethodInfo? method, object?[]? arguments)
+        {
+            return method!.ReturnType == typeof(void) ? null
+                : method.ReturnType == typeof(Task) ? Task.CompletedTask
+                : method.ReturnType.IsValueType ? Activator.CreateInstance(method.ReturnType)
+                : null;
+        }
+    }
+
+    private sealed class CapturingActivator(IServiceProvider services) : IComponentActivator
+    {
+        public MudDialog? LastDialog { get; set; }
+        public IncidentsPage? IncidentPage { get; private set; }
+
+        public IComponent CreateInstance(Type componentType)
+        {
+            var component = (IComponent)ActivatorUtilities.CreateInstance(services, componentType);
+            if (component is MudDialog dialog)
+                LastDialog = dialog;
+            if (component is IncidentsPage incidentPage)
+                IncidentPage = incidentPage;
+            return component;
+        }
+    }
+
+    private sealed class TestNavigation : NavigationManager
+    {
+        public TestNavigation() =>
+            Initialize("https://example.invalid/", "https://example.invalid/");
+
+        protected override void NavigateToCore(string uri, bool forceLoad) =>
+            throw new InvalidOperationException("Render tests must not navigate");
+    }
+
+    private sealed class NoJavaScript : IJSRuntime
+    {
+        public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args) =>
+            ValueTask.FromResult(default(TValue)!);
+
+        public ValueTask<TValue> InvokeAsync<TValue>(
+            string identifier,
+            CancellationToken cancellationToken,
+            object?[]? args
+        ) => ValueTask.FromResult(default(TValue)!);
     }
 }

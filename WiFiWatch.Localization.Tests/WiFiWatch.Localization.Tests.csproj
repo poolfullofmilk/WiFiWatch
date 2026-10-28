@@ -1,11 +1,31 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net10.0-windows</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <RootNamespace>WiFiWatch.Desktop</RootNamespace>
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="../WiFiWatch.Services/WiFiWatch.Services.csproj" />
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+        <PackageReference Include="MudBlazor" Version="9.11.0" />
+        <PackageReference Include="Blazor-ApexCharts" Version="7.0.0" />
+        <Compile
+            Include="../WiFiWatch.Desktop/Components/**/*.cs"
+            Link="Components/%(RecursiveDir)%(Filename)%(Extension)"
+        />
+        <Compile
+            Include="../WiFiWatch.Desktop/Theming/*.cs"
+            Link="Theming/%(Filename)%(Extension)"
+        />
+        <Compile
+            Include="../WiFiWatch.Desktop/Localization/*.cs"
+            Link="Localization/%(Filename)%(Extension)"
+        />
+        <Content
+            Include="../WiFiWatch.Desktop/Components/**/*.razor"
+            Link="Components/%(RecursiveDir)%(Filename)%(Extension)"
+        />
     </ItemGroup>
 </Project>

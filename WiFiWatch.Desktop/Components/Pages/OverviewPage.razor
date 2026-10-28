@@ -17,7 +17,7 @@
     }
 
     @* Day Strip *@
-    <Header Title="Last 24 Hours">
+    <Header Title="@AppText.Get("Last 24 Hours")">
         <TitleContent>
             <MudText Typo="Typo.body2"
                      Class="mx-2 mud-text-secondary">
@@ -43,14 +43,14 @@
     </Header>
 
     @* Recent Problems *@
-    <Header Title="Recent Problems">
+    <Header Title="@AppText.Get("Recent Problems")">
         <TitleContent>
             @* All Incidents Button *@
             <MudButton Variant="Variant.Text"
                        Size="Size.Small"
                        EndIcon="@Icons.Material.Rounded.ChevronRight"
                        OnClick="IncidentsRequested">
-                All Incidents
+                @AppText.Get("All Incidents")
             </MudButton>
         </TitleContent>
         <ChildContent>
@@ -63,7 +63,7 @@
                               Spacing="3">
                         <MudIcon Icon="@Icons.Material.Rounded.Check"
                                  Color="Color.Success" />
-                        <MudText Typo="Typo.body1">No Problems Recorded</MudText>
+                        <MudText Typo="Typo.body1">@AppText.Get("No Problems Recorded")</MudText>
                     </MudStack>
                 </MudPaper>
             }
@@ -94,7 +94,7 @@
                                 <MudChip T="string"
                                          Size="Size.Small"
                                          Variant="Variant.Text">
-                                    @scope
+                                    @AppText.Get(scope)
                                 </MudChip>
                             }
                             @if (Formatter.FormatIncidentLength(incident.OccurredAtUtc, incident.EndedAtUtc) is { } duration)

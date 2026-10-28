@@ -149,10 +149,23 @@ public sealed class ConditionTracker(EventJournal journal)
         }
     }
 
+    private static string Title(Check check) =>
+        check.Kind switch
+        {
+            EventKind.WeakSignal => EventKind.WeakSignal.ToLabel(),
+            EventKind.PingSpike => check.Scope == NetworkMonitor.ProviderScope
+                ? AppText.Get("Ping Spike At Internet Provider")
+                : AppText.Get("Ping Spike On {0}", AppText.Get(check.Scope)),
+            EventKind.PacketLoss => check.Scope == NetworkMonitor.ProviderScope
+                ? AppText.Get("Packet Loss At Internet Provider")
+                : AppText.Get("Packet Loss On {0}", AppText.Get(check.Scope)),
+            _ => AppText.Get(check.Title),
+        };
+
     private static string CurrentMessage(Check check, double value) =>
         check.Kind == EventKind.SlowDns
             ? AppText.Get("SlowDnsValue", value)
-            : $"{check.Title} {Format(value, check.Unit)}";
+            : AppText.Get("ConditionValue", Title(check), Format(value, check.Unit));
 
     private static string Summarize(Check check, Condition condition, TimeSpan duration)
     {
@@ -162,9 +175,16 @@ public sealed class ConditionTracker(EventJournal journal)
         {
             return AppText.SlowDnsSummary(duration, worst, values.Average());
         }
-        var worstLabel = check.IsHigherWorse ? "Peak" : "Lowest";
+        var worstLabel = check.IsHigherWorse ? AppText.Get("Peak") : AppText.Get("Lowest");
 
-        return $"{check.Title} For {Formatter.FormatDuration(duration)}, {worstLabel} {Format(worst, check.Unit)}, Average {Format(values.Average(), check.Unit)}";
+        return AppText.Get(
+            "{0} For {1}, {2} {3}, Average {4}",
+            Title(check),
+            Formatter.FormatDuration(duration),
+            worstLabel,
+            Format(worst, check.Unit),
+            Format(values.Average(), check.Unit)
+        );
     }
 
     private static double? BaselineLimit(Queue<double> baseline)
@@ -186,7 +206,7 @@ public sealed class ConditionTracker(EventJournal journal)
     }
 
     private static string Format(double value, string unit) =>
-        unit == "%" ? $"{value:0.#}%" : $"{value:0.#} {unit}";
+        unit == "%" ? $"{value:0.#}%" : $"{value:0.#} {AppText.Get(unit)}";
 
     private static bool SelfTestPasses()
     {

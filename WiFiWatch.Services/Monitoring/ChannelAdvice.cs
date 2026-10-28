@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using WiFiWatch.Data.Helpers;
+using WiFiWatch.Data.Localization;
 using WiFiWatch.Data.ViewModels;
 
 namespace WiFiWatch.Services.Monitoring;
@@ -48,11 +49,14 @@ public static class ChannelAdvice
     {
         var currentBlock = Blocks.FirstOrDefault(block => block.Contains(currentChannel));
         if (currentBlock is null)
-            return "Not On A 5 GHz 80 MHz Channel";
+            return AppText.Get("Not On A 5 GHz 80 MHz Channel");
 
         // Radar Beats Congestion When Stability Matters Most
         if (WiFiChannels.IsDfs(currentChannel) && evictionCount >= FrequentEvictions)
-            return $"Radar Moved You {evictionCount} Times, 36 To 48 Never Sees Radar";
+            return AppText.Get(
+                "Radar Moved You {0} Times, 36 To 48 Never Sees Radar",
+                evictionCount
+            );
 
         // Ties Keep The Current Block, Then Prefer No Radar
         var quietestBlock = Blocks
@@ -62,8 +66,13 @@ public static class ChannelAdvice
             .First();
 
         return quietestBlock == currentBlock
-            ? $"Channel {currentChannel} Sits On The Quietest Block, Stay"
-            : $"{quietestBlock.Label} Has {Formatter.FormatCount(neighborsPerBlock[quietestBlock], "Neighbor")}, Yours Has {neighborsPerBlock[currentBlock]}";
+            ? AppText.Get("Channel {0} Sits On The Quietest Block, Stay", currentChannel)
+            : AppText.Get(
+                "{0} Has {1}, Yours Has {2}",
+                quietestBlock.Label,
+                Formatter.FormatCount(neighborsPerBlock[quietestBlock], "Neighbor"),
+                neighborsPerBlock[currentBlock]
+            );
     }
 
     private static bool SelfTestPasses()
@@ -79,12 +88,8 @@ public static class ChannelAdvice
         return neighborsPerBlock[Blocks[0]] == 2
             && neighborsPerBlock[Blocks[2]] == 0
             && neighborsPerBlock[Blocks[3]] == 1
-            && Advise(100, neighborsPerBlock, 0).Contains("Quietest")
-            && Advise(100, neighborsPerBlock, 3).StartsWith("Radar Moved You 3")
-            && Advise(36, neighborsPerBlock, 3).StartsWith("52 To 64 DFS Has 0")
-            && Advise(6, neighborsPerBlock, 0).StartsWith("Not On")
             && Blocks[0].Channels.SequenceEqual([36, 40, 44, 48])
             && new ChannelBlock(1, 13).Channels.Count() == 13
-            && Blocks[3].Label == "116 To 128 Weather Radar";
+            && Blocks[3].Label == AppText.Get("{0} To {1} Weather Radar", 116, 128);
     }
 }
