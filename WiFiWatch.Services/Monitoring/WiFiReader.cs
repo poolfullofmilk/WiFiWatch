@@ -1,15 +1,28 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using WiFiWatch.Data.Enums;
-using WiFiWatch.Data.Helpers;
-using WiFiWatch.Data.Localization;
 using WiFiWatch.Data.ViewModels;
 
 namespace WiFiWatch.Services.Monitoring;
 
 public static partial class WiFiReader
 {
+    // netsh Field Names, Printed In The Windows Language, Never Translated By The App
+    private const string StateLabel = "State";
+    private const string ConnectedValue = "connected";
+    private const string SsidLabel = "SSID";
+    private const string BandLabel = "Band";
+    private const string ChannelLabel = "Channel";
+    private const string SignalLabel = "Signal";
+    private const string RssiLabel = "Rssi";
+    private const string ReceiveRateLabel = "Receive rate (Mbps)";
+    private const string TransmitRateLabel = "Transmit rate (Mbps)";
+    private const string ChannelUtilizationLabel = "Channel Utilization";
+    private const string BssidLabel = "BSSID";
+    private const string SsidPrefix = "SSID ";
+    private const string BssidPrefix = "BSSID ";
+    private const string LocationPermissionText = "location permission";
+
     static WiFiReader() => Debug.Assert(SelfTestPasses());
 
     public static async Task<WiFiReading> ReadAsync() =>
@@ -22,7 +35,7 @@ public static partial class WiFiReader
     {
         // Ponytail: English Labels Only, Native WiFi API Otherwise
         // Windows 11 Hides Wi-Fi Details Without Location Access
-        if (output.Contains("location permission", StringComparison.OrdinalIgnoreCase))
+        if (output.Contains(LocationPermissionText, StringComparison.OrdinalIgnoreCase))
             return new(true, false, null, null, null, null, null, null);
 
         // First Interface Wins When Several Print
@@ -36,18 +49,17 @@ public static partial class WiFiReader
             );
 
         // Older Builds Print No Rssi, Estimate It From Signal
-        var rssi =
-            ReadNumber(values, "Rssi") ?? (ReadNumber(values, AppText.Get("Signal")) / 2 - 100);
+        var rssi = ReadNumber(values, RssiLabel) ?? (ReadNumber(values, SignalLabel) / 2 - 100);
 
         return new(
             false,
-            values.GetValueOrDefault("State") == "connected",
-            values.GetValueOrDefault("SSID"),
-            values.GetValueOrDefault(AppText.Get("Band")),
-            ReadNumber(values, AppText.Get("Channel")),
+            values.GetValueOrDefault(StateLabel) == ConnectedValue,
+            values.GetValueOrDefault(SsidLabel),
+            values.GetValueOrDefault(BandLabel),
+            ReadNumber(values, ChannelLabel),
             rssi,
-            ReadNumber(values, "Receive rate (Mbps)"),
-            ReadNumber(values, "Transmit rate (Mbps)")
+            ReadNumber(values, ReceiveRateLabel),
+            ReadNumber(values, TransmitRateLabel)
         );
     }
 
@@ -59,18 +71,15 @@ public static partial class WiFiReader
 
         void AddPendingBssid()
         {
-            if (
-                bssidValues is not null
-                && ReadNumber(bssidValues, AppText.Get("Channel")) is { } channel
-            )
+            if (bssidValues is not null && ReadNumber(bssidValues, ChannelLabel) is { } channel)
             {
                 neighbors.Add(
                     new(
                         ssid,
-                        bssidValues["BSSID"],
+                        bssidValues[BssidLabel],
                         channel,
-                        ReadNumber(bssidValues, AppText.Get("Signal")) ?? 0,
-                        bssidValues.TryGetValue("Channel Utilization", out var utilization)
+                        ReadNumber(bssidValues, SignalLabel) ?? 0,
+                        bssidValues.TryGetValue(ChannelUtilizationLabel, out var utilization)
                         && UtilizationPercent().Match(utilization) is { Success: true } match
                             ? int.Parse(match.Groups["percent"].Value)
                             : null
@@ -86,15 +95,15 @@ public static partial class WiFiReader
         {
             var key = match.Groups["key"].Value;
             var value = match.Groups["value"].Value.Trim();
-            if (key.StartsWith("SSID ", StringComparison.Ordinal))
+            if (key.StartsWith(SsidPrefix, StringComparison.Ordinal))
             {
                 AddPendingBssid();
                 ssid = value;
             }
-            else if (key.StartsWith("BSSID ", StringComparison.Ordinal))
+            else if (key.StartsWith(BssidPrefix, StringComparison.Ordinal))
             {
                 AddPendingBssid();
-                bssidValues = new(StringComparer.OrdinalIgnoreCase) { ["BSSID"] = value };
+                bssidValues = new(StringComparer.OrdinalIgnoreCase) { [BssidLabel] = value };
             }
             else
             {
@@ -116,22 +125,9 @@ public static partial class WiFiReader
             : null;
     }
 
-    public static (EventKind Kind, string Message) DescribeChannelChange(int? from, int? to) =>
-        (WiFiChannels.IsDfs(from), WiFiChannels.IsDfs(to)) switch
-        {
-            (true, false) => (
-                EventKind.DfsEviction,
-                AppText.Get("Channel {0} To {1} Left DFS", from, to)
-            ),
-            (false, true) => (
-                EventKind.DfsReturn,
-                AppText.Get("Channel {0} To {1} Back On DFS", from, to)
-            ),
-            _ => (EventKind.ChannelChange, AppText.Get("Channel {0} To {1}", from, to)),
-        };
-
     private static bool SelfTestPasses()
     {
+        // netsh Labels Are Protocol Text, So This Passes In Every App Language
         const string connectedOutput = """
             There is 1 interface on the system:
 
@@ -198,11 +194,7 @@ public static partial class WiFiReader
                     ChannelUtilizationPercent: 13,
                 }
             && neighbors[1] is { Ssid: "Neighbor", Channel: 36, ChannelUtilizationPercent: null }
-            && neighbors[2] is { Bssid: "0a:0b:0c:0d:0e:10", SignalPercent: 20 }
-            && DescribeChannelChange(100, 36).Kind == EventKind.DfsEviction
-            && DescribeChannelChange(44, 100).Kind == EventKind.DfsReturn
-            && DescribeChannelChange(36, 44).Kind == EventKind.ChannelChange
-            && DescribeChannelChange(100, 52).Kind == EventKind.ChannelChange;
+            && neighbors[2] is { Bssid: "0a:0b:0c:0d:0e:10", SignalPercent: 20 };
     }
 
     [GeneratedRegex(@"^\s*(?<key>[^:\r\n]+?)\s+:\s(?<value>.*)$", RegexOptions.Multiline)]

@@ -45,9 +45,41 @@ updates and closing summaries use the current language.
   Driver-alert deduplication uses optional structured `DriverVersion` details,
   with compatibility for old English messages. Daily-summary deduplication uses
   its stable numeric date prefix rather than the translated weekday.
+- netsh field names, powercfg and PowerShell output, registry values and
+  Windows event fields are protocol text, not UI text. They stay untranslated
+  constants (`WiFiReader` holds the netsh ones) and follow the Windows language.
+  `TestNetshParsingIgnoresLanguage` parses netsh samples in all six app
+  languages, and a source check keeps `AppText` out of `WiFiReader.cs`.
 - No database schema changes or history migrations are introduced.
 - Publication checks require all five Data satellite assemblies in the single
   EXE bundle. The Windows release workflow runs the regressions before publish.
+
+## Fixed In 2
+
+v1.10 looked up the netsh labels `Signal`, `Band` and `Channel` through
+`AppText`, so with any app language but English the parser searched netsh's
+English output for `Kanaal`, `Канал` and so on. Channel was always null (no DFS
+state, channel changes, evictions or returns), band was null except in German,
+the neighbor scan returned nothing (no neighbors, own airtime or channel advice)
+and minute rows stored no channel or band. The Debug self-test also failed when
+a non-English language was saved. Those minutes cannot be recovered. The labels
+are constants again and the channel change message moved to `WiFiChannels`.
+Against v1.10 the new test fails for nl, tr, de, es and ru; with the fix it
+passes in all six.
+
+## Known Limits
+
+A non-English Windows still prints netsh, powercfg and adapter property labels
+in its own language, so channel, band, neighbors, power saving and roaming stay
+empty there, as before v1.10. Read Wi-Fi Natively would avoid netsh for the
+current connection, but `WlanQueryInterface` is denied inside the app process
+and the neighbor scan always uses netsh, so the Settings line saying it works in
+any language overpromises today. Options for a later release: native
+`WlanGetNetworkBssList` plus solving the in-process location consent (cleanest,
+largest), per-language label tables collected from real output (fragile), or
+position-based parsing (not recommended, field order changes between builds).
+Windows disconnect reasons and historical messages stay in the language they
+were recorded in.
 
 ## Reproduce
 

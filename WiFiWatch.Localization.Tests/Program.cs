@@ -45,6 +45,7 @@ internal static class Program
             Check(WiFiDbContext.DataDirectory == directory, "All stores are redirected to temp");
             TestSettings(Path.Combine(directory, "settings.json"));
             await TestResourcesAsync();
+            TestNetshParsingIgnoresLanguage();
             await TestIncidentsAsync();
             await TestFullAppAsync();
             TestSourceCoverage();
@@ -270,6 +271,80 @@ internal static class Program
         Check(AppText.Get("UnknownKey") == "UnknownKey", "Unknown key stays readable");
     }
 
+    private static void TestNetshParsingIgnoresLanguage()
+    {
+        // netsh Prints Its Labels In The Windows Language, Whatever The App Shows
+        const string connected = """
+                Name                   : Wi-Fi
+                State                  : connected
+                SSID                   : Home
+                Band                   : 5 GHz
+                Channel                : 100
+                Receive rate (Mbps)    : 1201
+                Transmit rate (Mbps)   : 1081
+                Signal                 : 87%
+                Rssi                   : -54
+            """;
+        const string signalOnly = """
+                State                  : connected
+                Channel                : 36
+                Signal                 : 80%
+            """;
+        const string networks = """
+            SSID 1 : Home
+                Network type            : Infrastructure
+                BSSID 1                 : 02:1a:2b:3c:4d:5f
+                     Signal             : 87%
+                     Band               : 5 GHz
+                     Channel            : 100
+                     Bss Load:
+                         Connected Stations:        2
+                         Channel Utilization:       34 (13 %)
+
+            SSID 2 : Neighbor
+                BSSID 1                 : 0a:0b:0c:0d:0e:0f
+                     Signal             : 41%
+                     Channel            : 36
+                BSSID 2                 : 0a:0b:0c:0d:0e:10
+                     Signal             : 20%
+                     Channel            : 6
+            """;
+        try
+        {
+            foreach (var language in AppText.Languages.Keys)
+            {
+                AppText.Select(language);
+                Check(
+                    WiFiReader.Parse(connected)
+                        is {
+                            IsConnected: true,
+                            Band: "5 GHz",
+                            Channel: 100,
+                            Rssi: -54,
+                            IsDfs: true,
+                        },
+                    "netsh interface parse ignores app language " + language
+                );
+                Check(
+                    WiFiReader.Parse(signalOnly) is { Channel: 36, Rssi: -60 },
+                    "netsh Rssi estimate from Signal ignores app language " + language
+                );
+                var neighbors = WiFiReader.ParseNeighbors(networks);
+                Check(
+                    neighbors.Count == 3
+                        && neighbors[0]
+                            is { Channel: 100, SignalPercent: 87, ChannelUtilizationPercent: 13 }
+                        && neighbors[2] is { Channel: 6, SignalPercent: 20 },
+                    "netsh neighbor parse ignores app language " + language
+                );
+            }
+        }
+        finally
+        {
+            AppText.Select("en");
+        }
+    }
+
     private static async Task TestIncidentsAsync()
     {
         // Real Migrations, Tracker And Journal, All Inside The Temporary Data Directory
@@ -387,6 +462,18 @@ internal static class Program
         while (root is not null && !File.Exists(Path.Combine(root.FullName, "WiFiWatch.slnx")))
             root = root.Parent;
         Check(root is not null, "Repository found for source coverage");
+        Check(
+            !File.ReadAllText(
+                    Path.Combine(
+                        root!.FullName,
+                        "WiFiWatch.Services",
+                        "Monitoring",
+                        "WiFiReader.cs"
+                    )
+                )
+                .Contains("AppText"),
+            "netsh parsing uses fixed labels, not AppText"
+        );
         var resources = new ResourceManager(
             "WiFiWatch.Data.Localization.Strings",
             typeof(AppText).Assembly
@@ -502,11 +589,17 @@ internal static class Program
                     !string.IsNullOrEmpty(kind.ToLabel()),
                     "Event label: " + kind + " in " + language
                 );
-            var changed = WiFiReader.DescribeChannelChange(100, 36);
+            var changed = WiFiChannels.DescribeChange(100, 36);
             Check(
-                changed.Item1 == EventKind.DfsEviction
-                    && changed.Item2 == AppText.Get("Channel {0} To {1} Left DFS", 100, 36),
+                changed.Kind == EventKind.DfsEviction
+                    && changed.Message == AppText.Get("Channel {0} To {1} Left DFS", 100, 36),
                 "Channel-change template " + language
+            );
+            Check(
+                WiFiChannels.DescribeChange(44, 100).Kind == EventKind.DfsReturn
+                    && WiFiChannels.DescribeChange(36, 44).Kind == EventKind.ChannelChange
+                    && WiFiChannels.DescribeChange(100, 52).Kind == EventKind.ChannelChange,
+                "Channel-change kinds " + language
             );
             Check(
                 ChannelAdvice.Advise(
