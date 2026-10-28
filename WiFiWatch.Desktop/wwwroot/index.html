@@ -23,6 +23,14 @@
         </a>
     </div>
     <script>
+        // Cards Marked For It Answer Enter And Space Like Buttons
+        document.addEventListener('keydown', (event) => {
+            if ((event.key === 'Enter' || event.key === ' ') && event.target instanceof HTMLElement && event.target.hasAttribute('data-keyclick')) {
+                event.preventDefault();
+                event.target.click();
+            }
+        });
+
         window.wifiwatch = {
             setLanguage: (language, errorMessage, reloadLabel) => {
                 document.documentElement.lang = language;

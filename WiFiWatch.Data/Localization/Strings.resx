@@ -392,4 +392,5 @@
     <data name="What Changed" xml:space="preserve"><value>What Changed</value></data>
     <data name="Nothing Found" xml:space="preserve"><value>Nothing found</value></data>
     <data name="ChannelLegend" xml:space="preserve"><value>Blue: your channel&#10;Amber: a neighbor at 30% signal or more on your 80 MHz block, sharing your airtime&#10;Grey: other networks in range&#10;Airtime busy: how often your access point reports the channel in use</value></data>
+    <data name="StartFailed" xml:space="preserve"><value>{0} could not start: {1}</value></data>
 </root>

@@ -3,6 +3,7 @@ using Microsoft.JSInterop;
 using MudBlazor;
 using WiFiWatch.Data.Enums;
 using WiFiWatch.Data.Localization;
+using WiFiWatch.Desktop.Components.Shared.Common;
 using WiFiWatch.Desktop.Components.Shared.Dialogs;
 using WiFiWatch.Services.Monitoring;
 
@@ -47,6 +48,7 @@ public partial class Home : IDisposable
 
     // Page State
     private MudMessageBox? _closeMessageBox;
+    private PageErrorBoundary? _errorBoundary;
     private Page _page = Page.Overview;
     private Color? _problemColor;
     private bool _hasOfferedUpdate;
@@ -87,7 +89,11 @@ public partial class Home : IDisposable
 
     private Task OnCloseRequested() => InvokeAsync(AskBeforeClosingAsync);
 
-    private void ShowPage(Page page) => _page = page;
+    private void ShowPage(Page page)
+    {
+        _page = page;
+        _errorBoundary?.Recover();
+    }
 
     // Red Or Amber Is An Open Problem, Blue A Waiting Update
     private Color? DotColor(Page page) =>

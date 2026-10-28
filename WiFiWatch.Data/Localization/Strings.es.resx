@@ -391,4 +391,5 @@
     <data name="What Changed" xml:space="preserve"><value>Qué Ha Cambiado</value></data>
     <data name="Nothing Found" xml:space="preserve"><value>No se encontró nada</value></data>
     <data name="ChannelLegend" xml:space="preserve"><value>Azul: su canal&#10;Naranja: un vecino con 30% de señal o más en su bloque de 80 MHz, que comparte su tiempo de emisión&#10;Gris: otras redes al alcance&#10;Tiempo de emisión ocupado: con qué frecuencia su punto de acceso indica el canal en uso</value></data>
+    <data name="StartFailed" xml:space="preserve"><value>{0} no pudo iniciarse: {1}</value></data>
 </root>

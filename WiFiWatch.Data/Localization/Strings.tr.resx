@@ -391,4 +391,5 @@
     <data name="What Changed" xml:space="preserve"><value>Neler Değişti</value></data>
     <data name="Nothing Found" xml:space="preserve"><value>Hiçbir şey bulunamadı</value></data>
     <data name="ChannelLegend" xml:space="preserve"><value>Mavi: kanalınız&#10;Turuncu: 80 MHz bloğunuzda %30 veya daha güçlü sinyalli bir komşu, yayın süresini sizinle paylaşır&#10;Gri: menzildeki diğer ağlar&#10;Yayın süresi meşgul: erişim noktanızın kanalı ne sıklıkla dolu bildirdiği</value></data>
+    <data name="StartFailed" xml:space="preserve"><value>{0} başlatılamadı: {1}</value></data>
 </root>

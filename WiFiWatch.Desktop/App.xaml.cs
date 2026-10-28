@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MudBlazor;
 using MudBlazor.Services;
 using WiFiWatch.Data;
+using WiFiWatch.Data.Helpers;
 using WiFiWatch.Data.Localization;
 using WiFiWatch.Desktop.Localization;
 using WiFiWatch.Services.Integration;
@@ -40,6 +41,25 @@ public partial class App : Application
             return;
         }
 
+        try
+        {
+            Start(eventArgs);
+        }
+        catch (Exception exception)
+        {
+            // A Failed Start At Sign In Would Otherwise Vanish Without A Word
+            MessageBox.Show(
+                AppText.Get("StartFailed", AppInfo.DisplayName, exception.Message),
+                AppInfo.DisplayName,
+                MessageBoxButton.OK,
+                MessageBoxImage.Error
+            );
+            Shutdown(1);
+        }
+    }
+
+    private void Start(StartupEventArgs eventArgs)
+    {
         Directory.CreateDirectory(WiFiDbContext.DataDirectory);
         Environment.SetEnvironmentVariable(
             "WEBVIEW2_USER_DATA_FOLDER",
@@ -92,7 +112,7 @@ public partial class App : Application
 
         window = new MainWindow(services.BuildServiceProvider(), monitor);
         ThreadPool.RegisterWaitForSingleObject(
-            _showSignal,
+            _showSignal!,
             (_, _) => Dispatcher.InvokeAsync(window.ShowFromTray),
             null,
             Timeout.Infinite,

@@ -36,7 +36,8 @@
             }
             @* Refresh *@
             <Tooltip Text="@AppText.Get("Refresh")">
-                <MudIconButton Icon="@Icons.Material.Rounded.Refresh"
+                <MudIconButton aria-label="@AppText.Get("Refresh")"
+                               Icon="@Icons.Material.Rounded.Refresh"
                                Size="Size.Small"
                                OnClick="ReloadAsync" />
             </Tooltip>

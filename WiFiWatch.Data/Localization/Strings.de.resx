@@ -391,4 +391,5 @@
     <data name="What Changed" xml:space="preserve"><value>Was Sich Geändert Hat</value></data>
     <data name="Nothing Found" xml:space="preserve"><value>Nichts gefunden</value></data>
     <data name="ChannelLegend" xml:space="preserve"><value>Blau: Ihr Kanal&#10;Orange: ein Nachbar mit 30% Signal oder mehr in Ihrem 80-MHz-Block, der die Sendezeit mit Ihnen teilt&#10;Grau: andere Netze in Reichweite&#10;Sendezeit belegt: wie oft Ihr Access Point den Kanal als belegt meldet</value></data>
+    <data name="StartFailed" xml:space="preserve"><value>{0} konnte nicht starten: {1}</value></data>
 </root>
