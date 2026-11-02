@@ -25,51 +25,65 @@
             </MudText>
             @if (DetailLines.Count > 0)
             {
-                @* Detail Table *@
-                <MudSimpleTable Dense
-                                Outlined
-                                Elevation="0"
-                                Class="rounded-inner">
-                    <tbody>
+                @* Details, Label Over Value On An Inset Surface *@
+                <MudPaper Elevation="0"
+                          Class="inset rounded-panel pa-4">
+                    <MudGrid Spacing="3">
                         @foreach (var (label, value) in DetailLines)
                         {
-                            <tr>
-                                <td class="mud-text-secondary">@label</td>
-                                <td class="selectable-text">@value</td>
-                            </tr>
+                            <MudItem xs="12"
+                                     sm="6">
+                                <MudText Typo="Typo.caption"
+                                         Class="mud-text-secondary">
+                                    @label
+                                </MudText>
+                                <MudText Typo="Typo.body2"
+                                         Class="selectable-text">
+                                    @value
+                                </MudText>
+                            </MudItem>
                         }
-                    </tbody>
-                </MudSimpleTable>
+                    </MudGrid>
+                </MudPaper>
             }
             @if (Details.Trace is { Count: > 0 } hops)
             {
                 @* Trace Table *@
-                <MudSimpleTable Dense
-                                Outlined
-                                Elevation="0"
-                                Class="rounded-inner">
-                    <thead>
-                        <tr>
-                            <th>@AppText.Get("Hop")</th>
-                            <th>@AppText.Get("Address")</th>
-                            <th>@AppText.Get("Name")</th>
-                            <th>@AppText.Get("Loss")</th>
-                            <th>@AppText.Get("Average")</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var hop in hops)
-                        {
-                            <tr>
-                                <td>@hop.Number</td>
-                                <td>@(hop.Address ?? AppText.Get("No Answer"))</td>
-                                <td>@(hop.Name ?? "-")</td>
-                                <td>@($"{hop.LossPercent:0}%")</td>
-                                <td>@Formatter.FormatNumber(hop.AverageMilliseconds, "ms")</td>
-                            </tr>
-                        }
-                    </tbody>
-                </MudSimpleTable>
+                <MudTable T="TraceHop"
+                          Items="hops"
+                          Dense
+                          Hover
+                          FixedHeader
+                          Elevation="0"
+                          Class="fit fixed-columns"
+                          Style="max-height:40vh">
+
+                    <ColGroup>
+                        <col style="width:56px" />
+                        <col style="width:140px" />
+                        <col />
+                        <col style="width:72px" />
+                        <col style="width:96px" />
+                    </ColGroup>
+                    <HeaderContent>
+                        <MudTh>@AppText.Get("Hop")</MudTh>
+                        <MudTh>@AppText.Get("Address")</MudTh>
+                        <MudTh>@AppText.Get("Name")</MudTh>
+                        <MudTh>@AppText.Get("Loss")</MudTh>
+                        <MudTh>@AppText.Get("Average")</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>@context.Number</MudTd>
+                        <MudTd Class="selectable-text mud-typography-nowrap">@(context.Address ?? AppText.Get("No Answer"))</MudTd>
+                        <MudTd Class="selectable-text mud-typography-nowrap"
+                               title="@context.Name">
+                            @(context.Name ?? "-")
+                        </MudTd>
+                        <MudTd>@($"{context.LossPercent:0}%")</MudTd>
+                        <MudTd>@Formatter.FormatNumber(context.AverageMilliseconds, "ms")</MudTd>
+                    </RowTemplate>
+
+                </MudTable>
             }
         </MudStack>
     </DialogContent>

@@ -57,7 +57,7 @@ public partial class HealthStrip
         var what =
             bucket.State == HealthState.NoData ? AppText.Get("Not Watched")
             : bucket.ProblemCount == 0 ? AppText.Get("No Problems")
-            : Formatter.FormatCount(bucket.ProblemCount, "Problem");
+            : AppText.FormatCount(bucket.ProblemCount, "CountProblem");
         var ping = bucket.InternetPing is { } internetPing
             ? AppText.Get(", Internet {0}", Formatter.FormatNumber(Math.Round(internetPing), "ms"))
             : string.Empty;

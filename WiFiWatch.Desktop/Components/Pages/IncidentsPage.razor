@@ -1,88 +1,125 @@
+@using Color = MudBlazor.Color
 @using Size = MudBlazor.Size
 
-@* Incidents, Title And Actions On One Row, The Table Ends On The Bottom Gutter *@
+@* Incidents, Actions Beside The Title, Filters Inside The Panel Above The List *@
 <Header Title="@AppText.Get("Incidents")"
         Class="page-fill">
     <TitleContent>
-        <MudStack Row
-                  AlignItems="AlignItems.Center"
-                  Spacing="2">
-            @* Search, Inset Like Every Field, Its Value Arrives Once Typing Pauses *@
-            <MudTextField T="string"
-                          Value="_searchTerm"
-                          ValueChanged="SearchAsync"
-                          Variant="Variant.Outlined"
-                          Margin="Margin.Dense"
-                          Placeholder="@AppText.Get("Search")"
-                          Adornment="Adornment.Start"
-                          AdornmentIcon="@Icons.Material.Rounded.Search"
-                          DebounceInterval="300"
-                          Clearable
-                          ClearIcon="@Icons.Material.Rounded.Clear"
-                          Class="fixed-width my-0" />
-            @* Scope Buttons *@
-            <SegmentedButtonGroup TValue="bool"
-                                  Options="ScopeOptions"
-                                  Value="_isEverything"
-                                  ValueChanged="SelectScopeAsync" />
-            @* Export Menu *@
-            <ExportMenu OnExport="ExportAsync" />
-            @* Refresh *@
-            <Tooltip Text="@AppText.Get("Refresh")">
-                <MudIconButton aria-label="@AppText.Get("Refresh")"
-                               Icon="@Icons.Material.Rounded.Refresh"
-                               Size="Size.Small"
-                               OnClick="ReloadAsync" />
-            </Tooltip>
-        </MudStack>
+        @* Export Menu *@
+        <ExportMenu OnExport="ExportAsync" />
+        @* Refresh *@
+        <MudButton Variant="Variant.Text"
+                   Size="Size.Small"
+                   StartIcon="@Icons.Material.Rounded.Refresh"
+                   OnClick="LoadIncidentsAsync">
+            @AppText.Get("Refresh")
+        </MudButton>
     </TitleContent>
     <ChildContent>
-        <DataTable TItem="WiFiEvent"
-                   @ref="_incidentTable"
-                   ServerData="LoadIncidentsAsync"
-                   OnRowClick="OpenDetailsAsync">
+        <MudPaper Elevation="4"
+                  Class="rounded-panel panel-flush fit">
+            <MudStack Row
+                      AlignItems="AlignItems.Center"
+                      Spacing="4"
+                      Class="pa-4 pb-2">
+                @* Search, Its Value Arrives Once Typing Pauses *@
+                <MudTextField T="string"
+                              Value="_searchTerm"
+                              ValueChanged="SearchAsync"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Placeholder="@AppText.Get("Search")"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Rounded.Search"
+                              DebounceInterval="300"
+                              Clearable
+                              ClearIcon="@Icons.Material.Rounded.Clear"
+                              Class="fixed-width my-0" />
+                <MudSpacer />
+                @* Scope Buttons, The Picked One Blue *@
+                <MudButtonGroup OverrideStyles="false"
+                                Size="Size.Small">
+                    @foreach (var isEverything in new[] { false, true })
+                    {
+                        <MudButton Variant="Variant.Filled"
+                                   Color="@(_isEverything == isEverything ? Color.Info : Color.Default)"
+                                   Size="Size.Small"
+                                   OnClick="() => SelectScopeAsync(isEverything)">
+                            @AppText.Get(isEverything ? "Everything" : "Problems")
+                        </MudButton>
+                    }
+                </MudButtonGroup>
+            </MudStack>
+            <MudTable T="WiFiEvent"
+                      Items="_incidents"
+                      Loading="@(_incidents is null)"
+                      LoadingProgressColor="Color.Info"
+                      Dense
+                      Hover
+                      FixedHeader
+                      Virtualize
+                      OverscanCount="10"
+                      ItemSize="RowHeight"
+                      RowStyle="@s_rowStyle"
+                      Elevation="0"
+                      Class="fit fixed-columns"
+                      RowClass="cursor-pointer"
+                      OnRowClick="OpenDetailsAsync">
 
-            <HeaderContent>
-                <MudTh>
-                    <MudTableSortLabel T="WiFiEvent"
-                                       SortLabel="@nameof(WiFiEvent.OccurredAtUtc)"
-                                       InitialDirection="SortDirection.Descending"
-                                       SortIcon="@Icons.Material.Rounded.ArrowUpward">
-                        @AppText.Get("When")
-                    </MudTableSortLabel>
-                </MudTh>
-                <MudTh>@AppText.Get("What")</MudTh>
-                <MudTh>@AppText.Get("Where")</MudTh>
-                <MudTh>@AppText.Get("Length")</MudTh>
-                <MudTh>@AppText.Get("Details")</MudTh>
-            </HeaderContent>
+                <ColGroup>
+                    <col style="width:170px" />
+                    <col style="width:280px" />
+                    <col style="width:110px" />
+                    <col />
+                </ColGroup>
+                <HeaderContent>
+                    <MudTh>@AppText.Get("When")</MudTh>
+                    <MudTh>@AppText.Get("What")</MudTh>
+                    <MudTh>@AppText.Get("Length")</MudTh>
+                    <MudTh>@AppText.Get("Details")</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd Class="selectable-text mud-typography-nowrap">
+                        @Formatter.FormatLocal(context.OccurredAtUtc, Formatter.DateTimeFormat)
+                    </MudTd>
+                    <MudTd Class="overflow-hidden">
+                        @* Kind On Its Tile, Where Under It *@
+                        <MudStack Row
+                                  AlignItems="AlignItems.Center"
+                                  Spacing="3">
+                            <MudIcon Icon="@EventKindColors.IconFor(context.Severity)"
+                                     Color="@EventKindColors.For(context.Kind, context.Severity)"
+                                     Class="thumb" />
+                            <MudStack Spacing="0"
+                                      Style="min-width:0">
+                                <MudText Typo="Typo.body2"
+                                         Class="mud-typography-nowrap text-tight">
+                                    <MudHighlighter Text="@context.Kind.ToLabel()"
+                                                    HighlightedText="@_searchTerm" />
+                                </MudText>
+                                <MudText Typo="Typo.caption"
+                                         Class="mud-text-secondary mud-typography-nowrap">
+                                    <MudHighlighter Text="@(context.Scope is { } scope ? AppText.Get(scope) : "-")"
+                                                    HighlightedText="@_searchTerm" />
+                                </MudText>
+                            </MudStack>
+                        </MudStack>
+                    </MudTd>
+                    <MudTd Class="mud-typography-nowrap">@(Formatter.FormatIncidentLength(context.OccurredAtUtc, context.EndedAtUtc) ?? "-")</MudTd>
+                    <MudTd Class="selectable-text mud-typography-nowrap"
+                           title="@context.Message">
+                        <MudHighlighter Text="@context.Message"
+                                        HighlightedText="@_searchTerm" />
+                    </MudTd>
+                </RowTemplate>
+                <NoRecordsContent>
+                    <MudText Typo="Typo.body2"
+                             Class="mud-text-secondary">
+                        @AppText.Get("Nothing Found")
+                    </MudText>
+                </NoRecordsContent>
 
-            <RowTemplate>
-                <MudTd DataLabel="@AppText.Get("When")"
-                       Class="selectable-text">
-                    @Formatter.FormatLocal(context.OccurredAtUtc, Formatter.DateTimeFormat)
-                </MudTd>
-                <MudTd DataLabel="@AppText.Get("What")">
-                    <MudChip T="string"
-                             Icon="@EventKindColors.IconFor(context.Severity)"
-                             Color="@EventKindColors.For(context.Kind, context.Severity)"
-                             Size="Size.Small"
-                             Variant="Variant.Text">
-                        @context.Kind.ToLabel()
-                    </MudChip>
-                </MudTd>
-                <MudTd DataLabel="@AppText.Get("Where")">
-                    <MudHighlighter Text="@(context.Scope is { } scope ? AppText.Get(scope) : "-")"
-                                    HighlightedText="@_searchTerm" />
-                </MudTd>
-                <MudTd DataLabel="@AppText.Get("Length")">@(Formatter.FormatIncidentLength(context.OccurredAtUtc, context.EndedAtUtc) ?? "-")</MudTd>
-                <MudTd DataLabel="@AppText.Get("Details")"
-                       Class="selectable-text">
-                    <MudHighlighter Text="@context.Message"
-                                    HighlightedText="@_searchTerm" />
-                </MudTd>
-            </RowTemplate>
-
-        </DataTable>
+            </MudTable>
+        </MudPaper>
     </ChildContent>
 </Header>

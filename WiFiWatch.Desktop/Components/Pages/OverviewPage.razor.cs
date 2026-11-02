@@ -48,7 +48,7 @@ public partial class OverviewPage : IDisposable
             var problems =
                 summary.ProblemCount == 0
                     ? AppText.Get("No Problems")
-                    : Formatter.FormatCount(summary.ProblemCount, "Problem");
+                    : AppText.FormatCount(summary.ProblemCount, "CountProblem");
             return AppText.Get(
                 "Watched {0}, {1:0.#}% Online, {2}",
                 watched,

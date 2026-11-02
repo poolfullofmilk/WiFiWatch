@@ -1,12 +1,12 @@
 @* Export *@
 <MudElement HtmlTag="div">
     @* Export Button *@
-    <Tooltip Text="@AppText.Get("Export")">
-        <MudIconButton aria-label="@AppText.Get("Export")"
-                       Icon="@Icons.Material.Rounded.FileDownload"
-                       Size="Size.Small"
-                       OnClick="Open" />
-    </Tooltip>
+    <MudButton Variant="Variant.Text"
+               Size="Size.Small"
+               StartIcon="@Icons.Material.Rounded.FileDownload"
+               OnClick="Open">
+        @AppText.Get("Export")
+    </MudButton>
 
     @* Export Popover *@
     <MudPopover Open="_isOpen"
@@ -18,7 +18,9 @@
                        @bind-Date="_day"
                        MaxDate="DateTime.Today"
                        Culture="@AppText.Culture"
-                                Color="Color.Info"
+                       Color="Color.Info"
+                       PreviousIcon="@Icons.Material.Rounded.ChevronLeft"
+                       NextIcon="@Icons.Material.Rounded.ChevronRight"
                        Elevation="0">
             <PickerActions>
                 @* All Button *@

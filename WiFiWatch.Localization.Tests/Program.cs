@@ -78,10 +78,8 @@ internal static class Program
         );
         var settings = UserSettings.Load();
         Check(
-            settings.Language is null
-                && settings.ReadWiFiNatively
-                && settings.RouterPingMilliseconds == 37,
-            "Old settings preserve values and case-insensitive keys"
+            settings.Language is null && settings.RouterPingMilliseconds == 37,
+            "Old settings keep their values and ignore removed keys"
         );
         Check(
             settings.WeakSignalRssi == -70 && settings.StartWithWindows,
@@ -160,16 +158,6 @@ internal static class Program
                     expectedIndices.SequenceEqual(actualIndices),
                     "Placeholder parity: " + language + ": " + key
                 );
-                if (key == "MudPagerInfo")
-                {
-                    Check(
-                        new[] { "{first_item}", "{last_item}", "{all_items}" }.All(token =>
-                            AppText.Get(key).Contains(token)
-                        ),
-                        "Pager template preserves all named placeholders"
-                    );
-                    continue;
-                }
                 var indices = Regex
                     .Matches((string)entry.Value!, @"\{(\d+)")
                     .Select(match => int.Parse(match.Groups[1].Value))
@@ -213,46 +201,6 @@ internal static class Program
             "Custom Windows number format"
         );
         CultureInfo.CurrentCulture = numberCulture;
-        foreach (
-            var (count, word) in new[]
-            {
-                (1, "минуту"),
-                (2, "минуты"),
-                (5, "минут"),
-                (11, "минут"),
-                (14, "минут"),
-                (21, "минуту"),
-                (22, "минуты"),
-                (25, "минут"),
-                (111, "минут"),
-                (121, "минуту"),
-            }
-        )
-            Check(
-                AppText.FormatDuration(TimeSpan.FromMinutes(count)) == $"{count} {word}",
-                "Russian minutes " + count
-            );
-        foreach (
-            var (count, word) in new[]
-            {
-                (0, "секунд"),
-                (1, "секунду"),
-                (2, "секунды"),
-                (5, "секунд"),
-                (11, "секунд"),
-                (21, "секунду"),
-                (22, "секунды"),
-            }
-        )
-            Check(
-                AppText.FormatDuration(TimeSpan.FromSeconds(count)) == $"{count} {word}",
-                "Russian seconds " + count
-            );
-        Check(
-            AppText.FormatDuration(TimeSpan.FromSeconds(125)) == "2 минуты 5 секунд",
-            "Combined duration"
-        );
-        Check(AppText.FormatDuration(TimeSpan.FromSeconds(-1)) == "0 секунд", "Negative duration");
         var ready = new TaskCompletionSource();
         var resume = new TaskCompletionSource();
         var background = Task.Run(async () =>
@@ -471,7 +419,7 @@ internal static class Program
             var closed = await context.Events.SingleAsync(row => row.Id == id);
             Check(
                 closed.Message
-                    == "Медленный DNS наблюдался 3 минуты, пик 600.5 мс, среднее 366.8 мс",
+                    == $"Медленный DNS наблюдался {Formatter.FormatDuration(TimeSpan.FromMinutes(3))}, пик 600.5 мс, среднее 366.8 мс",
                 "Localized duration, peak and average stored on close"
             );
             Check(
@@ -662,10 +610,6 @@ internal static class Program
                 "Stable fix URI " + language
             );
             Check(
-                interceptor.Handle("MudTablePager_NextPage").Value == AppText.Get("MudNext"),
-                "Built-in pager " + language
-            );
-            Check(
                 interceptor.Handle("MudInput_Clear").Value == AppText.Get("MudClear"),
                 "Built-in input " + language
             );
@@ -760,27 +704,23 @@ internal static class Program
                                 BindingFlags.Instance | BindingFlags.NonPublic
                             )!
                             .SetValue(page, AppText.Get("Slow DNS"));
-                        var load =
-                            (Task<TableData<WiFiEvent>>)
+                        await (Task)
+                            typeof(IncidentsPage)
+                                .GetMethod(
+                                    "LoadIncidentsAsync",
+                                    BindingFlags.Instance | BindingFlags.NonPublic
+                                )!
+                                .Invoke(page, [])!;
+                        var rows =
+                            (List<WiFiEvent>)
                                 typeof(IncidentsPage)
-                                    .GetMethod(
-                                        "LoadIncidentsAsync",
+                                    .GetField(
+                                        "_incidents",
                                         BindingFlags.Instance | BindingFlags.NonPublic
                                     )!
-                                    .Invoke(
-                                        page,
-                                        [
-                                            new TableState
-                                            {
-                                                Page = 0,
-                                                PageSize = 50,
-                                                SortDirection = SortDirection.Descending,
-                                            },
-                                            CancellationToken.None,
-                                        ]
-                                    )!;
+                                    .GetValue(page)!;
                         Check(
-                            (await load).Items!.Any(row => row.Kind == EventKind.SlowDns),
+                            rows.Any(row => row.Kind == EventKind.SlowDns),
                             "Localized search finds historical incidents in " + language
                         );
                     }
@@ -804,9 +744,15 @@ internal static class Program
             }
         }
         AppText.Select("ru");
-        Check(Formatter.FormatCount(21, "Problem") == "21 проблема", "Russian count ending in one");
-        Check(Formatter.FormatCount(22, "Problem") == "22 проблемы", "Russian count ending in two");
-        Check(Formatter.FormatCount(11, "Attempt") == "11 попыток", "Russian count teens");
+        Check(
+            AppText.FormatCount(21, "CountProblem") == "21 проблема",
+            "Russian count ending in one"
+        );
+        Check(
+            AppText.FormatCount(22, "CountProblem") == "22 проблемы",
+            "Russian count ending in two"
+        );
+        Check(AppText.FormatCount(11, "CountAttempt") == "11 попыток", "Russian count teens");
         Check(Formatter.FormatDuration(TimeSpan.FromMinutes(2)) == "2мин", "Compact duration");
         Check(
             Formatter.FormatNumber(12.5, "ms") == "12.5 мс",
@@ -891,8 +837,22 @@ internal static class Program
         await tracker.EvaluateAsync(signal);
         await tracker.EvaluateAsync(signal with { MinuteUtc = minute.AddMinutes(1) });
         AppText.Select("ru");
-        await tracker.EvaluateAsync(signal with { Value = -50, MinuteUtc = minute.AddMinutes(2) });
-        await tracker.EvaluateAsync(signal with { Value = -50, MinuteUtc = minute.AddMinutes(3) });
+        await tracker.EvaluateAsync(
+            signal with
+            {
+                Title = AppText.Get("Weak Signal"),
+                Value = -50,
+                MinuteUtc = minute.AddMinutes(2),
+            }
+        );
+        await tracker.EvaluateAsync(
+            signal with
+            {
+                Title = AppText.Get("Weak Signal"),
+                Value = -50,
+                MinuteUtc = minute.AddMinutes(3),
+            }
+        );
         await using (var context = new WiFiDbContext())
         {
             var row = await context.Events.SingleAsync(row => row.Kind == EventKind.WeakSignal);

@@ -112,7 +112,7 @@ deduplication, resource-key references and hardcoded Razor labels/text.
 
 Version 2, Windows 11 (en-GB), .NET SDK 10.0.401:
 
-- Debug and Release regression checks: passed, 9,865 assertions, including 54
+- Debug and Release regression checks: passed, 9,180 assertions, including 54
   rendering cases (v1.10 had 9,621).
 - Full solution Debug build: passed, 0 warnings and 0 errors.
 - Release publication: passed; `Verified localization bundle: nl;tr;de;es;ru`.

@@ -3,6 +3,7 @@ using ApexCharts;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
+using MudBlazor.Utilities;
 using WiFiWatch.Data;
 using WiFiWatch.Data.Enums;
 using WiFiWatch.Data.Helpers;
@@ -40,7 +41,7 @@ public partial class HistoryPage : IDisposable
 
     // Range State
     private DateRange _range = new(DateTime.Today, DateTime.Today);
-    private MudDateRangePicker? _rangePicker;
+    private RangePicker? _rangePicker;
     private bool _isDaily;
     private bool _isLoading = true;
     private int _renderKey;
@@ -64,59 +65,48 @@ public partial class HistoryPage : IDisposable
             ? [new(1, 13)]
             : [.. ChannelAdvice.Blocks, new(132, 140)];
 
-    private string EvictionText => Formatter.FormatCount(_evictionCount, "Radar Eviction");
+    private string EvictionText => AppText.FormatCount(_evictionCount, "CountRadarEviction");
+
+    // Same Order As The Chart Colours: Router, Internet, DNS
+    private (string Name, List<ChartPoint> Points)[] PingSeries =>
+        [("Router", _routerPingPoints), ("Internet", _internetPingPoints), ("DNS", _dnsPoints)];
 
     // A Range Spent On A Cable Has No Wi-Fi Channel
     private bool ShowsChannelPanel => _summary is not { DfsPercent: null };
 
-    private List<TileView> Tiles =>
-        _summary is not { MonitoredMinutes: > 0 } summary
-            ?
-            [
-                new(AppText.Get("Online"), "-", AppText.Get("Not Watched"), Color.Default),
-                new(
-                    AppText.Get("Problems"),
-                    "-",
-                    AppText.Get("Warnings And Outages"),
-                    Color.Default
-                ),
-                new(
-                    AppText.Get("Longest Outage"),
-                    "-",
-                    AppText.Get("Internet Or Connection Down"),
-                    Color.Default
-                ),
-                new(
-                    AppText.Get("Fastest Download"),
-                    "-",
-                    AppText.Get("From Speed Tests"),
-                    Color.Default
-                ),
-            ]
-            :
+    // An Unwatched Range Keeps Its Tiles, Each Value Shown As A Dash
+    private List<TileView> Tiles
+    {
+        get
+        {
+            var summary = _summary is { MonitoredMinutes: > 0 } watched ? watched : null;
+            return
             [
                 new(
                     AppText.Get("Online"),
-                    $"{summary.OnlinePercent:0.#}%",
-                    AppText.Get(
-                        "Of {0} Watched",
-                        Formatter.FormatDuration(TimeSpan.FromMinutes(summary.MonitoredMinutes))
-                    ),
-                    summary.OnlinePercent < 99 ? Color.Warning : Color.Default
+                    summary is null ? "-" : $"{summary.OnlinePercent:0.#}%",
+                    summary is null
+                        ? AppText.Get("Not Watched")
+                        : AppText.Get(
+                            "Of {0} Watched",
+                            Formatter.FormatDuration(TimeSpan.FromMinutes(summary.MonitoredMinutes))
+                        ),
+                    summary?.OnlinePercent < 99 ? Color.Warning : Color.Default
                 ),
                 new(
                     AppText.Get("Problems"),
-                    $"{summary.ProblemCount}",
+                    summary is null ? "-" : $"{summary.ProblemCount}",
                     AppText.Get("Warnings And Outages"),
-                    summary.ProblemCount > 0 ? Color.Warning : Color.Default
+                    summary?.ProblemCount > 0 ? Color.Warning : Color.Default
                 ),
                 new(
                     AppText.Get("Longest Outage"),
-                    summary.LongestOutage > TimeSpan.Zero
-                        ? Formatter.FormatDuration(summary.LongestOutage)
+                    summary is null ? "-"
+                        : summary.LongestOutage > TimeSpan.Zero
+                            ? Formatter.FormatDuration(summary.LongestOutage)
                         : AppText.Get("None"),
                     AppText.Get("Internet Or Connection Down"),
-                    summary.LongestOutage > TimeSpan.Zero ? Color.Error : Color.Default
+                    summary?.LongestOutage > TimeSpan.Zero ? Color.Error : Color.Default
                 ),
                 new(
                     AppText.Get("Fastest Download"),
@@ -125,10 +115,12 @@ public partial class HistoryPage : IDisposable
                         : $"{_speedTests.Max(test => test.DownloadMbps):0} {AppText.Get("Mbps")}",
                     _speedTests.Count == 0
                         ? AppText.Get("No Speed Test")
-                        : Formatter.FormatCount(_speedTests.Count, "Speed Test"),
+                        : AppText.FormatCount(_speedTests.Count, "CountSpeedTest"),
                     Color.Default
                 ),
             ];
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -153,12 +145,9 @@ public partial class HistoryPage : IDisposable
         InvokeAsync(RefreshTodayAsync);
 
     #region Range Methods
-    private async Task ApplyPresetAsync(int dayCount)
-    {
-        // Presets Apply At Once, Picked Days Wait For OK
-        await _rangePicker!.CloseAsync(false);
-        await SelectRangeAsync(new(DateTime.Today.AddDays(1 - dayCount), DateTime.Today));
-    }
+    private Task PickPresetAsync(int dayCount) =>
+        // A Preset Only Marks Its Days, OK Applies Them Like Picked Days
+        _rangePicker!.PickAsync(DateTime.Today.AddDays(1 - dayCount), DateTime.Today);
 
     private async Task SelectRangeAsync(DateRange? range)
     {
@@ -357,38 +346,72 @@ public partial class HistoryPage : IDisposable
     #region Option Methods
     private static ApexChartOptions<ChartPoint> BuildPingOptions()
     {
-        // Internet Leads In Blue, Router And DNS Stay Grey
-        var options = ChartTheme.BuildBaseOptions<ChartPoint>();
-        options.Theme.Monochrome.Enabled = false;
-        options.Colors =
-        [
-            ChartTheme.LightGreyColor,
-            ChartTheme.AccentColor,
-            ChartTheme.VioletColor,
-        ];
-        options.Stroke = new Stroke
+        var culture = AppText.Culture;
+        return new ApexChartOptions<ChartPoint>
         {
-            Curve = Curve.Smooth,
-            Width = 2,
-            DashArray = [0, 0, 6],
-        };
-        options.Markers = new Markers { Size = 0 };
-        options.Xaxis = new XAxis { TickAmount = MaximumTicks, Labels = ChartTheme.FlatLabels() };
-        options.Yaxis =
-        [
-            new YAxis
+            Theme = new Theme { Mode = Mode.Dark },
+            // Router Grey, Internet In The App's Blue, DNS Violet
+            Colors =
+            [
+                "#BDBDBD",
+                AppTheme.Custom.PaletteDark.Info.ToString(MudColorOutputFormats.Hex),
+                "#B39DDB",
+            ],
+            Chart = new Chart
             {
-                Min = 0,
-                Labels = new YAxisLabels
-                {
-                    Formatter =
-                        "function (value) { return value == null ? '' : Math.round(value) + "
-                        + System.Text.Json.JsonSerializer.Serialize(" " + AppText.Get("ms"))
-                        + "; }",
-                },
+                FontFamily = string.Join(", ", AppTheme.FontFamily),
+                DefaultLocale = culture.TwoLetterISOLanguageName,
+                Locales =
+                [
+                    new ChartLocale
+                    {
+                        Name = culture.TwoLetterISOLanguageName,
+                        Options = new LocaleOptions
+                        {
+                            Days = [.. culture.DateTimeFormat.DayNames],
+                            ShortDays = [.. culture.DateTimeFormat.AbbreviatedDayNames],
+                            Months = [.. culture.DateTimeFormat.MonthNames.Take(12)],
+                            ShortMonths =
+                            [
+                                .. culture.DateTimeFormat.AbbreviatedMonthNames.Take(12),
+                            ],
+                        },
+                    },
+                ],
+                Toolbar = new Toolbar { Show = false },
+                Zoom = new Zoom { Enabled = false },
+                Selection = new Selection { Enabled = false },
+                Animations = new Animations { Enabled = false },
             },
-        ];
-        return options;
+            DataLabels = new DataLabels { Enabled = false },
+            NoData = new NoData { Text = AppText.Get("No Measurements") },
+            Stroke = new Stroke
+            {
+                Curve = Curve.Smooth,
+                Width = 2,
+                DashArray = [0, 0, 6],
+            },
+            Markers = new Markers { Size = 0 },
+            Xaxis = new XAxis
+            {
+                TickAmount = MaximumTicks,
+                Labels = new XAxisLabels { Rotate = 0, HideOverlappingLabels = true },
+            },
+            Yaxis =
+            [
+                new YAxis
+                {
+                    Min = 0,
+                    Labels = new YAxisLabels
+                    {
+                        Formatter =
+                            "function (value) { return value == null ? '' : Math.round(value) + "
+                            + System.Text.Json.JsonSerializer.Serialize(" " + AppText.Get("ms"))
+                            + "; }",
+                    },
+                },
+            ],
+        };
     }
     #endregion
 

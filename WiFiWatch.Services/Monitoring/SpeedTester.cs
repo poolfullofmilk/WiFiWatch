@@ -73,9 +73,7 @@ public static class SpeedTester
                 ),
             cancellationToken
         );
-        var addedLatency = Math.Max(downloadPing - idlePing ?? 0, uploadPing - idlePing ?? 0);
-
-        return new SpeedTest
+        var result = new SpeedTest
         {
             TestedAtUtc = DateTime.UtcNow,
             Link = link,
@@ -84,8 +82,10 @@ public static class SpeedTester
             IdlePingMilliseconds = idlePing,
             DownloadPingMilliseconds = downloadPing,
             UploadPingMilliseconds = uploadPing,
-            Grade = Grade(addedLatency),
+            Grade = "",
         };
+        result.Grade = Grade(result.AddedLatencyMilliseconds ?? 0);
+        return result;
     }
 
     public static string Grade(double addedMilliseconds)
@@ -303,12 +303,10 @@ public static class SpeedTester
         }
     }
 
-    private static double? Median(List<double> values)
+    // Upper Middle, So One Lost DNS Lookup Of Four Is Ignored And Two Count
+    internal static double? Median(IEnumerable<double> values)
     {
-        if (values.Count == 0)
-            return null;
-
         var sorted = values.Order().ToList();
-        return Math.Round(sorted[sorted.Count / 2], 1);
+        return sorted.Count == 0 ? null : Math.Round(sorted[sorted.Count / 2], 1);
     }
 }

@@ -16,7 +16,4 @@ public partial class SettingSwitch
 
     [Parameter]
     public EventCallback<bool> ValueChanged { get; set; }
-
-    [Parameter]
-    public bool Disabled { get; set; }
 }

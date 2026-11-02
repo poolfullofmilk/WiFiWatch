@@ -7,6 +7,10 @@ public partial class Header
     [Parameter]
     public required string Title { get; set; }
 
+    // A Rounded Icon Before The Title, Greyed Like SoTF.Editor's
+    [Parameter]
+    public string? Icon { get; set; }
+
     // Shown In A Tooltip On An Info Icon After The Title
     [Parameter]
     public string? Info { get; set; }

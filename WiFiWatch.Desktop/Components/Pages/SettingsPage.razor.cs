@@ -29,6 +29,35 @@ public partial class SettingsPage
         }
     }
 
+    // The Three Limits Share One Card, Each With Its Own Range
+    private LimitView[] Limits =>
+        [
+            new(
+                "WeakSignal",
+                "SignalDescription",
+                Monitor.Settings.WeakSignalRssi,
+                -100,
+                -30,
+                value => Monitor.Settings with { WeakSignalRssi = value }
+            ),
+            new(
+                "RouterPing",
+                "RouterDescription",
+                Monitor.Settings.RouterPingMilliseconds,
+                1,
+                1000,
+                value => Monitor.Settings with { RouterPingMilliseconds = value }
+            ),
+            new(
+                "InternetPing",
+                "InternetDescription",
+                Monitor.Settings.InternetPingMilliseconds,
+                1,
+                2000,
+                value => Monitor.Settings with { InternetPingMilliseconds = value }
+            ),
+        ];
+
     private void SaveSettings(UserSettings settings)
     {
         Monitor.Settings = settings;
@@ -53,4 +82,13 @@ public partial class SettingsPage
 
     private static Color PowerColor(string? powerSaving) =>
         powerSaving is null or MaximumPerformance ? Color.Default : Color.Warning;
+
+    private sealed record LimitView(
+        string TitleKey,
+        string InfoKey,
+        int Value,
+        int Min,
+        int Max,
+        Func<int, UserSettings> With
+    );
 }

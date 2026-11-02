@@ -115,7 +115,7 @@ public sealed class NetworkMonitor
         _conditions.IncidentOpened += TraceIncidentAsync;
         _journal.Alerted += (title, message) => Alerted?.Invoke(title, message);
         _journal.EventRecorded += () => EventRecorded?.Invoke();
-        Status = new(OfflineLink, null, null, null, null, null, null, false);
+        Status = new(OfflineLink, null, null, null, null, null, false);
     }
 
     public UserSettings Settings { get; set; }
@@ -145,6 +145,19 @@ public sealed class NetworkMonitor
     {
         // Off The UI Thread, Or Every Tick Resumes On It
         _ = Task.Run(RunAsync);
+
+        // Every App Start Asks GitHub At Once, So The Update Is Offered When The App Opens
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await CheckForUpdateAsync();
+            }
+            catch
+            {
+                // Offline At Start, The Daily Check Tries Again
+            }
+        });
     }
 
     #region Loop Methods
@@ -309,8 +322,8 @@ public sealed class NetworkMonitor
             InternetPingMilliseconds = internetPing,
             InternetJitterMilliseconds = internetJitter,
             InternetLossPercent = internetLoss,
-            DnsMilliseconds = Median(_dnsTimes),
-            ReferenceDnsMilliseconds = Median(_referenceDnsTimes),
+            DnsMilliseconds = SpeedTester.Median(_dnsTimes.OfType<double>()),
+            ReferenceDnsMilliseconds = SpeedTester.Median(_referenceDnsTimes.OfType<double>()),
         };
         _minuteReadings.Clear();
         _routerRoundTrips.Clear();
@@ -484,7 +497,6 @@ public sealed class NetworkMonitor
     {
         Status = new(
             _link ?? OfflineLink,
-            _routerAddress,
             _routerAdminUrl,
             _lastReading,
             _lastRouterRoundTrip,
@@ -671,9 +683,7 @@ public sealed class NetworkMonitor
             return;
         }
 
-        var reading = Settings.ReadWiFiNatively
-            ? NativeWiFiReader.Read()
-            : await WiFiReader.ReadAsync();
+        var reading = await WiFiReader.ReadAsync();
         if (reading.IsBlocked && !_journal.IsOpen(LocationKey))
         {
             await _journal.OpenAsync(
@@ -855,7 +865,7 @@ public sealed class NetworkMonitor
                         AppText.Get(
                             "Could Not Connect To {0}, {1}",
                             notice.Ssid,
-                            Formatter.FormatCount(_connectFailures, "Attempt")
+                            AppText.FormatCount(_connectFailures, "CountAttempt")
                         ),
                         changeDetails: details => details with { Reason = notice.Reason }
                     );
@@ -868,7 +878,7 @@ public sealed class NetworkMonitor
                             "Could Not Connect To {0} For {1}, {2}, Then Connected",
                             notice.Ssid,
                             Formatter.FormatDuration(notice.TimeUtc - failingSinceUtc),
-                            Formatter.FormatCount(_connectFailures, "Attempt")
+                            AppText.FormatCount(_connectFailures, "CountAttempt")
                         )
                     );
                     _connectFailures = 0;
@@ -1076,9 +1086,6 @@ public sealed class NetworkMonitor
                 await context.SaveChangesAsync(CancellationToken.None);
             }
 
-            var addedLatency =
-                Math.Max(result.DownloadPingMilliseconds ?? 0, result.UploadPingMilliseconds ?? 0)
-                - (result.IdlePingMilliseconds ?? 0);
             await _journal.RecordAsync(
                 EventKind.SpeedTest,
                 EventSeverity.Info,
@@ -1086,7 +1093,7 @@ public sealed class NetworkMonitor
                     "Speed Test {0:0} Mbps Down, {1:0} Mbps Up, Ping Under Load +{2:0} ms, Grade {3}",
                     result.DownloadMbps,
                     result.UploadMbps,
-                    Math.Max(0, addedLatency),
+                    result.AddedLatencyMilliseconds ?? 0,
                     result.Grade
                 )
             );
@@ -1137,16 +1144,6 @@ public sealed class NetworkMonitor
                     .Average();
 
         return (Math.Round(replies.Average(), 1), Math.Round(jitter, 1), lossPercent);
-    }
-
-    private static double? Average(List<double?> values) =>
-        values.Average() is { } average ? Math.Round(average, 1) : null;
-
-    private static double? Median(List<double?> values)
-    {
-        // One Lost Lookup Of Four Is Ignored, Two Count
-        var sorted = values.OfType<double>().Order().ToList();
-        return sorted.Count == 0 ? null : Math.Round(sorted[sorted.Count / 2], 1);
     }
 
     private static DateTime TruncateToMinute(DateTime value) =>

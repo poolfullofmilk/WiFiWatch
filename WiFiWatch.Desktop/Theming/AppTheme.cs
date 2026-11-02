@@ -56,9 +56,6 @@ public static class AppTheme
             // UI Elements
             AppbarBackground = ChromeSurface,
             AppbarText = TextStrong,
-            DrawerBackground = ChromeSurface,
-            DrawerText = TextStrong,
-            DrawerIcon = TextStrong,
 
             // Content Areas
             Background = PageBackground,
@@ -98,7 +95,6 @@ public static class AppTheme
 
             // Tables
             TableLines = LineStrong,
-            TableStriped = "rgba(255,255,255, 0.05)",
             TableHover = "rgba(0,0,0, 0.12)",
 
             // System

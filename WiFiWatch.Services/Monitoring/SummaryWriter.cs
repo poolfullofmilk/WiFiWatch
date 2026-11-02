@@ -142,14 +142,14 @@ public static class SummaryWriter
         List<string> parts =
         [
             AppText.Get("{0:0.#}% Online", summary.OnlinePercent),
-            Formatter.FormatCount(summary.ProblemCount, "Problem"),
+            AppText.FormatCount(summary.ProblemCount, "CountProblem"),
             summary.LongestOutage > TimeSpan.Zero
                 ? AppText.Get("Longest Outage {0}", Formatter.FormatDuration(summary.LongestOutage))
                 : AppText.Get("No Outages"),
         ];
         if (summary.EvictionCount > 0)
         {
-            parts.Add(Formatter.FormatCount(summary.EvictionCount, "DFS Eviction"));
+            parts.Add(AppText.FormatCount(summary.EvictionCount, "CountDfsEviction"));
         }
 
         if (summary.DfsPercent is { } dfsPercent)

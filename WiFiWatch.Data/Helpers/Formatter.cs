@@ -39,17 +39,8 @@ public static class Formatter
             : FormatDuration(endUtc - occurredAtUtc);
     }
 
-    public static string FormatLagUnderLoad(SpeedTest test)
-    {
-        // The Worse Direction Shows How Much A Busy Line Lags
-        var loadedPing = Math.Max(
-            test.DownloadPingMilliseconds ?? 0,
-            test.UploadPingMilliseconds ?? 0
-        );
-        return test.IdlePingMilliseconds is { } idlePing
-            ? $"+{Math.Max(0, loadedPing - idlePing):0} {AppText.Get("ms")}"
-            : "-";
-    }
+    public static string FormatLagUnderLoad(SpeedTest test) =>
+        test.AddedLatencyMilliseconds is { } added ? $"+{added:0} {AppText.Get("ms")}" : "-";
 
     public static string FormatLocal(DateTime utcTime, string format) =>
         utcTime
@@ -77,8 +68,6 @@ public static class Formatter
 
     public static string FormatNumber(double? value, string unit) =>
         value is null ? "-" : $"{value:0.#} {AppText.Get(unit)}";
-
-    public static string FormatCount(int count, string noun) => AppText.FormatCount(count, noun);
 
     private static bool SelfTestPasses() =>
         FormatDuration(TimeSpan.FromMinutes(2), CultureInfo.GetCultureInfo("en")) == "2m"

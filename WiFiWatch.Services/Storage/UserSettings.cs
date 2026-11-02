@@ -11,7 +11,6 @@ public sealed record UserSettings(
     int InternetPingMilliseconds = 60,
     bool DailySummaryNotification = true,
     bool NightlySpeedTest = false,
-    bool ReadWiFiNatively = false,
     string? Language = null
 )
 {
@@ -20,20 +19,11 @@ public sealed record UserSettings(
         "settings.json"
     );
 
-    // Pre 1.6 Files Spell Their Keys With Wifi
-    private static readonly JsonSerializerOptions s_readOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-    };
-
     public static UserSettings Load()
     {
         try
         {
-            return JsonSerializer.Deserialize<UserSettings>(
-                    File.ReadAllText(s_filePath),
-                    s_readOptions
-                ) ?? new();
+            return JsonSerializer.Deserialize<UserSettings>(File.ReadAllText(s_filePath)) ?? new();
         }
         catch
         {

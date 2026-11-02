@@ -69,45 +69,11 @@ public static class AppText
             : string.Format(CultureInfo.CurrentCulture, template, arguments);
     }
 
-    public static string SlowDnsSummary(TimeSpan duration, double peak, double average)
-    {
-        // One Language Snapshot Keeps A Switch From Mixing Duration And Message Languages
-        var culture = Culture;
-        return Format(culture, "SlowDnsSummary", FormatDuration(duration, culture), peak, average);
-    }
-
-    public static string FormatDuration(TimeSpan duration) => FormatDuration(duration, Culture);
-
-    private static string FormatDuration(TimeSpan duration, CultureInfo culture)
-    {
-        var seconds = Math.Max(0, (int)duration.TotalSeconds);
-        var minutes = seconds / 60;
-        return minutes == 0 ? Count(seconds, "Second", culture)
-            : seconds % 60 == 0 ? Count(minutes, "Minute", culture)
-            : $"{Count(minutes, "Minute", culture)} {Count(seconds % 60, "Second", culture)}";
-    }
-
-    public static string FormatCount(int count, string noun)
-    {
-        var key = noun switch
-        {
-            "Problem" => "CountProblem",
-            "Attempt" => "CountAttempt",
-            "Neighbor" => "CountNeighbor",
-            "Speed Test" => "CountSpeedTest",
-            "DFS Eviction" => "CountDfsEviction",
-            "Radar Eviction" => "CountRadarEviction",
-            _ => null,
-        };
-        return key is null
-            ? $"{count} {noun}{(count == 1 ? string.Empty : "s")}"
-            : Count(count, key, Culture);
-    }
-
-    private static string Count(int count, string unit, CultureInfo culture)
+    // Counts Read Their Plural Form From The Key, Russian Has Three
+    public static string FormatCount(int count, string key)
     {
         var form = count == 1 ? "One" : "Many";
-        if (culture.TwoLetterISOLanguageName == "ru")
+        if (Culture.TwoLetterISOLanguageName == "ru")
         {
             form =
                 count % 100 is >= 11 and <= 14 ? "Many"
@@ -115,6 +81,6 @@ public static class AppText
                 : count % 10 is >= 2 and <= 4 ? "Few"
                 : "Many";
         }
-        return Format(culture, unit + form, count);
+        return Get(key + form, count);
     }
 }

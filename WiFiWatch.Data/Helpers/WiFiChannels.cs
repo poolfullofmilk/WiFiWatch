@@ -7,7 +7,6 @@ public static class WiFiChannels
 {
     // EU Radar Rules, Fixed By ETSI EN 301 893
     public static readonly TimeSpan NonOccupancy = TimeSpan.FromMinutes(30);
-    public static readonly TimeSpan ChannelCheck = TimeSpan.FromSeconds(60);
     public static readonly TimeSpan WeatherChannelCheck = TimeSpan.FromMinutes(10);
 
     public static bool IsDfs(int? channel)

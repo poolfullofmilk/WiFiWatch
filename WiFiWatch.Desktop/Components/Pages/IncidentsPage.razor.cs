@@ -10,7 +10,6 @@ using WiFiWatch.Data.Models;
 using WiFiWatch.Data.ViewModels;
 using WiFiWatch.Desktop.Components.Shared.Common;
 using WiFiWatch.Desktop.Components.Shared.Dialogs;
-using WiFiWatch.Desktop.Components.Shared.Tables;
 using WiFiWatch.Services.Monitoring;
 using WiFiWatch.Services.Storage;
 
@@ -18,43 +17,43 @@ namespace WiFiWatch.Desktop.Components.Pages;
 
 public partial class IncidentsPage : IDisposable
 {
-    private static List<SegmentedButtonOption<bool>> ScopeOptions =>
-        [new(false, AppText.Get("Problems")), new(true, AppText.Get("Everything"))];
-
     [Inject]
     public required NetworkMonitor Monitor { get; set; }
 
     [Inject]
     public required IDialogService DialogService { get; set; }
 
-    // Table State
-    private DataTable<WiFiEvent>? _incidentTable;
+    // Rows Share SoTF.Editor's Height, Which Virtualizing Needs Fixed
+    private const int RowHeight = 61;
+    private static readonly string s_rowStyle = $"height:{RowHeight}px";
+
+    // List State
+    private List<WiFiEvent>? _incidents;
     private string _searchTerm = string.Empty;
     private bool _isEverything;
 
-    protected override void OnInitialized() => Monitor.EventRecorded += OnEventRecorded;
+    protected override async Task OnInitializedAsync()
+    {
+        Monitor.EventRecorded += OnEventRecorded;
+        await LoadIncidentsAsync();
+    }
 
-    private void OnEventRecorded() => InvokeAsync(ReloadAsync);
-
-    private Task ReloadAsync() => _incidentTable?.ReloadAsync() ?? Task.CompletedTask;
+    private void OnEventRecorded() => InvokeAsync(LoadIncidentsAsync);
 
     private async Task SearchAsync(string? searchTerm)
     {
         // The Field Debounces, So Every Change Reloads, Clearing Too
         _searchTerm = searchTerm ?? string.Empty;
-        await ReloadAsync();
+        await LoadIncidentsAsync();
     }
 
     private async Task SelectScopeAsync(bool isEverything)
     {
         _isEverything = isEverything;
-        await ReloadAsync();
+        await LoadIncidentsAsync();
     }
 
-    private async Task<TableData<WiFiEvent>> LoadIncidentsAsync(
-        TableState state,
-        CancellationToken cancellationToken
-    )
+    private async Task LoadIncidentsAsync()
     {
         await using var context = new WiFiDbContext();
         var query = context.Events.AsNoTracking();
@@ -100,17 +99,11 @@ public partial class IncidentsPage : IDisposable
             );
         }
 
-        var total = await query.CountAsync(cancellationToken);
-        var items = await query
-            .OrderByColumn(
-                wifiEvent => wifiEvent.OccurredAtUtc,
-                state.SortDirection != SortDirection.Ascending
-            )
-            .Skip(state.Page * state.PageSize)
-            .Take(state.PageSize)
-            .ToListAsync(cancellationToken);
-
-        return new() { Items = items, TotalItems = total };
+        // ponytail: every match in memory, a year is a few thousand rows; page in SQL if that ever drags
+        _incidents = await query
+            .OrderByDescending(wifiEvent => wifiEvent.OccurredAtUtc)
+            .ToListAsync();
+        StateHasChanged();
     }
 
     private async Task OpenDetailsAsync(TableRowClickEventArgs<WiFiEvent> click)

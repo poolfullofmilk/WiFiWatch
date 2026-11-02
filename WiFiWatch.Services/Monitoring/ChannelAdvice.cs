@@ -70,7 +70,7 @@ public static class ChannelAdvice
             : AppText.Get(
                 "{0} Has {1}, Yours Has {2}",
                 quietestBlock.Label,
-                Formatter.FormatCount(neighborsPerBlock[quietestBlock], "Neighbor"),
+                AppText.FormatCount(neighborsPerBlock[quietestBlock], "CountNeighbor"),
                 neighborsPerBlock[currentBlock]
             );
     }

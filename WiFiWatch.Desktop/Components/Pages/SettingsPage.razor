@@ -4,11 +4,12 @@
 
 <MudStack Spacing="6">
     @* General Section, One Card Per Setting Straight On The Page *@
-    <Header Title="@AppText.Get("General")">
+    <Header Title="@AppText.Get("General")"
+            Icon="@Icons.Material.Rounded.Tune">
         <MudGrid Spacing="3">
             @* Start Switch *@
             <MudItem xs="12"
-                     md="6">
+                     md="4">
                 <SettingSwitch Title="@AppText.Get("StartWithWindows")"
                                Description="@AppText.Get("StartDescription")"
                                Value="Monitor.Settings.StartWithWindows"
@@ -16,7 +17,7 @@
             </MudItem>
             @* Summary Switch *@
             <MudItem xs="12"
-                     md="6">
+                     md="4">
                 <SettingSwitch Title="@AppText.Get("DailySummary")"
                                Description="@AppText.Get("SummaryDescription")"
                                Value="Monitor.Settings.DailySummaryNotification"
@@ -24,97 +25,52 @@
             </MudItem>
             @* Speed Test Switch *@
             <MudItem xs="12"
-                     md="6">
+                     md="4">
                 <SettingSwitch Title="@AppText.Get("NightlySpeedTest")"
                                Description="@AppText.Get("SpeedDescription")"
                                Value="Monitor.Settings.NightlySpeedTest"
                                ValueChanged="value => SaveSettings(Monitor.Settings with { NightlySpeedTest = value })" />
-            </MudItem>
-            @* Native Wi-Fi Switch *@
-            <MudItem xs="12"
-                     md="6">
-                <SettingSwitch Title="@AppText.Get("NativeWiFi")"
-                               Description="@AppText.Get("NativeDescription")"
-                               Value="Monitor.Settings.ReadWiFiNatively"
-                               ValueChanged="value => SaveSettings(Monitor.Settings with { ReadWiFiNatively = value })" />
             </MudItem>
         </MudGrid>
     </Header>
 
     @* Limits Section *@
     <Header Title="@AppText.Get("ProblemLimits")"
+            Icon="@Icons.Material.Rounded.Rule"
             Info="@AppText.Get("LimitsDescription")">
         <MudGrid Spacing="3">
-            @* Weak Signal *@
-            <MudItem xs="12"
-                     md="4">
-                <MudPaper Elevation="4"
-                          Class="pa-4 rounded-panel mud-height-full">
-                    <MudStack Spacing="2">
-                        <MudText Typo="Typo.subtitle2"
-                                 Class="d-inline-flex align-center">
-                            @AppText.Get("WeakSignal")
-                            <InfoIcon Text="@AppText.Get("SignalDescription")" />
-                        </MudText>
-                        <NumberField T="int"
-                                     Value="Monitor.Settings.WeakSignalRssi"
-                                     ValueChanged="value => SaveSettings(Monitor.Settings with { WeakSignalRssi = value })"
-                                     Min="-100"
-                                     Max="-30"
-                                     Margin="Margin.Dense"
-                                     Class="fixed-width" />
-                    </MudStack>
-                </MudPaper>
-            </MudItem>
-            @* Router Ping *@
-            <MudItem xs="12"
-                     md="4">
-                <MudPaper Elevation="4"
-                          Class="pa-4 rounded-panel mud-height-full">
-                    <MudStack Spacing="2">
-                        <MudText Typo="Typo.subtitle2"
-                                 Class="d-inline-flex align-center">
-                            @AppText.Get("RouterPing")
-                            <InfoIcon Text="@AppText.Get("RouterDescription")" />
-                        </MudText>
-                        <NumberField T="int"
-                                     Value="Monitor.Settings.RouterPingMilliseconds"
-                                     ValueChanged="value => SaveSettings(Monitor.Settings with { RouterPingMilliseconds = value })"
-                                     Min="1"
-                                     Max="1000"
-                                     Margin="Margin.Dense"
-                                     Class="fixed-width" />
-                    </MudStack>
-                </MudPaper>
-            </MudItem>
-            @* Internet Ping *@
-            <MudItem xs="12"
-                     md="4">
-                <MudPaper Elevation="4"
-                          Class="pa-4 rounded-panel mud-height-full">
-                    <MudStack Spacing="2">
-                        <MudText Typo="Typo.subtitle2"
-                                 Class="d-inline-flex align-center">
-                            @AppText.Get("InternetPing")
-                            <InfoIcon Text="@AppText.Get("InternetDescription")" />
-                        </MudText>
-                        <NumberField T="int"
-                                     Value="Monitor.Settings.InternetPingMilliseconds"
-                                     ValueChanged="value => SaveSettings(Monitor.Settings with { InternetPingMilliseconds = value })"
-                                     Min="1"
-                                     Max="2000"
-                                     Margin="Margin.Dense"
-                                     Class="fixed-width" />
-                    </MudStack>
-                </MudPaper>
-            </MudItem>
+            @foreach (var limit in Limits)
+            {
+                @* Limit Card *@
+                <MudItem xs="12"
+                         md="4">
+                    <MudPaper Elevation="4"
+                              Class="pa-4 rounded-panel mud-height-full">
+                        <MudStack Spacing="2">
+                            <MudText Typo="Typo.subtitle2"
+                                     Class="d-inline-flex align-center">
+                                @AppText.Get(limit.TitleKey)
+                                <InfoIcon Text="@AppText.Get(limit.InfoKey)" />
+                            </MudText>
+                            <NumberField T="int"
+                                         Value="limit.Value"
+                                         ValueChanged="value => SaveSettings(limit.With(value))"
+                                         Min="limit.Min"
+                                         Max="limit.Max"
+                                         Margin="Margin.Dense"
+                                         Class="fixed-width" />
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+            }
         </MudGrid>
     </Header>
 
     @* Adapter Section *@
     @if (Monitor.Adapter is { } adapter)
     {
-        <Header Title="@AppText.Get("WiFiAdapter")">
+        <Header Title="@AppText.Get("WiFiAdapter")"
+                Icon="@Icons.Material.Rounded.Router">
             <MudPaper Elevation="4"
                       Class="pa-4 rounded-panel">
                 @* Adapter Chips *@

@@ -11,7 +11,7 @@
         <MudElement HtmlTag="div"
                     Style="width:320px">
             @* Range Picker *@
-            <MudDateRangePicker @ref="_rangePicker"
+            <RangePicker @ref="_rangePicker"
                                 DateRange="_range"
                                 DateRangeChanged="SelectRangeAsync"
                                 MaxDate="DateTime.Today"
@@ -30,7 +30,7 @@
                         @* Preset Button *@
                         <MudButton Variant="Variant.Filled"
                                    Size="Size.Small"
-                                   OnClick="() => ApplyPresetAsync(dayCount)">
+                                   OnClick="() => PickPresetAsync(dayCount)">
                             @label
                         </MudButton>
                     }
@@ -49,7 +49,7 @@
                         @AppText.Get("OK")
                     </MudButton>
                 </PickerActions>
-            </MudDateRangePicker>
+            </RangePicker>
         </MudElement>
         <MudSpacer />
         @* Export Menu *@
@@ -93,65 +93,58 @@
 
         @* Health Panel *@
         <MudItem xs="12">
-            <Header Title="@(_isDaily ? AppText.Get("Day By Day") : AppText.Get("Hour By Hour"))">
-            <MudPaper Elevation="4"
-                      Class="pa-4 rounded-panel">
-                @if (_isLoading)
-                {
-                    <MudSkeleton SkeletonType="SkeletonType.Rectangle"
-                                 Animation="Animation.Wave"
-                                 Height="56px"
-                                 Style="border-radius:10px" />
-                }
-                else
-                {
-                    <HealthStrip Buckets="_buckets"
-                                 IsDaily="_isDaily" />
-                }
-            </MudPaper>
+            <Header Title="@(_isDaily ? AppText.Get("Day By Day") : AppText.Get("Hour By Hour"))"
+                    Icon="@Icons.Material.Rounded.CalendarMonth">
+                <MudPaper Elevation="4"
+                          Class="pa-4 rounded-panel">
+                    @if (_isLoading)
+                    {
+                        <MudSkeleton SkeletonType="SkeletonType.Rectangle"
+                                     Animation="Animation.Wave"
+                                     Height="56px"
+                                     Style="border-radius:var(--radius-inner)" />
+                    }
+                    else
+                    {
+                        <HealthStrip Buckets="_buckets"
+                                     IsDaily="_isDaily" />
+                    }
+                </MudPaper>
             </Header>
         </MudItem>
 
         @* Ping Chart *@
         <MudItem xs="12">
-            <Header Title="@(_isDaily ? AppText.Get("Ping Per Day") : AppText.Get("Ping Per Hour"))">
-            <MudPaper Elevation="4"
-                      Class="pa-4 rounded-panel">
-                @if (_isLoading)
-                {
-                    <MudSkeleton SkeletonType="SkeletonType.Rectangle"
-                                 Animation="Animation.Wave"
-                                 Height="280px"
-                                 Style="border-radius:10px" />
-                }
-                else
-                {
-                    <ApexChart @key="_renderKey"
-                               @ref="_pingChart"
-                               TItem="ChartPoint"
-                               Options="_pingOptions"
-                               Height="@("280")">
-                        <ApexPointSeries TItem="ChartPoint"
-                                         Items="_routerPingPoints"
-                                         Name="@AppText.Get("Router")"
-                                         SeriesType="SeriesType.Line"
-                                         XValue="@(point => point.Label)"
-                                         YValue="@(point => point.Value)" />
-                        <ApexPointSeries TItem="ChartPoint"
-                                         Items="_internetPingPoints"
-                                         Name="@AppText.Get("Internet")"
-                                         SeriesType="SeriesType.Line"
-                                         XValue="@(point => point.Label)"
-                                         YValue="@(point => point.Value)" />
-                        <ApexPointSeries TItem="ChartPoint"
-                                         Items="_dnsPoints"
-                                         Name="@AppText.Get("DNS")"
-                                         SeriesType="SeriesType.Line"
-                                         XValue="@(point => point.Label)"
-                                         YValue="@(point => point.Value)" />
-                    </ApexChart>
-                }
-            </MudPaper>
+            <Header Title="@(_isDaily ? AppText.Get("Ping Per Day") : AppText.Get("Ping Per Hour"))"
+                    Icon="@Icons.Material.Rounded.ShowChart">
+                <MudPaper Elevation="4"
+                          Class="pa-4 rounded-panel">
+                    @if (_isLoading)
+                    {
+                        <MudSkeleton SkeletonType="SkeletonType.Rectangle"
+                                     Animation="Animation.Wave"
+                                     Height="280px"
+                                     Style="border-radius:var(--radius-inner)" />
+                    }
+                    else
+                    {
+                        <ApexChart @key="_renderKey"
+                                   @ref="_pingChart"
+                                   TItem="ChartPoint"
+                                   Options="_pingOptions"
+                                   Height="@("280")">
+                            @foreach (var (name, points) in PingSeries)
+                            {
+                                <ApexPointSeries TItem="ChartPoint"
+                                                 Items="points"
+                                                 Name="@AppText.Get(name)"
+                                                 SeriesType="SeriesType.Line"
+                                                 XValue="@(point => point.Label)"
+                                                 YValue="@(point => point.Value)" />
+                            }
+                        </ApexChart>
+                    }
+                </MudPaper>
             </Header>
         </MudItem>
 
@@ -160,6 +153,7 @@
         {
             <MudItem xs="12">
                 <Header Title="@AppText.Get("Wi-Fi Channel")"
+                        Icon="@Icons.Material.Rounded.Wifi"
                         Info="@AppText.Get("ChannelLegend")">
                     <TitleContent>
                         @* Eviction Chip *@
@@ -175,28 +169,28 @@
                         }
                     </TitleContent>
                     <ChildContent>
-                <MudPaper Elevation="4"
-                          Class="pa-4 rounded-panel">
-                    @if (_isLoading)
-                    {
-                        <MudSkeleton SkeletonType="SkeletonType.Rectangle"
-                                     Animation="Animation.Wave"
-                                     Height="80px"
-                                     Style="border-radius:10px" />
-                    }
-                    else
-                    {
-                        <MudStack Spacing="3">
-                            <ChannelStrip Blocks="ChannelBlocks"
-                                          Neighbors="_neighbors"
-                                          CurrentChannel="Monitor.Status.Reading?.Channel" />
-                            <MudText Typo="Typo.body1"
-                                     Class="mx-2">
-                                @_channelAdvice
-                            </MudText>
-                        </MudStack>
-                    }
-                </MudPaper>
+                        <MudPaper Elevation="4"
+                                  Class="pa-4 rounded-panel">
+                            @if (_isLoading)
+                            {
+                                <MudSkeleton SkeletonType="SkeletonType.Rectangle"
+                                             Animation="Animation.Wave"
+                                             Height="80px"
+                                             Style="border-radius:var(--radius-inner)" />
+                            }
+                            else
+                            {
+                                <MudStack Spacing="3">
+                                    <ChannelStrip Blocks="ChannelBlocks"
+                                                  Neighbors="_neighbors"
+                                                  CurrentChannel="Monitor.Status.Reading?.Channel" />
+                                    <MudText Typo="Typo.body1"
+                                             Class="mx-2">
+                                        @_channelAdvice
+                                    </MudText>
+                                </MudStack>
+                            }
+                        </MudPaper>
                     </ChildContent>
                 </Header>
             </MudItem>
@@ -204,53 +198,55 @@
 
         @* Speed Tests *@
         <MudItem xs="12">
-            <Header Title="@AppText.Get("Speed Tests")">
-            <MudPaper Elevation="4"
-                      Class="pa-4 rounded-panel">
+            <Header Title="@AppText.Get("Speed Tests")"
+                    Icon="@Icons.Material.Rounded.Speed">
                 @if (_speedTests.Count == 0)
                 {
-                    <MudText Typo="Typo.body2"
-                             Class="mx-2 mud-text-secondary">
-                        @AppText.Get("None In This Range, Start One From Overview")
-                    </MudText>
+                    <MudPaper Elevation="4"
+                              Class="pa-4 rounded-panel">
+                        <MudText Typo="Typo.body2"
+                                 Class="mx-2 mud-text-secondary">
+                            @AppText.Get("None In This Range, Start One From Overview")
+                        </MudText>
+                    </MudPaper>
                 }
                 else
                 {
-                    @* Speed Table *@
-                    <MudSimpleTable Dense
-                                    Elevation="0"
-                                    Style="background:transparent">
-                        <thead>
-                            <tr>
-                                <th>@AppText.Get("When")</th>
-                                <th>@AppText.Get("Down")</th>
-                                <th>@AppText.Get("Up")</th>
-                                <th>@AppText.Get("Lag Under Load")</th>
-                                <th>@AppText.Get("Grade")</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var test in _speedTests)
-                            {
-                                <tr>
-                                    <td>@Formatter.FormatWhen(test.TestedAtUtc)</td>
-                                    <td>@($"{test.DownloadMbps:0} {AppText.Get("Mbps")}")</td>
-                                    <td>@($"{test.UploadMbps:0} {AppText.Get("Mbps")}")</td>
-                                    <td>@Formatter.FormatLagUnderLoad(test)</td>
-                                    <td>
-                                        <MudChip T="string"
-                                                 Size="Size.Small"
-                                                 Variant="Variant.Text"
-                                                 Color="@GradeColors.For(test.Grade)">
-                                            @test.Grade
-                                        </MudChip>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </MudSimpleTable>
+                    @* Speed Table, Flush In Its Panel *@
+                    <MudPaper Elevation="4"
+                              Class="rounded-panel panel-flush">
+                        <MudTable T="SpeedTest"
+                                  Items="_speedTests"
+                                  Dense
+                                  Hover
+                                  Elevation="0"
+                                  Class="fixed-columns">
+
+                            <HeaderContent>
+                                <MudTh>@AppText.Get("When")</MudTh>
+                                <MudTh>@AppText.Get("Down")</MudTh>
+                                <MudTh>@AppText.Get("Up")</MudTh>
+                                <MudTh>@AppText.Get("Lag Under Load")</MudTh>
+                                <MudTh>@AppText.Get("Grade")</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd>@Formatter.FormatWhen(context.TestedAtUtc)</MudTd>
+                                <MudTd>@($"{context.DownloadMbps:0} {AppText.Get("Mbps")}")</MudTd>
+                                <MudTd>@($"{context.UploadMbps:0} {AppText.Get("Mbps")}")</MudTd>
+                                <MudTd>@Formatter.FormatLagUnderLoad(context)</MudTd>
+                                <MudTd>
+                                    <MudChip T="string"
+                                             Size="Size.Small"
+                                             Variant="Variant.Text"
+                                             Color="@GradeColors.For(context.Grade)">
+                                        @context.Grade
+                                    </MudChip>
+                                </MudTd>
+                            </RowTemplate>
+
+                        </MudTable>
+                    </MudPaper>
                 }
-            </MudPaper>
             </Header>
         </MudItem>
 

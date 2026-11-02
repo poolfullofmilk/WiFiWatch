@@ -11,8 +11,6 @@
     <data name="SummaryDescription" xml:space="preserve"><value>Sorunlu bir günün ardından sabah bildirim gönderir</value></data>
     <data name="NightlySpeedTest" xml:space="preserve"><value>Gece hız testi</value></data>
     <data name="SpeedDescription" xml:space="preserve"><value>Saat 03:00’te yük altında hızı ve gecikmeyi ölçer</value></data>
-    <data name="NativeWiFi" xml:space="preserve"><value>Wi-Fi verilerini doğrudan oku</value></data>
-    <data name="NativeDescription" xml:space="preserve"><value>netsh yerine doğrudan Windows’a sorar, her dilde çalışır</value></data>
     <data name="ProblemLimits" xml:space="preserve"><value>Sorun eşikleri</value></data>
     <data name="LimitsDescription" xml:space="preserve"><value>2 kötü dakika olay açar; eşiğin üç katı hemen bildirim gönderir</value></data>
     <data name="WeakSignal" xml:space="preserve"><value>Zayıf sinyal eşiği dBm</value></data>
@@ -34,12 +32,6 @@
     <data name="SystemLanguage" xml:space="preserve"><value>Windows dili (otomatik)</value></data>
     <data name="SlowDnsValue" xml:space="preserve"><value>Yavaş DNS {0:0.#} ms</value></data>
     <data name="SlowDnsSummary" xml:space="preserve"><value>{0} boyunca yavaş DNS, en yüksek {1:0.#} ms, ortalama {2:0.#} ms</value></data>
-    <data name="MinuteOne" xml:space="preserve"><value>{0} dakika</value></data>
-    <data name="MinuteFew" xml:space="preserve"><value>{0} dakika</value></data>
-    <data name="MinuteMany" xml:space="preserve"><value>{0} dakika</value></data>
-    <data name="SecondOne" xml:space="preserve"><value>{0} saniye</value></data>
-    <data name="SecondFew" xml:space="preserve"><value>{0} saniye</value></data>
-    <data name="SecondMany" xml:space="preserve"><value>{0} saniye</value></data>
     <data name="Overview" xml:space="preserve"><value>Genel Bakış</value></data>
     <data name="Incidents" xml:space="preserve"><value>Olaylar</value></data>
     <data name="History" xml:space="preserve"><value>Geçmiş</value></data>
@@ -113,16 +105,13 @@
     <data name="Longest Outage" xml:space="preserve"><value>En Uzun Kesinti</value></data>
     <data name="Internet Or Connection Down" xml:space="preserve"><value>İnternet veya bağlantı kesildi</value></data>
     <data name="Fastest Download" xml:space="preserve"><value>En Hızlı İndirme</value></data>
-    <data name="From Speed Tests" xml:space="preserve"><value>Hız testlerinden</value></data>
     <data name="None" xml:space="preserve"><value>Yok</value></data>
     <data name="No Speed Test" xml:space="preserve"><value>Hız Testi Yok</value></data>
     <data name="No Wi-Fi Scans In This Range" xml:space="preserve"><value>Bu aralıkta Wi-Fi taraması yok</value></data>
     <data name="Export" xml:space="preserve"><value>Dışa Aktar</value></data>
     <data name="All" xml:space="preserve"><value>Tümü</value></data>
     <data name="Export Day" xml:space="preserve"><value>Günü Dışa Aktar</value></data>
-    <data name="Sort By" xml:space="preserve"><value>Sıralama Ölçütü</value></data>
     <data name="Search" xml:space="preserve"><value>Ara</value></data>
-    <data name="Rows Per Page" xml:space="preserve"><value>Sayfa Başına Satır</value></data>
     <data name="Hop" xml:space="preserve"><value>Atlama</value></data>
     <data name="Address" xml:space="preserve"><value>Adres</value></data>
     <data name="Name" xml:space="preserve"><value>Ad</value></data>
@@ -343,14 +332,6 @@
     <data name="ms" xml:space="preserve"><value>ms</value></data>
     <data name="Mbps" xml:space="preserve"><value>Mbps</value></data>
     <data name="dBm" xml:space="preserve"><value>dBm</value></data>
-    <data name="MudFirst" xml:space="preserve"><value>İlk sayfa</value></data>
-    <data name="MudLast" xml:space="preserve"><value>Son sayfa</value></data>
-    <data name="MudNext" xml:space="preserve"><value>Sonraki sayfa</value></data>
-    <data name="MudPrevious" xml:space="preserve"><value>Önceki sayfa</value></data>
-    <data name="MudPagerInfo" xml:space="preserve"><value>{all_items} öğeden {first_item}-{last_item}</value></data>
-    <data name="MudChooseDate" xml:space="preserve"><value>Tarih seç</value></data>
-    <data name="MudPreviousMonth" xml:space="preserve"><value>Önceki ay</value></data>
-    <data name="MudNextMonth" xml:space="preserve"><value>Sonraki ay</value></data>
     <data name="MudClear" xml:space="preserve"><value>Temizle</value></data>
     <data name="Previous year {0}" xml:space="preserve"><value>Önceki yıl {0}</value></data>
     <data name="Next year {0}" xml:space="preserve"><value>Sonraki yıl {0}</value></data>
@@ -367,14 +348,6 @@
     <data name="Not a valid boolean" xml:space="preserve"><value>Geçerli bir mantıksal değer değil</value></data>
     <data name="Not a valid {0}" xml:space="preserve"><value>Geçerli bir {0} değil</value></data>
     <data name="Conversion error: {0}" xml:space="preserve"><value>Dönüştürme hatası: {0}</value></data>
-    <data name="Select row" xml:space="preserve"><value>Satır seç</value></data>
-    <data name="Select all rows" xml:space="preserve"><value>Tüm satırları seç</value></data>
-    <data name="Select group" xml:space="preserve"><value>Grup seç</value></data>
-    <data name="Expand group" xml:space="preserve"><value>Grubu genişlet</value></data>
-    <data name="Collapse group" xml:space="preserve"><value>Grubu daralt</value></data>
-    <data name="Edit row" xml:space="preserve"><value>Satırı düzenle</value></data>
-    <data name="Cancel edit" xml:space="preserve"><value>Düzenlemeyi iptal et</value></data>
-    <data name="Commit edit" xml:space="preserve"><value>Düzenlemeyi kaydet</value></data>
     <data name="{0} {1} {2} Exported {3:yyyy-MM-dd HH-mm-ss}.csv" xml:space="preserve"><value>{0} {1} {2} Dışa Aktarıldı {3:yyyy-MM-dd HH-mm-ss}.csv</value></data>
     <data name="No Measurements" xml:space="preserve"><value>Ölçüm yok</value></data>
     <data name="ConditionValue" xml:space="preserve"><value>{0} {1}</value></data>

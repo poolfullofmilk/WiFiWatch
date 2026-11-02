@@ -11,8 +11,6 @@
     <data name="SummaryDescription" xml:space="preserve"><value>Notifies each morning after a day with problems</value></data>
     <data name="NightlySpeedTest" xml:space="preserve"><value>Nightly Speed Test</value></data>
     <data name="SpeedDescription" xml:space="preserve"><value>Measures speed and lag under load at 03:00</value></data>
-    <data name="NativeWiFi" xml:space="preserve"><value>Read Wi-Fi Natively</value></data>
-    <data name="NativeDescription" xml:space="preserve"><value>Asks Windows directly instead of netsh, works in any language</value></data>
     <data name="ProblemLimits" xml:space="preserve"><value>Problem Limits</value></data>
     <data name="LimitsDescription" xml:space="preserve"><value>2 bad minutes open a problem, triple the limit notifies at once</value></data>
     <data name="WeakSignal" xml:space="preserve"><value>Weak Signal Below dBm</value></data>
@@ -34,12 +32,6 @@
     <data name="SystemLanguage" xml:space="preserve"><value>Windows Language (Automatic)</value></data>
     <data name="SlowDnsValue" xml:space="preserve"><value>Slow DNS {0:0.#} ms</value></data>
     <data name="SlowDnsSummary" xml:space="preserve"><value>Slow DNS for {0}, peak {1:0.#} ms, average {2:0.#} ms</value></data>
-    <data name="MinuteOne" xml:space="preserve"><value>{0} minute</value></data>
-    <data name="MinuteFew" xml:space="preserve"><value>{0} minutes</value></data>
-    <data name="MinuteMany" xml:space="preserve"><value>{0} minutes</value></data>
-    <data name="SecondOne" xml:space="preserve"><value>{0} second</value></data>
-    <data name="SecondFew" xml:space="preserve"><value>{0} seconds</value></data>
-    <data name="SecondMany" xml:space="preserve"><value>{0} seconds</value></data>
     <data name="AppName" xml:space="preserve"><value>Wi-Fi Watch</value></data>
     <data name="Overview" xml:space="preserve"><value>Overview</value></data>
     <data name="Incidents" xml:space="preserve"><value>Incidents</value></data>
@@ -114,16 +106,13 @@
     <data name="Longest Outage" xml:space="preserve"><value>Longest Outage</value></data>
     <data name="Internet Or Connection Down" xml:space="preserve"><value>Internet or Connection Down</value></data>
     <data name="Fastest Download" xml:space="preserve"><value>Fastest Download</value></data>
-    <data name="From Speed Tests" xml:space="preserve"><value>From Speed Tests</value></data>
     <data name="None" xml:space="preserve"><value>None</value></data>
     <data name="No Speed Test" xml:space="preserve"><value>No Speed Test</value></data>
     <data name="No Wi-Fi Scans In This Range" xml:space="preserve"><value>No Wi-Fi scans in this range</value></data>
     <data name="Export" xml:space="preserve"><value>Export</value></data>
     <data name="All" xml:space="preserve"><value>All</value></data>
     <data name="Export Day" xml:space="preserve"><value>Export Day</value></data>
-    <data name="Sort By" xml:space="preserve"><value>Sort By</value></data>
     <data name="Search" xml:space="preserve"><value>Search</value></data>
-    <data name="Rows Per Page" xml:space="preserve"><value>Rows per Page</value></data>
     <data name="Hop" xml:space="preserve"><value>Hop</value></data>
     <data name="Address" xml:space="preserve"><value>Address</value></data>
     <data name="Name" xml:space="preserve"><value>Name</value></data>
@@ -344,14 +333,6 @@
     <data name="ms" xml:space="preserve"><value>ms</value></data>
     <data name="Mbps" xml:space="preserve"><value>Mbps</value></data>
     <data name="dBm" xml:space="preserve"><value>dBm</value></data>
-    <data name="MudFirst" xml:space="preserve"><value>First page</value></data>
-    <data name="MudLast" xml:space="preserve"><value>Last page</value></data>
-    <data name="MudNext" xml:space="preserve"><value>Next page</value></data>
-    <data name="MudPrevious" xml:space="preserve"><value>Previous page</value></data>
-    <data name="MudPagerInfo" xml:space="preserve"><value>{first_item}-{last_item} of {all_items}</value></data>
-    <data name="MudChooseDate" xml:space="preserve"><value>Choose date</value></data>
-    <data name="MudPreviousMonth" xml:space="preserve"><value>Previous month</value></data>
-    <data name="MudNextMonth" xml:space="preserve"><value>Next month</value></data>
     <data name="MudClear" xml:space="preserve"><value>Clear</value></data>
     <data name="Previous year {0}" xml:space="preserve"><value>Previous year {0}</value></data>
     <data name="Next year {0}" xml:space="preserve"><value>Next year {0}</value></data>
@@ -368,14 +349,6 @@
     <data name="Not a valid boolean" xml:space="preserve"><value>Not a valid boolean</value></data>
     <data name="Not a valid {0}" xml:space="preserve"><value>Not a valid {0}</value></data>
     <data name="Conversion error: {0}" xml:space="preserve"><value>Conversion error: {0}</value></data>
-    <data name="Select row" xml:space="preserve"><value>Select row</value></data>
-    <data name="Select all rows" xml:space="preserve"><value>Select all rows</value></data>
-    <data name="Select group" xml:space="preserve"><value>Select group</value></data>
-    <data name="Expand group" xml:space="preserve"><value>Expand group</value></data>
-    <data name="Collapse group" xml:space="preserve"><value>Collapse group</value></data>
-    <data name="Edit row" xml:space="preserve"><value>Edit row</value></data>
-    <data name="Cancel edit" xml:space="preserve"><value>Cancel edit</value></data>
-    <data name="Commit edit" xml:space="preserve"><value>Commit edit</value></data>
     <data name="{0} {1} {2} Exported {3:yyyy-MM-dd HH-mm-ss}.csv" xml:space="preserve"><value>{0} {1} {2} Exported {3:yyyy-MM-dd HH-mm-ss}.csv</value></data>
     <data name="No Measurements" xml:space="preserve"><value>No measurements</value></data>
     <data name="ConditionValue" xml:space="preserve"><value>{0} {1}</value></data>

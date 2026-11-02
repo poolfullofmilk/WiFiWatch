@@ -11,8 +11,6 @@
     <data name="SummaryDescription" xml:space="preserve"><value>Meldet morgens Probleme des Vortags</value></data>
     <data name="NightlySpeedTest" xml:space="preserve"><value>Nächtlicher Geschwindigkeitstest</value></data>
     <data name="SpeedDescription" xml:space="preserve"><value>Misst Geschwindigkeit und Latenz unter Last um 03:00</value></data>
-    <data name="NativeWiFi" xml:space="preserve"><value>WLAN nativ auslesen</value></data>
-    <data name="NativeDescription" xml:space="preserve"><value>Fragt Windows direkt statt netsh, funktioniert in jeder Sprache</value></data>
     <data name="ProblemLimits" xml:space="preserve"><value>Problemgrenzen</value></data>
     <data name="LimitsDescription" xml:space="preserve"><value>2 schlechte Minuten öffnen einen Vorfall; der dreifache Grenzwert meldet sofort</value></data>
     <data name="WeakSignal" xml:space="preserve"><value>Schwaches Signal unter dBm</value></data>
@@ -34,12 +32,6 @@
     <data name="SystemLanguage" xml:space="preserve"><value>Windows-Sprache (automatisch)</value></data>
     <data name="SlowDnsValue" xml:space="preserve"><value>Langsames DNS {0:0.#} ms</value></data>
     <data name="SlowDnsSummary" xml:space="preserve"><value>Langsames DNS für {0}, Spitze {1:0.#} ms, Durchschnitt {2:0.#} ms</value></data>
-    <data name="MinuteOne" xml:space="preserve"><value>{0} Minute</value></data>
-    <data name="MinuteFew" xml:space="preserve"><value>{0} Minuten</value></data>
-    <data name="MinuteMany" xml:space="preserve"><value>{0} Minuten</value></data>
-    <data name="SecondOne" xml:space="preserve"><value>{0} Sekunde</value></data>
-    <data name="SecondFew" xml:space="preserve"><value>{0} Sekunden</value></data>
-    <data name="SecondMany" xml:space="preserve"><value>{0} Sekunden</value></data>
     <data name="Overview" xml:space="preserve"><value>Übersicht</value></data>
     <data name="Incidents" xml:space="preserve"><value>Vorfälle</value></data>
     <data name="History" xml:space="preserve"><value>Verlauf</value></data>
@@ -113,16 +105,13 @@
     <data name="Longest Outage" xml:space="preserve"><value>Längster Ausfall</value></data>
     <data name="Internet Or Connection Down" xml:space="preserve"><value>Internet- oder Verbindungsausfall</value></data>
     <data name="Fastest Download" xml:space="preserve"><value>Schnellster Download</value></data>
-    <data name="From Speed Tests" xml:space="preserve"><value>Aus Geschwindigkeitstests</value></data>
     <data name="None" xml:space="preserve"><value>Keine</value></data>
     <data name="No Speed Test" xml:space="preserve"><value>Kein Geschwindigkeitstest</value></data>
     <data name="No Wi-Fi Scans In This Range" xml:space="preserve"><value>Keine WLAN-Scans in diesem Zeitraum</value></data>
     <data name="Export" xml:space="preserve"><value>Exportieren</value></data>
     <data name="All" xml:space="preserve"><value>Alle</value></data>
     <data name="Export Day" xml:space="preserve"><value>Tag Exportieren</value></data>
-    <data name="Sort By" xml:space="preserve"><value>Sortieren Nach</value></data>
     <data name="Search" xml:space="preserve"><value>Suchen</value></data>
-    <data name="Rows Per Page" xml:space="preserve"><value>Zeilen pro Seite</value></data>
     <data name="Hop" xml:space="preserve"><value>Hop</value></data>
     <data name="Address" xml:space="preserve"><value>Adresse</value></data>
     <data name="Name" xml:space="preserve"><value>Name</value></data>
@@ -343,14 +332,6 @@
     <data name="ms" xml:space="preserve"><value>ms</value></data>
     <data name="Mbps" xml:space="preserve"><value>Mbps</value></data>
     <data name="dBm" xml:space="preserve"><value>dBm</value></data>
-    <data name="MudFirst" xml:space="preserve"><value>Erste Seite</value></data>
-    <data name="MudLast" xml:space="preserve"><value>Letzte Seite</value></data>
-    <data name="MudNext" xml:space="preserve"><value>Nächste Seite</value></data>
-    <data name="MudPrevious" xml:space="preserve"><value>Vorherige Seite</value></data>
-    <data name="MudPagerInfo" xml:space="preserve"><value>{first_item}-{last_item} von {all_items}</value></data>
-    <data name="MudChooseDate" xml:space="preserve"><value>Datum wählen</value></data>
-    <data name="MudPreviousMonth" xml:space="preserve"><value>Vorheriger Monat</value></data>
-    <data name="MudNextMonth" xml:space="preserve"><value>Nächster Monat</value></data>
     <data name="MudClear" xml:space="preserve"><value>Löschen</value></data>
     <data name="Previous year {0}" xml:space="preserve"><value>Vorheriges Jahr {0}</value></data>
     <data name="Next year {0}" xml:space="preserve"><value>Nächstes Jahr {0}</value></data>
@@ -367,14 +348,6 @@
     <data name="Not a valid boolean" xml:space="preserve"><value>Kein gültiger Wahrheitswert</value></data>
     <data name="Not a valid {0}" xml:space="preserve"><value>Kein gültiger Wert für {0}</value></data>
     <data name="Conversion error: {0}" xml:space="preserve"><value>Konvertierungsfehler: {0}</value></data>
-    <data name="Select row" xml:space="preserve"><value>Zeile auswählen</value></data>
-    <data name="Select all rows" xml:space="preserve"><value>Alle Zeilen auswählen</value></data>
-    <data name="Select group" xml:space="preserve"><value>Gruppe auswählen</value></data>
-    <data name="Expand group" xml:space="preserve"><value>Gruppe aufklappen</value></data>
-    <data name="Collapse group" xml:space="preserve"><value>Gruppe zuklappen</value></data>
-    <data name="Edit row" xml:space="preserve"><value>Zeile bearbeiten</value></data>
-    <data name="Cancel edit" xml:space="preserve"><value>Bearbeiten abbrechen</value></data>
-    <data name="Commit edit" xml:space="preserve"><value>Änderung speichern</value></data>
     <data name="{0} {1} {2} Exported {3:yyyy-MM-dd HH-mm-ss}.csv" xml:space="preserve"><value>{0} {1} {2} Exportiert {3:yyyy-MM-dd HH-mm-ss}.csv</value></data>
     <data name="No Measurements" xml:space="preserve"><value>Keine Messungen</value></data>
     <data name="ConditionValue" xml:space="preserve"><value>{0} {1}</value></data>

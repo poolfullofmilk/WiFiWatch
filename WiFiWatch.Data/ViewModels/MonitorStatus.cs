@@ -1,4 +1,3 @@
-using System.Net;
 using WiFiWatch.Data.Helpers;
 using WiFiWatch.Data.Localization;
 
@@ -6,7 +5,6 @@ namespace WiFiWatch.Data.ViewModels;
 
 public sealed record MonitorStatus(
     string Link,
-    IPAddress? RouterAddress,
     string? RouterAdminUrl,
     WiFiReading? Reading,
     long? RouterRoundTrip,

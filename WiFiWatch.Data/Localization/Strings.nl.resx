@@ -11,8 +11,6 @@
     <data name="SummaryDescription" xml:space="preserve"><value>Meldt elke ochtend problemen van de vorige dag</value></data>
     <data name="NightlySpeedTest" xml:space="preserve"><value>Nachtelijke snelheidstest</value></data>
     <data name="SpeedDescription" xml:space="preserve"><value>Meet snelheid en vertraging onder belasting om 03:00</value></data>
-    <data name="NativeWiFi" xml:space="preserve"><value>Wifi rechtstreeks uitlezen</value></data>
-    <data name="NativeDescription" xml:space="preserve"><value>Vraagt Windows rechtstreeks in plaats van netsh, werkt in elke taal</value></data>
     <data name="ProblemLimits" xml:space="preserve"><value>Probleemgrenzen</value></data>
     <data name="LimitsDescription" xml:space="preserve"><value>2 slechte minuten openen een incident; driemaal de grens geeft direct een melding</value></data>
     <data name="WeakSignal" xml:space="preserve"><value>Zwak signaal onder dBm</value></data>
@@ -34,12 +32,6 @@
     <data name="SystemLanguage" xml:space="preserve"><value>Windows-taal (automatisch)</value></data>
     <data name="SlowDnsValue" xml:space="preserve"><value>Trage DNS {0:0.#} ms</value></data>
     <data name="SlowDnsSummary" xml:space="preserve"><value>Trage DNS gedurende {0}, piek {1:0.#} ms, gemiddeld {2:0.#} ms</value></data>
-    <data name="MinuteOne" xml:space="preserve"><value>{0} minuut</value></data>
-    <data name="MinuteFew" xml:space="preserve"><value>{0} minuten</value></data>
-    <data name="MinuteMany" xml:space="preserve"><value>{0} minuten</value></data>
-    <data name="SecondOne" xml:space="preserve"><value>{0} seconde</value></data>
-    <data name="SecondFew" xml:space="preserve"><value>{0} seconden</value></data>
-    <data name="SecondMany" xml:space="preserve"><value>{0} seconden</value></data>
     <data name="Overview" xml:space="preserve"><value>Overzicht</value></data>
     <data name="Incidents" xml:space="preserve"><value>Incidenten</value></data>
     <data name="History" xml:space="preserve"><value>Geschiedenis</value></data>
@@ -113,16 +105,13 @@
     <data name="Longest Outage" xml:space="preserve"><value>Langste uitval</value></data>
     <data name="Internet Or Connection Down" xml:space="preserve"><value>Internet of verbinding uitgevallen</value></data>
     <data name="Fastest Download" xml:space="preserve"><value>Snelste download</value></data>
-    <data name="From Speed Tests" xml:space="preserve"><value>Uit snelheidstests</value></data>
     <data name="None" xml:space="preserve"><value>Geen</value></data>
     <data name="No Speed Test" xml:space="preserve"><value>Geen snelheidstest</value></data>
     <data name="No Wi-Fi Scans In This Range" xml:space="preserve"><value>Geen wifi-scans in deze periode</value></data>
     <data name="Export" xml:space="preserve"><value>Exporteren</value></data>
     <data name="All" xml:space="preserve"><value>Alles</value></data>
     <data name="Export Day" xml:space="preserve"><value>Dag exporteren</value></data>
-    <data name="Sort By" xml:space="preserve"><value>Sorteren op</value></data>
     <data name="Search" xml:space="preserve"><value>Zoeken</value></data>
-    <data name="Rows Per Page" xml:space="preserve"><value>Rijen per pagina</value></data>
     <data name="Hop" xml:space="preserve"><value>Hop</value></data>
     <data name="Address" xml:space="preserve"><value>Adres</value></data>
     <data name="Name" xml:space="preserve"><value>Naam</value></data>
@@ -343,14 +332,6 @@
     <data name="ms" xml:space="preserve"><value>ms</value></data>
     <data name="Mbps" xml:space="preserve"><value>Mbps</value></data>
     <data name="dBm" xml:space="preserve"><value>dBm</value></data>
-    <data name="MudFirst" xml:space="preserve"><value>Eerste pagina</value></data>
-    <data name="MudLast" xml:space="preserve"><value>Laatste pagina</value></data>
-    <data name="MudNext" xml:space="preserve"><value>Volgende pagina</value></data>
-    <data name="MudPrevious" xml:space="preserve"><value>Vorige pagina</value></data>
-    <data name="MudPagerInfo" xml:space="preserve"><value>{first_item}-{last_item} van {all_items}</value></data>
-    <data name="MudChooseDate" xml:space="preserve"><value>Datum kiezen</value></data>
-    <data name="MudPreviousMonth" xml:space="preserve"><value>Vorige maand</value></data>
-    <data name="MudNextMonth" xml:space="preserve"><value>Volgende maand</value></data>
     <data name="MudClear" xml:space="preserve"><value>Wissen</value></data>
     <data name="Previous year {0}" xml:space="preserve"><value>Vorig jaar {0}</value></data>
     <data name="Next year {0}" xml:space="preserve"><value>Volgend jaar {0}</value></data>
@@ -367,14 +348,6 @@
     <data name="Not a valid boolean" xml:space="preserve"><value>Geen geldige booleaanse waarde</value></data>
     <data name="Not a valid {0}" xml:space="preserve"><value>Geen geldige {0}</value></data>
     <data name="Conversion error: {0}" xml:space="preserve"><value>Conversiefout: {0}</value></data>
-    <data name="Select row" xml:space="preserve"><value>Rij selecteren</value></data>
-    <data name="Select all rows" xml:space="preserve"><value>Alle rijen selecteren</value></data>
-    <data name="Select group" xml:space="preserve"><value>Groep selecteren</value></data>
-    <data name="Expand group" xml:space="preserve"><value>Groep uitvouwen</value></data>
-    <data name="Collapse group" xml:space="preserve"><value>Groep invouwen</value></data>
-    <data name="Edit row" xml:space="preserve"><value>Rij bewerken</value></data>
-    <data name="Cancel edit" xml:space="preserve"><value>Bewerken annuleren</value></data>
-    <data name="Commit edit" xml:space="preserve"><value>Bewerking opslaan</value></data>
     <data name="{0} {1} {2} Exported {3:yyyy-MM-dd HH-mm-ss}.csv" xml:space="preserve"><value>{0} {1} {2} Geëxporteerd {3:yyyy-MM-dd HH-mm-ss}.csv</value></data>
     <data name="No Measurements" xml:space="preserve"><value>Geen metingen</value></data>
     <data name="ConditionValue" xml:space="preserve"><value>{0} {1}</value></data>

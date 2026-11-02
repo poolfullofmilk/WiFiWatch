@@ -114,7 +114,7 @@ public partial class Home : IDisposable
 
     private async Task OfferUpdateAsync()
     {
-        // Found By The Daily Check, Offered Once Per Run
+        // Found At Start Or By The Daily Check, Offered Once Per Run
         if (_hasOfferedUpdate || Monitor.AvailableUpdate is not { } version)
             return;
 

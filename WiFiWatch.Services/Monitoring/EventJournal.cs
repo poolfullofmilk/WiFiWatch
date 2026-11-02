@@ -62,7 +62,6 @@ public sealed class EventJournal
                     Scope = scope,
                     Message = message,
                     Details = details?.ToJson(),
-                    IsAlert = severity != EventSeverity.Info,
                 }
             );
             await context.SaveChangesAsync();
@@ -75,16 +74,11 @@ public sealed class EventJournal
         }
     }
 
-    public async Task TryRecordAsync(
-        EventKind kind,
-        EventSeverity severity,
-        string message,
-        string? scope = null
-    )
+    public async Task TryRecordAsync(EventKind kind, EventSeverity severity, string message)
     {
         try
         {
-            await RecordAsync(kind, severity, message, scope);
+            await RecordAsync(kind, severity, message);
         }
         catch
         {
@@ -158,7 +152,6 @@ public sealed class EventJournal
                 Scope = scope,
                 Message = message,
                 Details = details?.ToJson(),
-                IsAlert = severity != EventSeverity.Info,
             };
             await using var context = new WiFiDbContext();
             context.Events.Add(row);
@@ -200,18 +193,13 @@ public sealed class EventJournal
         EventRecorded?.Invoke();
     }
 
-    public async Task CloseAsync(
-        string key,
-        string message,
-        DateTime? endedAtUtc = null,
-        Func<EventDetails, EventDetails>? changeDetails = null
-    )
+    public async Task CloseAsync(string key, string message, DateTime? endedAtUtc = null)
     {
         if (!_openIncidents.TryRemove(key, out var incident))
             return;
 
         await WithGateAsync(() =>
-            WriteAsync(incident.Id, message, null, changeDetails, endedAtUtc ?? DateTime.UtcNow)
+            WriteAsync(incident.Id, message, null, null, endedAtUtc ?? DateTime.UtcNow)
         );
         EventRecorded?.Invoke();
     }
@@ -331,7 +319,6 @@ public sealed class EventJournal
 
         row.Message = message ?? row.Message;
         row.Severity = severity ?? row.Severity;
-        row.IsAlert = row.Severity != EventSeverity.Info;
         row.EndedAtUtc = endedAtUtc ?? row.EndedAtUtc;
         if (changeDetails is not null)
         {

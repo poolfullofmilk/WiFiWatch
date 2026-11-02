@@ -19,16 +19,7 @@ public sealed class AppLocalizationInterceptor : ILocalizationInterceptor
         var english = s_english.GetString(key, CultureInfo.InvariantCulture) ?? key;
         var resource = english switch
         {
-            "First page" => "MudFirst",
-            "Last page" => "MudLast",
-            "Next page" => "MudNext",
-            "Previous page" => "MudPrevious",
             "Clear" => "MudClear",
-            "Open" => "Open",
-            "Close" => "Close",
-            "Start" => "Start",
-            "End" => "End",
-            "Select all" => "All",
             _ => english,
         };
         return new LocalizedString(key, AppText.Get(resource, arguments), resourceNotFound: false);

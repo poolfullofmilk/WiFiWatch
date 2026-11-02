@@ -17,7 +17,8 @@
     }
 
     @* Day Strip *@
-    <Header Title="@AppText.Get("Last 24 Hours")">
+    <Header Title="@AppText.Get("Last 24 Hours")"
+            Icon="@Icons.Material.Rounded.Schedule">
         <TitleContent>
             <MudText Typo="Typo.body2"
                      Class="mx-2 mud-text-secondary">
@@ -32,7 +33,7 @@
                     <MudSkeleton SkeletonType="SkeletonType.Rectangle"
                                  Animation="Animation.Wave"
                                  Height="56px"
-                                 Style="border-radius:10px" />
+                                 Style="border-radius:var(--radius-inner)" />
                 }
                 else
                 {
@@ -43,7 +44,8 @@
     </Header>
 
     @* Recent Problems *@
-    <Header Title="@AppText.Get("Recent Problems")">
+    <Header Title="@AppText.Get("Recent Problems")"
+            Icon="@Icons.Material.Rounded.ReportProblem">
         <TitleContent>
             @* All Incidents Button *@
             <MudButton Variant="Variant.Text"
@@ -57,7 +59,7 @@
             @if (!_isLoading && _recent.Count == 0)
             {
                 <MudPaper Elevation="4"
-                          Class="pa-6 rounded-panel">
+                          Class="pa-4 rounded-panel">
                     <MudStack Row
                               AlignItems="AlignItems.Center"
                               Spacing="3">
@@ -80,7 +82,8 @@
                               AlignItems="AlignItems.Center"
                               Spacing="3">
                         <MudIcon Icon="@EventKindColors.IconFor(incident.Severity)"
-                                 Color="@EventKindColors.For(incident.Kind, incident.Severity)" />
+                                 Color="@EventKindColors.For(incident.Kind, incident.Severity)"
+                                 Class="thumb" />
                         <MudStack Spacing="0"
                                   Style="flex:1 1 auto; min-width:0">
                             <MudText Typo="Typo.subtitle2">@incident.Kind.ToLabel()</MudText>

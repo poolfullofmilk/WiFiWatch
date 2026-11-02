@@ -11,8 +11,6 @@
     <data name="SummaryDescription" xml:space="preserve"><value>Уведомляет утром о проблемах за предыдущий день</value></data>
     <data name="NightlySpeedTest" xml:space="preserve"><value>Ночной тест скорости</value></data>
     <data name="SpeedDescription" xml:space="preserve"><value>Измеряет скорость и задержку под нагрузкой в 03:00</value></data>
-    <data name="NativeWiFi" xml:space="preserve"><value>Читать данные Wi-Fi напрямую</value></data>
-    <data name="NativeDescription" xml:space="preserve"><value>Запрашивает Windows напрямую вместо netsh, работает на любом языке</value></data>
     <data name="ProblemLimits" xml:space="preserve"><value>Пороговые значения</value></data>
     <data name="LimitsDescription" xml:space="preserve"><value>2 плохие минуты открывают инцидент; тройное превышение порога вызывает уведомление сразу</value></data>
     <data name="WeakSignal" xml:space="preserve"><value>Слабый сигнал ниже, дБм</value></data>
@@ -34,12 +32,6 @@
     <data name="SystemLanguage" xml:space="preserve"><value>Язык Windows (автоматически)</value></data>
     <data name="SlowDnsValue" xml:space="preserve"><value>Медленный DNS: {0:0.#} мс</value></data>
     <data name="SlowDnsSummary" xml:space="preserve"><value>Медленный DNS наблюдался {0}, пик {1:0.#} мс, среднее {2:0.#} мс</value></data>
-    <data name="MinuteOne" xml:space="preserve"><value>{0} минуту</value></data>
-    <data name="MinuteFew" xml:space="preserve"><value>{0} минуты</value></data>
-    <data name="MinuteMany" xml:space="preserve"><value>{0} минут</value></data>
-    <data name="SecondOne" xml:space="preserve"><value>{0} секунду</value></data>
-    <data name="SecondFew" xml:space="preserve"><value>{0} секунды</value></data>
-    <data name="SecondMany" xml:space="preserve"><value>{0} секунд</value></data>
     <data name="Overview" xml:space="preserve"><value>Обзор</value></data>
     <data name="Incidents" xml:space="preserve"><value>Инциденты</value></data>
     <data name="History" xml:space="preserve"><value>История</value></data>
@@ -113,16 +105,13 @@
     <data name="Longest Outage" xml:space="preserve"><value>Самый Долгий Перебой</value></data>
     <data name="Internet Or Connection Down" xml:space="preserve"><value>Недоступен интернет или соединение</value></data>
     <data name="Fastest Download" xml:space="preserve"><value>Самая Быстрая Загрузка</value></data>
-    <data name="From Speed Tests" xml:space="preserve"><value>По тестам скорости</value></data>
     <data name="None" xml:space="preserve"><value>Нет</value></data>
     <data name="No Speed Test" xml:space="preserve"><value>Нет Теста Скорости</value></data>
     <data name="No Wi-Fi Scans In This Range" xml:space="preserve"><value>В этом периоде нет сканирований Wi-Fi</value></data>
     <data name="Export" xml:space="preserve"><value>Экспорт</value></data>
     <data name="All" xml:space="preserve"><value>Все</value></data>
     <data name="Export Day" xml:space="preserve"><value>Экспорт За День</value></data>
-    <data name="Sort By" xml:space="preserve"><value>Сортировка</value></data>
     <data name="Search" xml:space="preserve"><value>Поиск</value></data>
-    <data name="Rows Per Page" xml:space="preserve"><value>Строк На Странице</value></data>
     <data name="Hop" xml:space="preserve"><value>Узел</value></data>
     <data name="Address" xml:space="preserve"><value>Адрес</value></data>
     <data name="Name" xml:space="preserve"><value>Имя</value></data>
@@ -343,14 +332,6 @@
     <data name="ms" xml:space="preserve"><value>мс</value></data>
     <data name="Mbps" xml:space="preserve"><value>Мбит/с</value></data>
     <data name="dBm" xml:space="preserve"><value>дБм</value></data>
-    <data name="MudFirst" xml:space="preserve"><value>Первая страница</value></data>
-    <data name="MudLast" xml:space="preserve"><value>Последняя страница</value></data>
-    <data name="MudNext" xml:space="preserve"><value>Следующая страница</value></data>
-    <data name="MudPrevious" xml:space="preserve"><value>Предыдущая страница</value></data>
-    <data name="MudPagerInfo" xml:space="preserve"><value>{first_item}-{last_item} из {all_items}</value></data>
-    <data name="MudChooseDate" xml:space="preserve"><value>Выбрать дату</value></data>
-    <data name="MudPreviousMonth" xml:space="preserve"><value>Предыдущий месяц</value></data>
-    <data name="MudNextMonth" xml:space="preserve"><value>Следующий месяц</value></data>
     <data name="MudClear" xml:space="preserve"><value>Очистить</value></data>
     <data name="Previous year {0}" xml:space="preserve"><value>Предыдущий год {0}</value></data>
     <data name="Next year {0}" xml:space="preserve"><value>Следующий год {0}</value></data>
@@ -367,14 +348,6 @@
     <data name="Not a valid boolean" xml:space="preserve"><value>Недопустимое логическое значение</value></data>
     <data name="Not a valid {0}" xml:space="preserve"><value>Недопустимое значение: {0}</value></data>
     <data name="Conversion error: {0}" xml:space="preserve"><value>Ошибка преобразования: {0}</value></data>
-    <data name="Select row" xml:space="preserve"><value>Выбрать строку</value></data>
-    <data name="Select all rows" xml:space="preserve"><value>Выбрать все строки</value></data>
-    <data name="Select group" xml:space="preserve"><value>Выбрать группу</value></data>
-    <data name="Expand group" xml:space="preserve"><value>Развернуть группу</value></data>
-    <data name="Collapse group" xml:space="preserve"><value>Свернуть группу</value></data>
-    <data name="Edit row" xml:space="preserve"><value>Изменить строку</value></data>
-    <data name="Cancel edit" xml:space="preserve"><value>Отменить изменение</value></data>
-    <data name="Commit edit" xml:space="preserve"><value>Сохранить изменение</value></data>
     <data name="{0} {1} {2} Exported {3:yyyy-MM-dd HH-mm-ss}.csv" xml:space="preserve"><value>{0} {1} {2} Экспорт {3:yyyy-MM-dd HH-mm-ss}.csv</value></data>
     <data name="No Measurements" xml:space="preserve"><value>Нет измерений</value></data>
     <data name="ConditionValue" xml:space="preserve"><value>{0} {1}</value></data>
