@@ -84,7 +84,7 @@ internal static class Program
             "Old settings preserve values and case-insensitive keys"
         );
         Check(
-            settings.WeakSignalRssi == -70 && settings.ShowUpdatePopup,
+            settings.WeakSignalRssi == -70 && settings.StartWithWindows,
             "Missing keys retain defaults"
         );
         foreach (var language in AppText.Languages.Keys)
@@ -697,6 +697,7 @@ internal static class Program
                     (typeof(IncidentDialog), "What To Do"),
                     (typeof(SpeedTestDialog), "Test Again"),
                     (typeof(UpdateDialog), "What Changed"),
+                    (typeof(AboutDialog), "GitHubProject"),
                 }
             )
             {

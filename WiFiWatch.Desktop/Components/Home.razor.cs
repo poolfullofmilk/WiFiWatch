@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
 using WiFiWatch.Data.Enums;
+using WiFiWatch.Data.Helpers;
 using WiFiWatch.Data.Localization;
 using WiFiWatch.Desktop.Components.Shared.Common;
 using WiFiWatch.Desktop.Components.Shared.Dialogs;
@@ -34,6 +35,9 @@ public partial class Home : IDisposable
 
     [Inject]
     public required IJSRuntime JavaScript { get; set; }
+
+    [Inject]
+    public required ISnackbar Snackbar { get; set; }
 
     private int _languageVersion;
     private bool _languageChanged = true;
@@ -95,15 +99,6 @@ public partial class Home : IDisposable
         _errorBoundary?.Recover();
     }
 
-    // Red Or Amber Is An Open Problem, Blue A Waiting Update
-    private Color? DotColor(Page page) =>
-        page switch
-        {
-            Page.Overview => _problemColor,
-            Page.Settings when Monitor.AvailableUpdate is not null => Color.Info,
-            _ => null,
-        };
-
     private async Task LoadProblemColorAsync()
     {
         // A Dot On Overview While Something Is Still Wrong
@@ -119,17 +114,39 @@ public partial class Home : IDisposable
 
     private async Task OfferUpdateAsync()
     {
-        // One Popup Per Run, Unless Turned Off
-        if (
-            _hasOfferedUpdate
-            || !Monitor.Settings.ShowUpdatePopup
-            || Monitor.AvailableUpdate is not { } version
-        )
+        // Found By The Daily Check, Offered Once Per Run
+        if (_hasOfferedUpdate || Monitor.AvailableUpdate is not { } version)
             return;
 
         _hasOfferedUpdate = true;
         await UpdateDialog.ShowAsync(DialogService, version);
     }
+
+    private async Task CheckForUpdatesAsync()
+    {
+        // This Check Shows Its Own Dialog, So The Popup It Triggers Stays Away
+        var wasOffered = _hasOfferedUpdate;
+        _hasOfferedUpdate = true;
+        var latest = await Monitor.CheckForUpdateAsync();
+        if (latest is not null && latest > AppInfo.Version)
+        {
+            StateHasChanged();
+            await UpdateDialog.ShowAsync(DialogService, latest);
+            return;
+        }
+
+        _hasOfferedUpdate = wasOffered;
+        Snackbar.Add(
+            AppText.Get(latest is null ? "UnableToCheckForUpdates" : "AlreadyLatestVersion"),
+            latest is null ? Severity.Warning : Severity.Success
+        );
+    }
+
+    private Task<IDialogReference> ShowAboutAsync() =>
+        DialogService.ShowAsync<AboutDialog>(
+            title: null,
+            new DialogOptions { MaxWidth = MaxWidth.ExtraSmall, FullWidth = true }
+        );
 
     private async Task AskBeforeClosingAsync()
     {

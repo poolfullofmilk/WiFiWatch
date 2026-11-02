@@ -31,6 +31,13 @@
             }
         });
 
+        // Escape Closes The Top Dialog Even When A Menu Left Focus Outside It, Not While It Hides Its X
+        document.addEventListener('keydown', (event) => {
+            if (event.key !== 'Escape' || document.querySelector('.mud-popover-open .mud-list')) return;
+            const dialog = [...document.querySelectorAll('.mud-dialog')].pop();
+            if (dialog && !dialog.contains(document.activeElement)) dialog.querySelector('.mud-button-close')?.click();
+        });
+
         // An Info Icon Inside A Switch Label Never Toggles The Switch
         document.addEventListener('click', (event) => {
             if (event.target instanceof Element && event.target.closest('.info-icon')) {

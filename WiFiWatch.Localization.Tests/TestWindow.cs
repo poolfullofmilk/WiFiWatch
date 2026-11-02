@@ -23,6 +23,8 @@ namespace WiFiWatch.Desktop
             remove { }
         }
 
+        public bool IsUpdating { get; set; }
+
         public void Hide() { }
 
         public void Exit() { }

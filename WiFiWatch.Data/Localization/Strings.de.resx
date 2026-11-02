@@ -13,8 +13,6 @@
     <data name="SpeedDescription" xml:space="preserve"><value>Misst Geschwindigkeit und Latenz unter Last um 03:00</value></data>
     <data name="NativeWiFi" xml:space="preserve"><value>WLAN nativ auslesen</value></data>
     <data name="NativeDescription" xml:space="preserve"><value>Fragt Windows direkt statt netsh, funktioniert in jeder Sprache</value></data>
-    <data name="UpdatePopup" xml:space="preserve"><value>Updatefenster</value></data>
-    <data name="UpdateDescription" xml:space="preserve"><value>Fragt nach einem Update, sobald eine neue Version verfügbar ist</value></data>
     <data name="ProblemLimits" xml:space="preserve"><value>Problemgrenzen</value></data>
     <data name="LimitsDescription" xml:space="preserve"><value>2 schlechte Minuten öffnen einen Vorfall; der dreifache Grenzwert meldet sofort</value></data>
     <data name="WeakSignal" xml:space="preserve"><value>Schwaches Signal unter dBm</value></data>
@@ -28,17 +26,12 @@
     <data name="PluggedIn" xml:space="preserve"><value>Netzbetrieb {0}</value></data>
     <data name="OnBattery" xml:space="preserve"><value>Akkubetrieb {0}</value></data>
     <data name="Roaming" xml:space="preserve"><value>Roaming {0}</value></data>
-    <data name="VersionAvailable" xml:space="preserve"><value>Version {0} verfügbar</value></data>
     <data name="Downloading" xml:space="preserve"><value>Wird Heruntergeladen</value></data>
-    <data name="UpdateNow" xml:space="preserve"><value>Jetzt aktualisieren</value></data>
     <data name="CheckUpdates" xml:space="preserve"><value>Nach Updates suchen</value></data>
-    <data name="GitHubUnavailable" xml:space="preserve"><value>GitHub nicht erreichbar</value></data>
-    <data name="VersionLatest" xml:space="preserve"><value>Version {0} ist aktuell</value></data>
     <data name="DriverFrom" xml:space="preserve"><value>Treiber {0} vom {1:dd-MM-yyyy}</value></data>
     <data name="Driver" xml:space="preserve"><value>Treiber {0}</value></data>
     <data name="Language" xml:space="preserve"><value>Sprache</value></data>
     <data name="SystemLanguage" xml:space="preserve"><value>Windows-Sprache (automatisch)</value></data>
-    <data name="LanguageDescription" xml:space="preserve"><value>Ändert die Sprache in der gesamten App</value></data>
     <data name="SlowDnsValue" xml:space="preserve"><value>Langsames DNS {0:0.#} ms</value></data>
     <data name="SlowDnsSummary" xml:space="preserve"><value>Langsames DNS für {0}, Spitze {1:0.#} ms, Durchschnitt {2:0.#} ms</value></data>
     <data name="MinuteOne" xml:space="preserve"><value>{0} Minute</value></data>
@@ -148,7 +141,6 @@
     <data name="Speed Test Failed, Check The Connection" xml:space="preserve"><value>Geschwindigkeitstest fehlgeschlagen, Verbindung prüfen</value></data>
     <data name="Measured Against Fast.com Servers, 8 Seconds Each Way" xml:space="preserve"><value>An Fast.com-Servern gemessen, 8 Sekunden je Richtung</value></data>
     <data name="Test Again" xml:space="preserve"><value>Erneut Testen</value></data>
-    <data name="Don't Show Again" xml:space="preserve"><value>Nicht Mehr Anzeigen</value></data>
     <data name="Update Now" xml:space="preserve"><value>Jetzt Aktualisieren</value></data>
     <data name="Hidden" xml:space="preserve"><value>Versteckt</value></data>
     <data name="Yours" xml:space="preserve"><value>Ihr Netzwerk</value></data>
@@ -225,9 +217,8 @@
     <data name="Airtime Busy {0}%" xml:space="preserve"><value>Sendezeit zu {0}% belegt</value></data>
     <data name="Grade {0}" xml:space="preserve"><value>Bewertung {0}</value></data>
     <data name="Lag Under Load {0}" xml:space="preserve"><value>Latenz unter Last {0}</value></data>
-    <data name="Installed Version Is {0}, Updating Restarts {1}" xml:space="preserve"><value>Installierte Version ist {0}, Aktualisieren startet {1} neu</value></data>
-    <data name="Version {0} Available" xml:space="preserve"><value>Version {0} verfügbar</value></data>
-    <data name="Update Failed {0}" xml:space="preserve"><value>Update fehlgeschlagen: {0}</value></data>
+    <data name="Installed Version Is {0}, Updating Restarts {1}" xml:space="preserve"><value>Sie haben Version {0}. Beim Aktualisieren wird die neue heruntergeladen und {1} neu gestartet</value></data>
+    <data name="Version {0} Available" xml:space="preserve"><value>Version {0} Ist Verfügbar</value></data>
     <data name="{0}, Still Going" xml:space="preserve"><value>{0}, läuft noch</value></data>
     <data name="{0} To {1}, {2}" xml:space="preserve"><value>{0} bis {1}, {2}</value></data>
     <data name="{0} To {1}" xml:space="preserve"><value>{0} bis {1}</value></data>
@@ -392,4 +383,18 @@
     <data name="ChannelLegend" xml:space="preserve"><value>Blau: Ihr Kanal&#10;Orange: ein Nachbar mit 30% Signal oder mehr in Ihrem 80-MHz-Block, der die Sendezeit mit Ihnen teilt&#10;Grau: andere Netze in Reichweite&#10;Sendezeit belegt: wie oft Ihr Access Point den Kanal als belegt meldet</value></data>
     <data name="StartFailed" xml:space="preserve"><value>{0} konnte nicht starten: {1}</value></data>
     <data name="Scroll To Top" xml:space="preserve"><value>Nach Oben</value></data>
+    <data name="MB" xml:space="preserve"><value>MB</value></data>
+    <data name="DownloadedOf" xml:space="preserve"><value>{0} von {1}</value></data>
+    <data name="StartingUpdate" xml:space="preserve"><value>Update Wird Gestartet</value></data>
+    <data name="UpdateNotVerified" xml:space="preserve"><value>Der Download konnte nicht geprüft werden, daher öffnet sich die Release-Seite zum selbst Herunterladen</value></data>
+    <data name="UpdateFolderProtected" xml:space="preserve"><value>Der Ordner der App ist geschützt, daher öffnet sich die Release-Seite zum selbst Herunterladen</value></data>
+    <data name="UpdateFailed" xml:space="preserve"><value>Aktualisierung fehlgeschlagen, später erneut versuchen</value></data>
+    <data name="GitHubProject" xml:space="preserve"><value>GitHub-Projekt</value></data>
+    <data name="Help" xml:space="preserve"><value>Hilfe</value></data>
+    <data name="AboutText" xml:space="preserve"><value>Überwacht WLAN, Router und Internet und erklärt jedes Problem</value></data>
+    <data name="Version" xml:space="preserve"><value>Version</value></data>
+    <data name="AlreadyLatestVersion" xml:space="preserve"><value>Sie haben bereits die neueste Version</value></data>
+    <data name="UnableToCheckForUpdates" xml:space="preserve"><value>Suche nach Updates fehlgeschlagen</value></data>
+    <data name="UpdatingText" xml:space="preserve"><value>Wi-Fi Watch schließt sich von selbst, sobald das Update heruntergeladen ist</value></data>
+    <data name="UpdatingTitle" xml:space="preserve"><value>Update Läuft</value></data>
 </root>

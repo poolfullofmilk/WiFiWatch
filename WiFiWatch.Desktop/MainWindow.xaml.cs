@@ -111,8 +111,23 @@ public partial class MainWindow : Window
         Activate();
     }
 
+    // A Download In Flight Keeps The App Running, The Update Exits Once It Is Done
+    public bool IsUpdating { get; set; }
+
     public void Exit()
     {
+        if (IsUpdating)
+        {
+            MessageBox.Show(
+                this,
+                AppText.Get("UpdatingText"),
+                AppText.Get("UpdatingTitle"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Information
+            );
+            return;
+        }
+
         _isExiting = true;
         _trayIcon.Dispose();
         Application.Current.Shutdown();

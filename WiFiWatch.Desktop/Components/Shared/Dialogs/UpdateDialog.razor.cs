@@ -1,6 +1,9 @@
+using System.ComponentModel;
 using System.IO;
+using System.Net.Http;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using WiFiWatch.Data.Helpers;
 using WiFiWatch.Data.Localization;
 using WiFiWatch.Services.Integration;
 using WiFiWatch.Services.Monitoring;
@@ -26,21 +29,27 @@ public partial class UpdateDialog
 
     private bool _isInstalling;
 
-    // Whole Percents, Null While The Length Is Unknown
-    private int? _percent;
+    // Bytes So Far, Zero Total While No Length Is Sent
+    private long _received;
+    private long _total;
+    private int _percent;
+
+    private string ProgressText =>
+        _total > 0 && _received >= _total ? AppText.Get("StartingUpdate")
+        : _total > 0
+            ? AppText.Get(
+                "DownloadedOf",
+                Formatter.FormatSize(_received),
+                Formatter.FormatSize(_total)
+            )
+        : Formatter.FormatSize(_received);
 
     public static Task ShowAsync(IDialogService dialogService, Version version) =>
         dialogService.ShowAsync<UpdateDialog>(
             null,
             new DialogParameters<UpdateDialog> { { dialog => dialog.Version, version } },
-            new DialogOptions { BackdropClick = true, MaxWidth = MaxWidth.ExtraSmall }
+            new DialogOptions { MaxWidth = MaxWidth.ExtraSmall, FullWidth = true }
         );
-
-    private void SetHidden(bool isHidden)
-    {
-        Monitor.Settings = Monitor.Settings with { ShowUpdatePopup = !isHidden };
-        Monitor.Settings.Save();
-    }
 
     private async Task InstallAsync()
     {
@@ -51,41 +60,68 @@ public partial class UpdateDialog
         // A Debug Build Has No Release Exe To Replace
         if (!Updater.CanInstall)
         {
-            QuickActions.Open(UpdateChecker.LatestReleaseUrl);
+            OpenReleasePage();
             return;
         }
 
-        // No Corner X Or Escape While The Download Runs
+        // A Running Update Cannot Be Closed Halfway
         _isInstalling = true;
+        Window.IsUpdating = true;
         await SetClosableAsync(false);
         try
         {
-            _percent = null;
-            Updater.Launch(
-                await Updater.DownloadAsync(
-                    Version,
-                    new Progress<int?>(percent =>
-                    {
-                        _percent = percent;
-                        _ = InvokeAsync(StateHasChanged);
-                    })
-                )
+            var path = await Updater.DownloadAsync(
+                Version,
+                new Progress<(long, long)>(ShowProgress)
             );
+            Updater.Launch(path);
+            Window.IsUpdating = false;
             Window.Exit();
         }
-        catch (Exception exception)
+        catch (InvalidDataException)
         {
-            Snackbar.Add(
-                AppText.Get("Update Failed {0}", exception.GetType().Name),
-                Severity.Warning
-            );
-
-            // A Bad Checksum Or A Protected Folder Needs The Release Page
-            if (exception is InvalidDataException or UnauthorizedAccessException)
-                QuickActions.Open(UpdateChecker.LatestReleaseUrl);
+            // An Unverified Download Never Runs, The Release Page Opens Instead
+            Snackbar.Add(AppText.Get("UpdateNotVerified"), Severity.Warning);
+            OpenReleasePage();
         }
-        _isInstalling = false;
-        await SetClosableAsync(true);
+        catch (UnauthorizedAccessException)
+        {
+            // A Protected Folder Like Program Files Takes A Manual Download
+            Snackbar.Add(AppText.Get("UpdateFolderProtected"), Severity.Warning);
+            OpenReleasePage();
+        }
+        catch (Exception exception)
+            when (exception
+                    is HttpRequestException
+                        or IOException
+                        or TaskCanceledException
+                        or Win32Exception
+            )
+        {
+            Snackbar.Add(AppText.Get("UpdateFailed"), Severity.Error);
+            _isInstalling = false;
+            await SetClosableAsync(true);
+        }
+        finally
+        {
+            Window.IsUpdating = false;
+        }
+    }
+
+    private void ShowProgress((long Received, long Total) progress)
+    {
+        // Redraws Once Per Percent, Not Per Chunk
+        var (received, total) = progress;
+        var percent = total > 0 ? (int)(received * 100 / total) : 0;
+        var moved =
+            total != _total || (total > 0 ? percent != _percent : received - _received >= 1048576);
+        if (!moved)
+            return;
+
+        _received = received;
+        _total = total;
+        _percent = percent;
+        _ = InvokeAsync(StateHasChanged);
     }
 
     private Task SetClosableAsync(bool isClosable) =>
@@ -97,4 +133,10 @@ public partial class UpdateDialog
                 BackdropClick = isClosable,
             }
         );
+
+    private void OpenReleasePage()
+    {
+        QuickActions.Open(UpdateChecker.LatestReleaseUrl);
+        Dialog.Close();
+    }
 }

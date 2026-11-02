@@ -13,15 +13,6 @@ public partial class DataTable<TItem>
     > ServerData { get; set; }
 
     [Parameter]
-    public string SearchTerm { get; set; } = string.Empty;
-
-    [Parameter]
-    public EventCallback<string> SearchTermChanged { get; set; }
-
-    [Parameter]
-    public RenderFragment? ToolBarExtra { get; set; }
-
-    [Parameter]
     public RenderFragment? HeaderContent { get; set; }
 
     [Parameter]
@@ -58,12 +49,4 @@ public partial class DataTable<TItem>
     }
 
     public Task ReloadAsync() => _mudTable?.ReloadServerData() ?? Task.CompletedTask;
-
-    private async Task OnSearchTermChangedAsync(string? value)
-    {
-        // The Field Debounces, So Every Change Reloads, Clearing Too
-        SearchTerm = value ?? string.Empty;
-        await SearchTermChanged.InvokeAsync(SearchTerm);
-        await ReloadAsync();
-    }
 }

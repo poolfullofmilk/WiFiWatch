@@ -311,6 +311,20 @@ svg.apexcharts-svg {
     box-shadow: var(--mud-elevation-1);
 }
 
+/* A Found Update Marks Check For Updates With The Help Badge's Red Dot */
+.update-dot .mud-menu-item-text::after {
+    content: "";
+    display: inline-block;
+    flex-shrink: 0;
+    align-self: flex-start;
+    width: 9px;
+    height: 9px;
+    margin-left: 4px;
+    border-radius: 50%;
+    background-color: var(--mud-palette-error);
+    box-shadow: var(--mud-elevation-1);
+}
+
 /* Keyboard Focus On Clickable Cards */
 [data-keyclick]:focus-visible {
     outline: 2px solid var(--mud-palette-info);

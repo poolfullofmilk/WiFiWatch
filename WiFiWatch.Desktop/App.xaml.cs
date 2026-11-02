@@ -86,7 +86,6 @@ public partial class App : Application
             );
         };
 
-
         // The Page Resolves The Window Only After It Exists
         MainWindow? window = null;
         var services = new ServiceCollection();

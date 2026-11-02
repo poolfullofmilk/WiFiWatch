@@ -3,7 +3,6 @@ using MudBlazor;
 using WiFiWatch.Data.Helpers;
 using WiFiWatch.Data.Localization;
 using WiFiWatch.Data.ViewModels;
-using WiFiWatch.Desktop.Components.Shared.Dialogs;
 using WiFiWatch.Services.Integration;
 using WiFiWatch.Services.Monitoring;
 using WiFiWatch.Services.Storage;
@@ -16,14 +15,6 @@ public partial class SettingsPage
 
     [Inject]
     public required NetworkMonitor Monitor { get; set; }
-
-    [Inject]
-    public required IDialogService DialogService { get; set; }
-
-    [Inject]
-    public required ISnackbar Snackbar { get; set; }
-
-    private bool _isChecking;
 
     protected override async Task OnInitializedAsync()
     {
@@ -44,41 +35,10 @@ public partial class SettingsPage
         settings.Save();
     }
 
-    private string SelectedLanguage =>
-        string.IsNullOrWhiteSpace(Monitor.Settings.Language)
-            ? string.Empty
-            : AppText.Culture.TwoLetterISOLanguageName;
-
-    private void SaveLanguage(string language)
-    {
-        SaveSettings(
-            Monitor.Settings with
-            {
-                Language = string.IsNullOrEmpty(language) ? null : language,
-            }
-        );
-        AppText.Select(language);
-    }
-
     private void SaveStartWithWindows(bool isStarted)
     {
         StartupRegistration.Apply(isStarted);
         SaveSettings(Monitor.Settings with { StartWithWindows = isStarted });
-    }
-
-    private async Task CheckForUpdateAsync()
-    {
-        _isChecking = true;
-        var latest = await Monitor.CheckForUpdateAsync();
-        _isChecking = false;
-        if (latest is null)
-        {
-            Snackbar.Add(AppText.Get("GitHubUnavailable"), Severity.Warning);
-        }
-        else if (latest <= AppInfo.Version)
-        {
-            Snackbar.Add(AppText.Get("VersionLatest", AppInfo.VersionText), Severity.Success);
-        }
     }
 
     private static string DriverText(AdapterInfo adapter) =>

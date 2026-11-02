@@ -99,7 +99,7 @@ live probes, adapter inspection, updater or real settings/database are used.
 
 The harness links the production Razor components, component code, themes and
 MudBlazor interceptor. `HtmlRenderer` checks navigation, all four pages and the
-three dialogs in all six languages (48 cases), plus live navigation language
+four dialogs in all six languages (54 cases), plus live navigation language
 changes. Dialog content fragments render without native dialog interaction.
 
 Other checks cover every satellite entry and placeholder set, English fallback,
@@ -112,11 +112,11 @@ deduplication, resource-key references and hardcoded Razor labels/text.
 
 Version 2, Windows 11 (en-GB), .NET SDK 10.0.401:
 
-- Debug and Release regression checks: passed, 9,733 assertions, including 48
+- Debug and Release regression checks: passed, 9,865 assertions, including 54
   rendering cases (v1.10 had 9,621).
 - Full solution Debug build: passed, 0 warnings and 0 errors.
 - Release publication: passed; `Verified localization bundle: nl;tr;de;es;ru`.
-  Output is the Windows single-file `WiFiWatch_v2.0.exe`.
+  Output is the Windows single-file `WiFiWatch_v2.0.1.exe`.
 - CSharpier 1.3.0 verification: passed.
 - Analyzer/style verification for all three projects: passed, apart from two
   info-level suggestions already on v1.10 (`IDE0032` in `WiFiDbContext`,

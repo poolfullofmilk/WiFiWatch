@@ -13,8 +13,6 @@
     <data name="SpeedDescription" xml:space="preserve"><value>Measures speed and lag under load at 03:00</value></data>
     <data name="NativeWiFi" xml:space="preserve"><value>Read Wi-Fi Natively</value></data>
     <data name="NativeDescription" xml:space="preserve"><value>Asks Windows directly instead of netsh, works in any language</value></data>
-    <data name="UpdatePopup" xml:space="preserve"><value>Update Popup</value></data>
-    <data name="UpdateDescription" xml:space="preserve"><value>Asks to update when a new version is out</value></data>
     <data name="ProblemLimits" xml:space="preserve"><value>Problem Limits</value></data>
     <data name="LimitsDescription" xml:space="preserve"><value>2 bad minutes open a problem, triple the limit notifies at once</value></data>
     <data name="WeakSignal" xml:space="preserve"><value>Weak Signal Below dBm</value></data>
@@ -28,17 +26,12 @@
     <data name="PluggedIn" xml:space="preserve"><value>Plugged In {0}</value></data>
     <data name="OnBattery" xml:space="preserve"><value>On Battery {0}</value></data>
     <data name="Roaming" xml:space="preserve"><value>Roaming {0}</value></data>
-    <data name="VersionAvailable" xml:space="preserve"><value>Version {0} Available</value></data>
     <data name="Downloading" xml:space="preserve"><value>Downloading</value></data>
-    <data name="UpdateNow" xml:space="preserve"><value>Update Now</value></data>
     <data name="CheckUpdates" xml:space="preserve"><value>Check for Updates</value></data>
-    <data name="GitHubUnavailable" xml:space="preserve"><value>Could not reach GitHub</value></data>
-    <data name="VersionLatest" xml:space="preserve"><value>Version {0} is the latest</value></data>
     <data name="DriverFrom" xml:space="preserve"><value>Driver {0} From {1:dd-MM-yyyy}</value></data>
     <data name="Driver" xml:space="preserve"><value>Driver {0}</value></data>
     <data name="Language" xml:space="preserve"><value>Language</value></data>
     <data name="SystemLanguage" xml:space="preserve"><value>Windows Language (Automatic)</value></data>
-    <data name="LanguageDescription" xml:space="preserve"><value>Changes the language throughout the app</value></data>
     <data name="SlowDnsValue" xml:space="preserve"><value>Slow DNS {0:0.#} ms</value></data>
     <data name="SlowDnsSummary" xml:space="preserve"><value>Slow DNS for {0}, peak {1:0.#} ms, average {2:0.#} ms</value></data>
     <data name="MinuteOne" xml:space="preserve"><value>{0} minute</value></data>
@@ -149,7 +142,6 @@
     <data name="Speed Test Failed, Check The Connection" xml:space="preserve"><value>Speed test failed, check the connection</value></data>
     <data name="Measured Against Fast.com Servers, 8 Seconds Each Way" xml:space="preserve"><value>Measured against Fast.com servers, 8 seconds each way</value></data>
     <data name="Test Again" xml:space="preserve"><value>Test Again</value></data>
-    <data name="Don't Show Again" xml:space="preserve"><value>Don't Show Again</value></data>
     <data name="Update Now" xml:space="preserve"><value>Update Now</value></data>
     <data name="Hidden" xml:space="preserve"><value>Hidden</value></data>
     <data name="Yours" xml:space="preserve"><value>Yours</value></data>
@@ -226,9 +218,8 @@
     <data name="Airtime Busy {0}%" xml:space="preserve"><value>Airtime Busy {0}%</value></data>
     <data name="Grade {0}" xml:space="preserve"><value>Grade {0}</value></data>
     <data name="Lag Under Load {0}" xml:space="preserve"><value>Lag Under Load {0}</value></data>
-    <data name="Installed Version Is {0}, Updating Restarts {1}" xml:space="preserve"><value>Installed version is {0}, updating restarts {1}</value></data>
-    <data name="Version {0} Available" xml:space="preserve"><value>Version {0} Available</value></data>
-    <data name="Update Failed {0}" xml:space="preserve"><value>Update Failed {0}</value></data>
+    <data name="Installed Version Is {0}, Updating Restarts {1}" xml:space="preserve"><value>You have version {0}. Updating downloads the new one and restarts {1}</value></data>
+    <data name="Version {0} Available" xml:space="preserve"><value>Version {0} Is Available</value></data>
     <data name="{0}, Still Going" xml:space="preserve"><value>{0}, Still Going</value></data>
     <data name="{0} To {1}, {2}" xml:space="preserve"><value>{0} to {1}, {2}</value></data>
     <data name="{0} To {1}" xml:space="preserve"><value>{0} to {1}</value></data>
@@ -393,4 +384,18 @@
     <data name="ChannelLegend" xml:space="preserve"><value>Blue: your channel&#10;Amber: a neighbor at 30% signal or more on your 80 MHz block, sharing your airtime&#10;Grey: other networks in range&#10;Airtime busy: how often your access point reports the channel in use</value></data>
     <data name="StartFailed" xml:space="preserve"><value>{0} could not start: {1}</value></data>
     <data name="Scroll To Top" xml:space="preserve"><value>Scroll to Top</value></data>
+    <data name="MB" xml:space="preserve"><value>MB</value></data>
+    <data name="DownloadedOf" xml:space="preserve"><value>{0} of {1}</value></data>
+    <data name="StartingUpdate" xml:space="preserve"><value>Starting Update</value></data>
+    <data name="UpdateNotVerified" xml:space="preserve"><value>The download could not be verified, so the release page opens to download it yourself</value></data>
+    <data name="UpdateFolderProtected" xml:space="preserve"><value>The app's folder is protected, so the release page opens to download it yourself</value></data>
+    <data name="UpdateFailed" xml:space="preserve"><value>Update failed, try again later</value></data>
+    <data name="GitHubProject" xml:space="preserve"><value>GitHub Project</value></data>
+    <data name="Help" xml:space="preserve"><value>Help</value></data>
+    <data name="AboutText" xml:space="preserve"><value>Watches your Wi-Fi, router and internet, and explains every problem</value></data>
+    <data name="Version" xml:space="preserve"><value>Version</value></data>
+    <data name="AlreadyLatestVersion" xml:space="preserve"><value>You already have the latest version</value></data>
+    <data name="UnableToCheckForUpdates" xml:space="preserve"><value>Unable to check for updates</value></data>
+    <data name="UpdatingText" xml:space="preserve"><value>Wi-Fi Watch closes by itself once the update has downloaded</value></data>
+    <data name="UpdatingTitle" xml:space="preserve"><value>Update Running</value></data>
 </root>

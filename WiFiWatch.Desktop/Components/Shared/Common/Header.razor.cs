@@ -16,4 +16,7 @@ public partial class Header
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
 }

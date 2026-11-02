@@ -1,0 +1,19 @@
+@* Language Menu, The Windows Language First, Then Each Language In Its Own Name *@
+<Tooltip Text="@AppText.Get("Language")"
+         RootClass="d-flex">
+    <MudMenu Icon="@Icons.Material.Rounded.Public"
+             AriaLabel="@AppText.Get("Language")"
+             Size="Size.Small"
+             Dense
+             AnchorOrigin="Origin.BottomLeft"
+             TransformOrigin="Origin.TopLeft">
+        @foreach (var (language, name) in Choices)
+        {
+            <MudMenuItem Icon="@(language == Monitor.Settings.Language ? Icons.Material.Rounded.Check : string.Empty)"
+                         IconColor="Color.Info"
+                         OnClick="() => Select(language)">
+                @name
+            </MudMenuItem>
+        }
+    </MudMenu>
+</Tooltip>

@@ -72,6 +72,9 @@ public static class Formatter
         return $"{dayLabel} {localTime:HH:mm}";
     }
 
+    // Downloads Count In Megabytes With One Decimal
+    public static string FormatSize(long bytes) => $"{bytes / 1048576.0:0.0} {AppText.Get("MB")}";
+
     public static string FormatNumber(double? value, string unit) =>
         value is null ? "-" : $"{value:0.#} {AppText.Get(unit)}";
 

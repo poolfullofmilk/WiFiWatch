@@ -6,35 +6,9 @@
     @* General Section, One Card Per Setting Straight On The Page *@
     <Header Title="@AppText.Get("General")">
         <MudGrid Spacing="3">
-            @* Language *@
-            <MudItem xs="12"
-                     md="4">
-                <MudPaper Elevation="4"
-                          Class="pa-4 rounded-panel mud-height-full">
-                    <MudStack Spacing="2">
-                        <MudText Typo="Typo.subtitle2"
-                                 Class="d-inline-flex align-center">
-                            @AppText.Get("Language")
-                            <InfoIcon Text="@AppText.Get("LanguageDescription")" />
-                        </MudText>
-                        <MudSelect T="string"
-                                   Value="@SelectedLanguage"
-                                   ValueChanged="SaveLanguage"
-                                   Variant="Variant.Outlined"
-                                   Margin="Margin.Dense"
-                                   Dense>
-                            <MudSelectItem T="string" Value="@(string.Empty)">@AppText.Get("SystemLanguage")</MudSelectItem>
-                            @foreach (var language in AppText.Languages)
-                            {
-                                <MudSelectItem T="string" Value="@language.Key">@language.Value</MudSelectItem>
-                            }
-                        </MudSelect>
-                    </MudStack>
-                </MudPaper>
-            </MudItem>
             @* Start Switch *@
             <MudItem xs="12"
-                     md="4">
+                     md="6">
                 <SettingSwitch Title="@AppText.Get("StartWithWindows")"
                                Description="@AppText.Get("StartDescription")"
                                Value="Monitor.Settings.StartWithWindows"
@@ -42,7 +16,7 @@
             </MudItem>
             @* Summary Switch *@
             <MudItem xs="12"
-                     md="4">
+                     md="6">
                 <SettingSwitch Title="@AppText.Get("DailySummary")"
                                Description="@AppText.Get("SummaryDescription")"
                                Value="Monitor.Settings.DailySummaryNotification"
@@ -50,7 +24,7 @@
             </MudItem>
             @* Speed Test Switch *@
             <MudItem xs="12"
-                     md="4">
+                     md="6">
                 <SettingSwitch Title="@AppText.Get("NightlySpeedTest")"
                                Description="@AppText.Get("SpeedDescription")"
                                Value="Monitor.Settings.NightlySpeedTest"
@@ -58,19 +32,11 @@
             </MudItem>
             @* Native Wi-Fi Switch *@
             <MudItem xs="12"
-                     md="4">
+                     md="6">
                 <SettingSwitch Title="@AppText.Get("NativeWiFi")"
                                Description="@AppText.Get("NativeDescription")"
                                Value="Monitor.Settings.ReadWiFiNatively"
                                ValueChanged="value => SaveSettings(Monitor.Settings with { ReadWiFiNatively = value })" />
-            </MudItem>
-            @* Update Popup Switch *@
-            <MudItem xs="12"
-                     md="4">
-                <SettingSwitch Title="@AppText.Get("UpdatePopup")"
-                               Description="@AppText.Get("UpdateDescription")"
-                               Value="Monitor.Settings.ShowUpdatePopup"
-                               ValueChanged="value => SaveSettings(Monitor.Settings with { ShowUpdatePopup = value })" />
             </MudItem>
         </MudGrid>
     </Header>
@@ -176,48 +142,4 @@
             </MudPaper>
         </Header>
     }
-
-    @* About Section *@
-    <Header Title="@AppText.Get("About")">
-        <MudPaper Elevation="4"
-                  Class="pa-4 rounded-panel">
-            @* Version Row *@
-            <MudStack Row
-                      AlignItems="AlignItems.Center"
-                      Spacing="2">
-                <MudText Typo="Typo.body2"
-                         Class="mud-text-secondary">
-                    @AppText.Get("AppName") @AppInfo.VersionText
-                </MudText>
-                @if (Monitor.AvailableUpdate is { } availableUpdate)
-                {
-                    <ActionChip Icon="@Icons.Material.Rounded.NewReleases"
-                                Text="@AppText.Get("VersionAvailable", AppInfo.ShortText(availableUpdate))"
-                                Color="Color.Info"
-                                Target="@UpdateChecker.LatestReleaseUrl" />
-                    <MudSpacer />
-                    @* Update Button, The Same Dialog As The Popup *@
-                    <MudButton Variant="Variant.Filled"
-                               Color="Color.Info"
-                               Size="Size.Small"
-                               StartIcon="@Icons.Material.Rounded.SystemUpdateAlt"
-                               OnClick="() => UpdateDialog.ShowAsync(DialogService, availableUpdate)">
-                        @AppText.Get("UpdateNow")
-                    </MudButton>
-                }
-                else
-                {
-                    <MudSpacer />
-                    @* Check Button *@
-                    <MudButton Variant="Variant.Filled"
-                               Size="Size.Small"
-                               StartIcon="@Icons.Material.Rounded.Refresh"
-                               Disabled="_isChecking"
-                               OnClick="CheckForUpdateAsync">
-                        @AppText.Get("CheckUpdates")
-                    </MudButton>
-                }
-            </MudStack>
-        </MudPaper>
-    </Header>
 </MudStack>

@@ -13,8 +13,6 @@
     <data name="SpeedDescription" xml:space="preserve"><value>Saat 03:00’te yük altında hızı ve gecikmeyi ölçer</value></data>
     <data name="NativeWiFi" xml:space="preserve"><value>Wi-Fi verilerini doğrudan oku</value></data>
     <data name="NativeDescription" xml:space="preserve"><value>netsh yerine doğrudan Windows’a sorar, her dilde çalışır</value></data>
-    <data name="UpdatePopup" xml:space="preserve"><value>Güncelleme penceresi</value></data>
-    <data name="UpdateDescription" xml:space="preserve"><value>Yeni sürüm çıktığında güncelleme ister</value></data>
     <data name="ProblemLimits" xml:space="preserve"><value>Sorun eşikleri</value></data>
     <data name="LimitsDescription" xml:space="preserve"><value>2 kötü dakika olay açar; eşiğin üç katı hemen bildirim gönderir</value></data>
     <data name="WeakSignal" xml:space="preserve"><value>Zayıf sinyal eşiği dBm</value></data>
@@ -28,17 +26,12 @@
     <data name="PluggedIn" xml:space="preserve"><value>Prize takılı {0}</value></data>
     <data name="OnBattery" xml:space="preserve"><value>Pilde {0}</value></data>
     <data name="Roaming" xml:space="preserve"><value>Dolaşım {0}</value></data>
-    <data name="VersionAvailable" xml:space="preserve"><value>{0} sürümü mevcut</value></data>
     <data name="Downloading" xml:space="preserve"><value>İndiriliyor</value></data>
-    <data name="UpdateNow" xml:space="preserve"><value>Şimdi güncelle</value></data>
     <data name="CheckUpdates" xml:space="preserve"><value>Güncellemeleri denetle</value></data>
-    <data name="GitHubUnavailable" xml:space="preserve"><value>GitHub’a ulaşılamadı</value></data>
-    <data name="VersionLatest" xml:space="preserve"><value>{0} en son sürümdür</value></data>
     <data name="DriverFrom" xml:space="preserve"><value>Sürücü {0}, tarih {1:dd-MM-yyyy}</value></data>
     <data name="Driver" xml:space="preserve"><value>Sürücü {0}</value></data>
     <data name="Language" xml:space="preserve"><value>Dil</value></data>
     <data name="SystemLanguage" xml:space="preserve"><value>Windows dili (otomatik)</value></data>
-    <data name="LanguageDescription" xml:space="preserve"><value>Uygulamanın tamamındaki dili değiştirir</value></data>
     <data name="SlowDnsValue" xml:space="preserve"><value>Yavaş DNS {0:0.#} ms</value></data>
     <data name="SlowDnsSummary" xml:space="preserve"><value>{0} boyunca yavaş DNS, en yüksek {1:0.#} ms, ortalama {2:0.#} ms</value></data>
     <data name="MinuteOne" xml:space="preserve"><value>{0} dakika</value></data>
@@ -148,7 +141,6 @@
     <data name="Speed Test Failed, Check The Connection" xml:space="preserve"><value>Hız testi başarısız, bağlantıyı kontrol edin</value></data>
     <data name="Measured Against Fast.com Servers, 8 Seconds Each Way" xml:space="preserve"><value>Fast.com sunucularıyla her yönde 8 saniye ölçülür</value></data>
     <data name="Test Again" xml:space="preserve"><value>Yeniden Test Et</value></data>
-    <data name="Don't Show Again" xml:space="preserve"><value>Bir Daha Gösterme</value></data>
     <data name="Update Now" xml:space="preserve"><value>Şimdi Güncelle</value></data>
     <data name="Hidden" xml:space="preserve"><value>Gizli</value></data>
     <data name="Yours" xml:space="preserve"><value>Sizin</value></data>
@@ -225,9 +217,8 @@
     <data name="Airtime Busy {0}%" xml:space="preserve"><value>Yayın süresi %{0} meşgul</value></data>
     <data name="Grade {0}" xml:space="preserve"><value>Not {0}</value></data>
     <data name="Lag Under Load {0}" xml:space="preserve"><value>Yük altında gecikme {0}</value></data>
-    <data name="Installed Version Is {0}, Updating Restarts {1}" xml:space="preserve"><value>Yüklü sürüm {0}, güncelleme {1} uygulamasını yeniden başlatır</value></data>
-    <data name="Version {0} Available" xml:space="preserve"><value>{0} sürümü mevcut</value></data>
-    <data name="Update Failed {0}" xml:space="preserve"><value>Güncelleme başarısız: {0}</value></data>
+    <data name="Installed Version Is {0}, Updating Restarts {1}" xml:space="preserve"><value>Sizdeki sürüm: {0}. Güncelleme yenisini indirir ve {1} uygulamasını yeniden başlatır</value></data>
+    <data name="Version {0} Available" xml:space="preserve"><value>Sürüm {0} Mevcut</value></data>
     <data name="{0}, Still Going" xml:space="preserve"><value>{0}, devam ediyor</value></data>
     <data name="{0} To {1}, {2}" xml:space="preserve"><value>{0} – {1}, {2}</value></data>
     <data name="{0} To {1}" xml:space="preserve"><value>{0} – {1}</value></data>
@@ -392,4 +383,18 @@
     <data name="ChannelLegend" xml:space="preserve"><value>Mavi: kanalınız&#10;Turuncu: 80 MHz bloğunuzda %30 veya daha güçlü sinyalli bir komşu, yayın süresini sizinle paylaşır&#10;Gri: menzildeki diğer ağlar&#10;Yayın süresi meşgul: erişim noktanızın kanalı ne sıklıkla dolu bildirdiği</value></data>
     <data name="StartFailed" xml:space="preserve"><value>{0} başlatılamadı: {1}</value></data>
     <data name="Scroll To Top" xml:space="preserve"><value>Başa Dön</value></data>
+    <data name="MB" xml:space="preserve"><value>MB</value></data>
+    <data name="DownloadedOf" xml:space="preserve"><value>{0} / {1}</value></data>
+    <data name="StartingUpdate" xml:space="preserve"><value>Güncelleme Başlatılıyor</value></data>
+    <data name="UpdateNotVerified" xml:space="preserve"><value>İndirme doğrulanamadı, bu yüzden kendiniz indirmeniz için sürüm sayfası açılır</value></data>
+    <data name="UpdateFolderProtected" xml:space="preserve"><value>Uygulamanın klasörü korumalı, bu yüzden kendiniz indirmeniz için sürüm sayfası açılır</value></data>
+    <data name="UpdateFailed" xml:space="preserve"><value>Güncelleme başarısız oldu, daha sonra tekrar deneyin</value></data>
+    <data name="GitHubProject" xml:space="preserve"><value>GitHub Projesi</value></data>
+    <data name="Help" xml:space="preserve"><value>Yardım</value></data>
+    <data name="AboutText" xml:space="preserve"><value>Wi-Fi'ınızı, yönlendiricinizi ve internetinizi izler, her sorunu açıklar</value></data>
+    <data name="Version" xml:space="preserve"><value>Sürüm</value></data>
+    <data name="AlreadyLatestVersion" xml:space="preserve"><value>Zaten en son sürüme sahipsiniz</value></data>
+    <data name="UnableToCheckForUpdates" xml:space="preserve"><value>Güncellemeler denetlenemedi</value></data>
+    <data name="UpdatingText" xml:space="preserve"><value>Güncelleme indirildiğinde Wi-Fi Watch kendiliğinden kapanır</value></data>
+    <data name="UpdatingTitle" xml:space="preserve"><value>Güncelleme Sürüyor</value></data>
 </root>

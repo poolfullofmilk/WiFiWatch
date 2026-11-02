@@ -13,8 +13,6 @@
     <data name="SpeedDescription" xml:space="preserve"><value>Mide velocidad y latencia bajo carga a las 03:00</value></data>
     <data name="NativeWiFi" xml:space="preserve"><value>Leer wifi de forma nativa</value></data>
     <data name="NativeDescription" xml:space="preserve"><value>Consulta Windows directamente en lugar de netsh, en cualquier idioma</value></data>
-    <data name="UpdatePopup" xml:space="preserve"><value>Aviso de actualización</value></data>
-    <data name="UpdateDescription" xml:space="preserve"><value>Solicita actualizar cuando hay una nueva versión</value></data>
     <data name="ProblemLimits" xml:space="preserve"><value>Límites de problemas</value></data>
     <data name="LimitsDescription" xml:space="preserve"><value>2 minutos malos abren un incidente; el triple del límite avisa de inmediato</value></data>
     <data name="WeakSignal" xml:space="preserve"><value>Señal débil por debajo de dBm</value></data>
@@ -28,17 +26,12 @@
     <data name="PluggedIn" xml:space="preserve"><value>Conectado a la corriente {0}</value></data>
     <data name="OnBattery" xml:space="preserve"><value>Con batería {0}</value></data>
     <data name="Roaming" xml:space="preserve"><value>Itinerancia {0}</value></data>
-    <data name="VersionAvailable" xml:space="preserve"><value>Versión {0} disponible</value></data>
     <data name="Downloading" xml:space="preserve"><value>Descargando</value></data>
-    <data name="UpdateNow" xml:space="preserve"><value>Actualizar ahora</value></data>
     <data name="CheckUpdates" xml:space="preserve"><value>Buscar actualizaciones</value></data>
-    <data name="GitHubUnavailable" xml:space="preserve"><value>No se pudo acceder a GitHub</value></data>
-    <data name="VersionLatest" xml:space="preserve"><value>La versión {0} es la más reciente</value></data>
     <data name="DriverFrom" xml:space="preserve"><value>Controlador {0} del {1:dd-MM-yyyy}</value></data>
     <data name="Driver" xml:space="preserve"><value>Controlador {0}</value></data>
     <data name="Language" xml:space="preserve"><value>Idioma</value></data>
     <data name="SystemLanguage" xml:space="preserve"><value>Idioma de Windows (automático)</value></data>
-    <data name="LanguageDescription" xml:space="preserve"><value>Cambia el idioma de toda la aplicación</value></data>
     <data name="SlowDnsValue" xml:space="preserve"><value>DNS lento {0:0.#} ms</value></data>
     <data name="SlowDnsSummary" xml:space="preserve"><value>DNS lento durante {0}, máximo {1:0.#} ms, promedio {2:0.#} ms</value></data>
     <data name="MinuteOne" xml:space="preserve"><value>{0} minuto</value></data>
@@ -148,7 +141,6 @@
     <data name="Speed Test Failed, Check The Connection" xml:space="preserve"><value>Falló la prueba de velocidad, revise la conexión</value></data>
     <data name="Measured Against Fast.com Servers, 8 Seconds Each Way" xml:space="preserve"><value>Medido con servidores Fast.com, 8 segundos en cada dirección</value></data>
     <data name="Test Again" xml:space="preserve"><value>Repetir Prueba</value></data>
-    <data name="Don't Show Again" xml:space="preserve"><value>No Mostrar de Nuevo</value></data>
     <data name="Update Now" xml:space="preserve"><value>Actualizar Ahora</value></data>
     <data name="Hidden" xml:space="preserve"><value>Oculta</value></data>
     <data name="Yours" xml:space="preserve"><value>Su Red</value></data>
@@ -225,9 +217,8 @@
     <data name="Airtime Busy {0}%" xml:space="preserve"><value>Tiempo de emisión ocupado: {0}%</value></data>
     <data name="Grade {0}" xml:space="preserve"><value>Calificación {0}</value></data>
     <data name="Lag Under Load {0}" xml:space="preserve"><value>Latencia bajo carga {0}</value></data>
-    <data name="Installed Version Is {0}, Updating Restarts {1}" xml:space="preserve"><value>La versión instalada es {0}, actualizar reinicia {1}</value></data>
-    <data name="Version {0} Available" xml:space="preserve"><value>Versión {0} disponible</value></data>
-    <data name="Update Failed {0}" xml:space="preserve"><value>Falló la actualización: {0}</value></data>
+    <data name="Installed Version Is {0}, Updating Restarts {1}" xml:space="preserve"><value>Tiene la versión {0}. Actualizar descarga la nueva y reinicia {1}</value></data>
+    <data name="Version {0} Available" xml:space="preserve"><value>La Versión {0} Está Disponible</value></data>
     <data name="{0}, Still Going" xml:space="preserve"><value>{0}, sigue en curso</value></data>
     <data name="{0} To {1}, {2}" xml:space="preserve"><value>{0} a {1}, {2}</value></data>
     <data name="{0} To {1}" xml:space="preserve"><value>{0} a {1}</value></data>
@@ -392,4 +383,18 @@
     <data name="ChannelLegend" xml:space="preserve"><value>Azul: su canal&#10;Naranja: un vecino con 30% de señal o más en su bloque de 80 MHz, que comparte su tiempo de emisión&#10;Gris: otras redes al alcance&#10;Tiempo de emisión ocupado: con qué frecuencia su punto de acceso indica el canal en uso</value></data>
     <data name="StartFailed" xml:space="preserve"><value>{0} no pudo iniciarse: {1}</value></data>
     <data name="Scroll To Top" xml:space="preserve"><value>Volver Arriba</value></data>
+    <data name="MB" xml:space="preserve"><value>MB</value></data>
+    <data name="DownloadedOf" xml:space="preserve"><value>{0} de {1}</value></data>
+    <data name="StartingUpdate" xml:space="preserve"><value>Iniciando la Actualización</value></data>
+    <data name="UpdateNotVerified" xml:space="preserve"><value>No se pudo verificar la descarga, así que se abre la página de la versión para descargarla usted mismo</value></data>
+    <data name="UpdateFolderProtected" xml:space="preserve"><value>La carpeta de la aplicación está protegida, así que se abre la página de la versión para descargarla usted mismo</value></data>
+    <data name="UpdateFailed" xml:space="preserve"><value>La actualización falló, inténtelo más tarde</value></data>
+    <data name="GitHubProject" xml:space="preserve"><value>Proyecto en GitHub</value></data>
+    <data name="Help" xml:space="preserve"><value>Ayuda</value></data>
+    <data name="AboutText" xml:space="preserve"><value>Vigila su wifi, router e internet, y explica cada problema</value></data>
+    <data name="Version" xml:space="preserve"><value>Versión</value></data>
+    <data name="AlreadyLatestVersion" xml:space="preserve"><value>Ya tiene la última versión</value></data>
+    <data name="UnableToCheckForUpdates" xml:space="preserve"><value>No se pudo buscar actualizaciones</value></data>
+    <data name="UpdatingText" xml:space="preserve"><value>Wi-Fi Watch se cierra solo cuando la actualización se haya descargado</value></data>
+    <data name="UpdatingTitle" xml:space="preserve"><value>Actualizando</value></data>
 </root>

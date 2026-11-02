@@ -1,5 +1,6 @@
 @using Color = MudBlazor.Color
 @using Size = MudBlazor.Size
+@using WiFiWatch.Services.Integration
 
 @* Providers *@
 @* DefaultScrollbar, Or MudBlazor's Injected Thin Scrollbar Brings The Arrows Back *@
@@ -51,9 +52,45 @@
                   Spacing="2"
                   Class="mud-width-full px-2">
             <MudText Typo="Typo.h6"
-                     Class="text-truncate mr-4">
+                     Class="mud-typography-nowrap mr-4">
                 @AppInfo.DisplayName
             </MudText>
+
+            @* Language Menu *@
+            <LanguagePicker />
+
+            @* Help Menu, A Red Dot Until Restart Once An Update Is Found *@
+            <Tooltip Text="@AppText.Get("Help")"
+                     RootClass="d-flex">
+                <MudBadge Dot
+                          Overlap
+                          Color="Color.Error"
+                          Visible="@(Monitor.AvailableUpdate is not null)"
+                          Class="d-flex">
+                    <MudMenu Icon="@Icons.Material.Rounded.Help"
+                             AriaLabel="@AppText.Get("Help")"
+                             Size="Size.Small"
+                             Dense
+                             AnchorOrigin="Origin.BottomLeft"
+                             TransformOrigin="Origin.TopLeft">
+                        @* Project Page *@
+                        <MudMenuItem Icon="@Icons.Custom.Brands.GitHub"
+                                     Label="@AppText.Get("GitHubProject")"
+                                     Href="@UpdateChecker.RepositoryUrl" />
+                        @* Check Updates *@
+                        <MudMenuItem Icon="@Icons.Material.Rounded.SystemUpdateAlt"
+                                     Label="@AppText.Get("CheckUpdates")"
+                                     Class="@(Monitor.AvailableUpdate is null ? null : "update-dot")"
+                                     OnClick="CheckForUpdatesAsync" />
+                        <MudDivider />
+                        @* About *@
+                        <MudMenuItem Icon="@Icons.Material.Rounded.Info"
+                                     Label="@AppText.Get("About")"
+                                     OnClick="ShowAboutAsync" />
+                    </MudMenu>
+                </MudBadge>
+            </Tooltip>
+
             <MudSpacer />
             @foreach (var link in Pages)
             {
@@ -61,8 +98,8 @@
                 <MudBadge Dot
                           Overlap
                           Class="d-flex"
-                          Visible="@(DotColor(link.Page) is not null)"
-                          Color="@(DotColor(link.Page) ?? Color.Default)">
+                          Visible="@(link.Page == Page.Overview && _problemColor is not null)"
+                          Color="@(_problemColor ?? Color.Default)">
                     <MudButton StartIcon="@link.Icon"
                                Color="@(link.Page == _page ? Color.Info : Color.Default)"
                                Variant="@(link.Page == _page ? Variant.Filled : Variant.Text)"

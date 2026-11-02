@@ -6,13 +6,13 @@
 
     <TitleContent>
         <MudText Typo="Typo.h6">
-            @(AppText.Get("Version {0} Available", AppInfo.ShortText(Version)))
+            @AppText.Get("Version {0} Available", AppInfo.ShortText(Version))
         </MudText>
     </TitleContent>
     <DialogContent>
         <MudStack Spacing="2">
-            <MudText Typo="Typo.body1">
-                @(AppText.Get("Installed Version Is {0}, Updating Restarts {1}", AppInfo.VersionText, AppInfo.DisplayName))
+            <MudText Typo="Typo.body2">
+                @AppText.Get("Installed Version Is {0}, Updating Restarts {1}", AppInfo.VersionText, AppInfo.DisplayName)
             </MudText>
             @* What Changed, Commit Titles As GitHub Supplies Them *@
             @if (Monitor.UpdateNotes.Count > 0)
@@ -32,29 +32,30 @@
                     }
                 </MudStack>
             }
-            @* Hide Checkbox *@
-            <MudCheckBox T="bool"
-                         Value="!Monitor.Settings.ShowUpdatePopup"
-                         ValueChanged="SetHidden"
-                         Label="@AppText.Get("Don't Show Again")"
-                         Color="Color.Info"
-                         CheckedIcon="@Icons.Material.Rounded.CheckBox"
-                         UncheckedIcon="@Icons.Material.Rounded.CheckBoxOutlineBlank" />
             @if (_isInstalling)
             {
                 @* Download Progress *@
-                <MudStack Row
-                          AlignItems="AlignItems.Center"
-                          Spacing="2">
+                <MudStack Spacing="1"
+                          Class="mt-2">
                     <MudProgressLinear Color="Color.Info"
-                                       Value="@(_percent ?? 0)"
-                                       Indeterminate="@(_percent is null)"
+                                       Value="@_percent"
+                                       Indeterminate="@(_total == 0)"
                                        Rounded
                                        Size="Size.Medium" />
-                    <MudText Typo="Typo.caption"
-                             Class="mud-text-secondary">
-                        @(_percent is { } percent ? $"{percent}%" : "")
-                    </MudText>
+                    <MudStack Row
+                              Justify="Justify.SpaceBetween">
+                        <MudText Typo="Typo.caption"
+                                 Class="mud-text-secondary">
+                            @ProgressText
+                        </MudText>
+                        @if (_total > 0)
+                        {
+                            <MudText Typo="Typo.caption"
+                                     Class="mud-text-secondary">
+                                @($"{_percent}%")
+                            </MudText>
+                        }
+                    </MudStack>
                 </MudStack>
             }
         </MudStack>
@@ -65,13 +66,6 @@
                    Color="Color.Info"
                    StartIcon="@(_isInstalling ? null : Icons.Material.Rounded.SystemUpdateAlt)"
                    OnClick="InstallAsync">
-            @if (_isInstalling)
-            {
-                <MudProgressCircular Color="Color.Inherit"
-                                     Indeterminate
-                                     Class="mr-2"
-                                     Style="width:16px; height:16px" />
-            }
             @(_isInstalling ? AppText.Get("Downloading") : AppText.Get("Update Now"))
         </MudButton>
     </DialogActions>

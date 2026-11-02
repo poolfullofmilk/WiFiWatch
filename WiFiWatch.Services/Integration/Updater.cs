@@ -8,10 +8,10 @@ namespace WiFiWatch.Services.Integration;
 
 public static class Updater
 {
-    // Releases Always Carry One Exe Named After Their Version
+    // Releases Always Carry One Exe Named After Their Tag
     private const string ExecutablePrefix = "WiFiWatch_v";
     private const string AssetUrlFormat =
-        "https://github.com/poolfullofmilk/WiFiWatch/releases/download/v{0}/WiFiWatch_v{0}.exe";
+        UpdateChecker.RepositoryUrl + "/releases/download/{0}/WiFiWatch_{0}.exe";
     private const string AfterUpdateArgument = "--after-update";
 
     private static readonly HttpClient s_httpClient = new() { Timeout = TimeSpan.FromMinutes(5) };
@@ -22,47 +22,49 @@ public static class Updater
             ?.StartsWith(ExecutablePrefix, StringComparison.OrdinalIgnoreCase) == true;
 
     // Off The Window's Thread, Writing And Hashing 80 MB Would Freeze It
-    public static Task<string> DownloadAsync(Version version, IProgress<int?> percent) =>
-        Task.Run(() => DownloadOnPoolAsync(version, percent));
+    public static Task<string> DownloadAsync(
+        Version version,
+        IProgress<(long Received, long Total)> progress
+    ) => Task.Run(() => DownloadOnPoolAsync(version, progress));
 
-    private static async Task<string> DownloadOnPoolAsync(Version version, IProgress<int?> percent)
+    private static async Task<string> DownloadOnPoolAsync(
+        Version version,
+        IProgress<(long Received, long Total)> progress
+    )
     {
-        var versionText = AppInfo.ShortText(version);
-        var fileName = $"{ExecutablePrefix}{versionText}.exe";
+        var tag = UpdateChecker.TagOf(version);
+        var fileName = $"WiFiWatch_{tag}.exe";
         var targetPath = Path.Combine(Path.GetDirectoryName(Environment.ProcessPath)!, fileName);
         var partialPath = targetPath + ".download";
 
         // GitHub Hashes Every Release Asset, A Download That Differs Never Runs
         var digest =
-            (await UpdateChecker.GetJsonAsync("releases/tags/v" + versionText))
+            (await UpdateChecker.GetJsonAsync("releases/tags/" + tag))
                 ?["assets"]?.AsArray()
                 .FirstOrDefault(asset => asset?["name"]?.GetValue<string>() == fileName)
                 ?["digest"]?.GetValue<string>()
-            ?? throw new InvalidDataException($"Release {versionText} Lists No Checksum");
+            ?? throw new InvalidDataException($"Release {tag} Lists No Checksum");
 
         try
         {
             using var response = await s_httpClient.GetAsync(
-                string.Format(AssetUrlFormat, versionText),
+                string.Format(AssetUrlFormat, tag),
                 HttpCompletionOption.ResponseHeadersRead
             );
             response.EnsureSuccessStatusCode();
             await using (var file = File.Create(partialPath))
             {
-                // Once Per Percent, Null While GitHub Sends No Length
-                var total = response.Content.Headers.ContentLength;
+                // Zero Total Means GitHub Sent No Length
+                var total = response.Content.Headers.ContentLength ?? 0;
                 await using var download = await response.Content.ReadAsStreamAsync();
                 var buffer = new byte[81920];
                 long received = 0;
-                int? reported = -1;
                 int read;
                 while ((read = await download.ReadAsync(buffer)) > 0)
                 {
                     await file.WriteAsync(buffer.AsMemory(0, read));
                     received += read;
-                    int? now = total > 0 ? (int)(received * 100 / total) : null;
-                    if (now != reported)
-                        percent.Report(reported = now);
+                    progress.Report((received, total));
                 }
             }
 
@@ -70,7 +72,7 @@ public static class Updater
             {
                 var actual = "sha256:" + Convert.ToHexStringLower(await SHA256.HashDataAsync(file));
                 if (!string.Equals(actual, digest, StringComparison.OrdinalIgnoreCase))
-                    throw new InvalidDataException($"Checksum Mismatch For {versionText}");
+                    throw new InvalidDataException($"Checksum Mismatch For {tag}");
             }
 
             // Only A Complete, Verified Download Gets The Real Name

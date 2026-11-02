@@ -13,8 +13,6 @@
     <data name="SpeedDescription" xml:space="preserve"><value>Измеряет скорость и задержку под нагрузкой в 03:00</value></data>
     <data name="NativeWiFi" xml:space="preserve"><value>Читать данные Wi-Fi напрямую</value></data>
     <data name="NativeDescription" xml:space="preserve"><value>Запрашивает Windows напрямую вместо netsh, работает на любом языке</value></data>
-    <data name="UpdatePopup" xml:space="preserve"><value>Окно обновления</value></data>
-    <data name="UpdateDescription" xml:space="preserve"><value>Предлагает обновление при выходе новой версии</value></data>
     <data name="ProblemLimits" xml:space="preserve"><value>Пороговые значения</value></data>
     <data name="LimitsDescription" xml:space="preserve"><value>2 плохие минуты открывают инцидент; тройное превышение порога вызывает уведомление сразу</value></data>
     <data name="WeakSignal" xml:space="preserve"><value>Слабый сигнал ниже, дБм</value></data>
@@ -28,17 +26,12 @@
     <data name="PluggedIn" xml:space="preserve"><value>От сети {0}</value></data>
     <data name="OnBattery" xml:space="preserve"><value>От батареи {0}</value></data>
     <data name="Roaming" xml:space="preserve"><value>Роуминг {0}</value></data>
-    <data name="VersionAvailable" xml:space="preserve"><value>Доступна версия {0}</value></data>
     <data name="Downloading" xml:space="preserve"><value>Загрузка</value></data>
-    <data name="UpdateNow" xml:space="preserve"><value>Обновить сейчас</value></data>
     <data name="CheckUpdates" xml:space="preserve"><value>Проверить обновления</value></data>
-    <data name="GitHubUnavailable" xml:space="preserve"><value>Не удалось связаться с GitHub</value></data>
-    <data name="VersionLatest" xml:space="preserve"><value>Версия {0} — последняя</value></data>
     <data name="DriverFrom" xml:space="preserve"><value>Драйвер {0} от {1:dd-MM-yyyy}</value></data>
     <data name="Driver" xml:space="preserve"><value>Драйвер {0}</value></data>
     <data name="Language" xml:space="preserve"><value>Язык</value></data>
     <data name="SystemLanguage" xml:space="preserve"><value>Язык Windows (автоматически)</value></data>
-    <data name="LanguageDescription" xml:space="preserve"><value>Изменяет язык всего приложения</value></data>
     <data name="SlowDnsValue" xml:space="preserve"><value>Медленный DNS: {0:0.#} мс</value></data>
     <data name="SlowDnsSummary" xml:space="preserve"><value>Медленный DNS наблюдался {0}, пик {1:0.#} мс, среднее {2:0.#} мс</value></data>
     <data name="MinuteOne" xml:space="preserve"><value>{0} минуту</value></data>
@@ -148,7 +141,6 @@
     <data name="Speed Test Failed, Check The Connection" xml:space="preserve"><value>Тест скорости не удался, проверьте соединение</value></data>
     <data name="Measured Against Fast.com Servers, 8 Seconds Each Way" xml:space="preserve"><value>Измерено на серверах Fast.com, по 8 секунд в каждую сторону</value></data>
     <data name="Test Again" xml:space="preserve"><value>Повторить Тест</value></data>
-    <data name="Don't Show Again" xml:space="preserve"><value>Больше Не Показывать</value></data>
     <data name="Update Now" xml:space="preserve"><value>Обновить Сейчас</value></data>
     <data name="Hidden" xml:space="preserve"><value>Скрытая</value></data>
     <data name="Yours" xml:space="preserve"><value>Ваша Сеть</value></data>
@@ -225,9 +217,8 @@
     <data name="Airtime Busy {0}%" xml:space="preserve"><value>Эфир занят на {0}%</value></data>
     <data name="Grade {0}" xml:space="preserve"><value>Оценка {0}</value></data>
     <data name="Lag Under Load {0}" xml:space="preserve"><value>Задержка под нагрузкой {0}</value></data>
-    <data name="Installed Version Is {0}, Updating Restarts {1}" xml:space="preserve"><value>Установлена версия {0}, обновление перезапустит {1}</value></data>
-    <data name="Version {0} Available" xml:space="preserve"><value>Доступна версия {0}</value></data>
-    <data name="Update Failed {0}" xml:space="preserve"><value>Обновление не удалось: {0}</value></data>
+    <data name="Installed Version Is {0}, Updating Restarts {1}" xml:space="preserve"><value>У вас версия {0}. Обновление загружает новую и перезапускает {1}</value></data>
+    <data name="Version {0} Available" xml:space="preserve"><value>Доступна Версия {0}</value></data>
     <data name="{0}, Still Going" xml:space="preserve"><value>{0}, продолжается</value></data>
     <data name="{0} To {1}, {2}" xml:space="preserve"><value>С {0} до {1}, {2}</value></data>
     <data name="{0} To {1}" xml:space="preserve"><value>С {0} до {1}</value></data>
@@ -392,4 +383,18 @@
     <data name="ChannelLegend" xml:space="preserve"><value>Синий: ваш канал&#10;Оранжевый: сосед с сигналом 30% или сильнее в вашем блоке 80 МГц, делит с вами эфир&#10;Серый: другие сети в зоне приёма&#10;Эфир занят: как часто ваша точка доступа сообщает, что канал занят</value></data>
     <data name="StartFailed" xml:space="preserve"><value>Не удалось запустить {0}: {1}</value></data>
     <data name="Scroll To Top" xml:space="preserve"><value>Наверх</value></data>
+    <data name="MB" xml:space="preserve"><value>МБ</value></data>
+    <data name="DownloadedOf" xml:space="preserve"><value>{0} из {1}</value></data>
+    <data name="StartingUpdate" xml:space="preserve"><value>Запуск Обновления</value></data>
+    <data name="UpdateNotVerified" xml:space="preserve"><value>Загрузку не удалось проверить, поэтому открывается страница выпуска, чтобы скачать его самому</value></data>
+    <data name="UpdateFolderProtected" xml:space="preserve"><value>Папка приложения защищена, поэтому открывается страница выпуска, чтобы скачать его самому</value></data>
+    <data name="UpdateFailed" xml:space="preserve"><value>Обновление не удалось, попробуйте позже</value></data>
+    <data name="GitHubProject" xml:space="preserve"><value>Проект на GitHub</value></data>
+    <data name="Help" xml:space="preserve"><value>Справка</value></data>
+    <data name="AboutText" xml:space="preserve"><value>Следит за Wi-Fi, роутером и интернетом и объясняет каждую проблему</value></data>
+    <data name="Version" xml:space="preserve"><value>Версия</value></data>
+    <data name="AlreadyLatestVersion" xml:space="preserve"><value>У вас уже последняя версия</value></data>
+    <data name="UnableToCheckForUpdates" xml:space="preserve"><value>Не удалось проверить обновления</value></data>
+    <data name="UpdatingText" xml:space="preserve"><value>Wi-Fi Watch закроется сам, когда обновление загрузится</value></data>
+    <data name="UpdatingTitle" xml:space="preserve"><value>Идёт Обновление</value></data>
 </root>

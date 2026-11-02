@@ -1,0 +1,33 @@
+@using Size = MudBlazor.Size
+@using WiFiWatch.Services.Integration
+
+@* About Dialog *@
+<MudDialog>
+
+    <TitleContent>
+        <MudText Typo="Typo.h6">@AppText.Get("About")</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudStack Spacing="4">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h5">@AppInfo.DisplayName</MudText>
+                <MudText Typo="Typo.body2"
+                         Class="mud-text-secondary">
+                    @($"{AppText.Get("Version")} {AppInfo.VersionText} · poolfullofmilk")
+                </MudText>
+            </MudStack>
+            <MudText Typo="Typo.body1">@AppText.Get("AboutText")</MudText>
+            @* Project Link *@
+            <MudStack Row>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Info"
+                           Size="Size.Small"
+                           StartIcon="@Icons.Custom.Brands.GitHub"
+                           Href="@UpdateChecker.RepositoryUrl">
+                    @AppText.Get("GitHubProject")
+                </MudButton>
+            </MudStack>
+        </MudStack>
+    </DialogContent>
+
+</MudDialog>

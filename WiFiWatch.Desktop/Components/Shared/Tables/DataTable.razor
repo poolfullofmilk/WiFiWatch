@@ -14,44 +14,6 @@
           OnRowClick="OnRowClick"
           RowClass="@(OnRowClick.HasDelegate ? "cursor-pointer" : null)">
 
-    @* ToolBar *@
-    <ToolBarContent>
-        @* Search *@
-        @* Search, Inset Like Every Field, Its Value Arrives Once Typing Pauses *@
-        <MudTextField T="string"
-                      Value="SearchTerm"
-                      ValueChanged="OnSearchTermChangedAsync"
-                      Variant="Variant.Outlined"
-                      Margin="Margin.Dense"
-                      Placeholder="@AppText.Get("Search")"
-                      Adornment="Adornment.Start"
-                      AdornmentIcon="@Icons.Material.Rounded.Search"
-                      DebounceInterval="300"
-                      Clearable
-                      ClearIcon="@Icons.Material.Rounded.Clear"
-                      Class="fixed-width my-0" />
-
-        <MudSpacer />
-
-        <MudStack Row
-                  Spacing="3"
-                  AlignItems="AlignItems.Center"
-                  Class="px-4">
-            @* Extra *@
-            @if (ToolBarExtra is not null)
-            {
-                @ToolBarExtra
-            }
-            @* Refresh *@
-            <Tooltip Text="@AppText.Get("Refresh")">
-                <MudIconButton aria-label="@AppText.Get("Refresh")"
-                               Icon="@Icons.Material.Rounded.Refresh"
-                               Size="Size.Small"
-                               OnClick="ReloadAsync" />
-            </Tooltip>
-        </MudStack>
-    </ToolBarContent>
-
     @* Header *@
     <HeaderContent>
         @HeaderContent

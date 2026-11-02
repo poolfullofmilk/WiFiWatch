@@ -6,8 +6,8 @@ namespace WiFiWatch.Services.Integration;
 
 public static class UpdateChecker
 {
-    public const string LatestReleaseUrl =
-        "https://github.com/poolfullofmilk/WiFiWatch/releases/latest";
+    public const string RepositoryUrl = "https://github.com/poolfullofmilk/WiFiWatch";
+    public const string LatestReleaseUrl = RepositoryUrl + "/releases/latest";
     private const string ApiUrl = "https://api.github.com/repos/poolfullofmilk/WiFiWatch/";
 
     private static readonly HttpClient s_httpClient = new(
@@ -16,6 +16,9 @@ public static class UpdateChecker
     {
         Timeout = TimeSpan.FromSeconds(10),
     };
+
+    // The Tag As GitHub Names It, So Notes And Downloads Never Rebuild It
+    private static string? s_latestTag;
 
     public static async Task<Version?> CheckAsync()
     {
@@ -27,7 +30,11 @@ public static class UpdateChecker
                 HttpCompletionOption.ResponseHeadersRead
             );
             var location = response.Headers.Location?.ToString() ?? string.Empty;
-            return AppInfo.ParseTag(location[(location.LastIndexOf('/') + 1)..]);
+            var tag = location[(location.LastIndexOf('/') + 1)..];
+            var latest = AppInfo.ParseTag(tag);
+            if (latest is not null)
+                s_latestTag = tag;
+            return latest;
         }
         catch
         {
@@ -36,9 +43,15 @@ public static class UpdateChecker
         }
     }
 
+    // The Bridge Tag v2.0 Shows As 2, So Only The Checked Tag Names It Right
+    internal static string TagOf(Version version) =>
+        s_latestTag is { } tag && AppInfo.ParseTag(tag) == version
+            ? tag
+            : "v" + AppInfo.ShortText(version);
+
     public static async Task<List<string>> NotesAsync(Version version)
     {
-        var tag = "v" + AppInfo.ShortText(version);
+        var tag = TagOf(version);
         try
         {
             // A Workflow Build Lists Every Commit Since Itself, Newest First Like The Body

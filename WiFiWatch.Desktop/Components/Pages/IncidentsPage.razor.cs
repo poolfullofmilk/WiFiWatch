@@ -38,6 +38,13 @@ public partial class IncidentsPage : IDisposable
 
     private Task ReloadAsync() => _incidentTable?.ReloadAsync() ?? Task.CompletedTask;
 
+    private async Task SearchAsync(string? searchTerm)
+    {
+        // The Field Debounces, So Every Change Reloads, Clearing Too
+        _searchTerm = searchTerm ?? string.Empty;
+        await ReloadAsync();
+    }
+
     private async Task SelectScopeAsync(bool isEverything)
     {
         _isEverything = isEverything;

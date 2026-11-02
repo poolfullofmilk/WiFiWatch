@@ -12,7 +12,6 @@ public sealed record UserSettings(
     bool DailySummaryNotification = true,
     bool NightlySpeedTest = false,
     bool ReadWiFiNatively = false,
-    bool ShowUpdatePopup = true,
     string? Language = null
 )
 {
