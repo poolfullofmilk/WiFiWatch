@@ -17,9 +17,19 @@
     @* ToolBar *@
     <ToolBarContent>
         @* Search *@
-        <SearchTextField Value="@SearchTerm"
-                         ValueChanged="OnSearchTermChangedAsync"
-                         PlaceHolder="@AppText.Get("Search")" />
+        @* Search, Inset Like Every Field, Its Value Arrives Once Typing Pauses *@
+        <MudTextField T="string"
+                      Value="SearchTerm"
+                      ValueChanged="OnSearchTermChangedAsync"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      Placeholder="@AppText.Get("Search")"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Rounded.Search"
+                      DebounceInterval="300"
+                      Clearable
+                      ClearIcon="@Icons.Material.Rounded.Clear"
+                      Class="fixed-width my-0" />
 
         <MudSpacer />
 

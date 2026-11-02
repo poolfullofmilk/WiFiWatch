@@ -42,9 +42,6 @@
     --tonal-info: color-mix(in srgb, var(--mud-palette-info) 20%, transparent);
     --tonal-info-hover: color-mix(in srgb, var(--mud-palette-info) 30%, transparent);
     --tonal-info-text: color-mix(in srgb, var(--mud-palette-info) 40%, var(--mud-palette-white));
-    --tonal-error: color-mix(in srgb, var(--mud-palette-error) 20%, transparent);
-    --tonal-error-hover: color-mix(in srgb, var(--mud-palette-error) 30%, transparent);
-    --tonal-error-text: color-mix(in srgb, var(--mud-palette-error) 40%, var(--mud-palette-white));
     --tooltip-surface: color-mix(in srgb, var(--mud-palette-white) 9%, var(--mud-palette-surface));
     --scrollbar-thumb: color-mix(in srgb, var(--mud-palette-white) 18%, transparent);
     --scrollbar-thumb-hover: color-mix(in srgb, var(--mud-palette-white) 32%, transparent);
@@ -117,11 +114,6 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
-
-/* Two Line Heights, Titles Tight And Prose Relaxed */
-.text-relaxed {
-    line-height: 1.6 !important;
-}
 
 /* Fields Keep One Width Instead Of Stretching With The Window */
 .fixed-width {
@@ -247,7 +239,7 @@ svg.apexcharts-svg {
     box-shadow: var(--mud-elevation-1);
 }
 
-/* Every Blue Button And Info Alert Is Tonal Like The Open Page */
+/* Every Blue Button Is Tonal Like The Open Page */
 .mud-button-filled.mud-button-filled-info:not(:disabled, .mud-disabled) {
     background-color: var(--tonal-info);
     color: var(--tonal-info-text);
@@ -256,15 +248,6 @@ svg.apexcharts-svg {
 
     .mud-button-filled.mud-button-filled-info:not(:disabled, .mud-disabled):is(:hover, :focus-visible, :active) {
         background-color: var(--tonal-info-hover);
-    }
-
-.mud-alert-text-info {
-    background-color: var(--tonal-info);
-}
-
-    .mud-alert-text-info,
-    .mud-alert-text-info .mud-alert-icon {
-        color: var(--tonal-info-text);
     }
 
 /* Fields Sit Inset, Their Edge Shows On Hover And Turns Blue On Focus */
@@ -284,11 +267,6 @@ svg.apexcharts-svg {
 
 .mud-input-control:focus-within .mud-input-label {
     color: var(--mud-palette-info);
-}
-
-/* Icon Text Buttons Take Filled Padding, Clear Of The Edge */
-.mud-button-text-size-small:has(.mud-button-icon-start) {
-    padding-inline: 10px;
 }
 
 /* A Number At Its Limit Greys Out That Spin Button */

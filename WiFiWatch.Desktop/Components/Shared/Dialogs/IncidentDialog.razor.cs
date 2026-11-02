@@ -13,8 +13,6 @@ namespace WiFiWatch.Desktop.Components.Shared.Dialogs;
 
 public partial class IncidentDialog : IDisposable
 {
-    private const string TimeFormat = Formatter.DateTimeSecondsFormat;
-
     [Inject]
     public required NetworkMonitor Monitor { get; set; }
 
@@ -35,13 +33,13 @@ public partial class IncidentDialog : IDisposable
         Current.EndedAtUtc is not { } endedAtUtc
             ? AppText.Get(
                 "{0}, Still Going",
-                Formatter.FormatLocal(Current.OccurredAtUtc, TimeFormat)
+                Formatter.FormatLocal(Current.OccurredAtUtc, Formatter.DateTimeSecondsFormat)
             )
         : endedAtUtc == Current.OccurredAtUtc
-            ? Formatter.FormatLocal(Current.OccurredAtUtc, TimeFormat)
+            ? Formatter.FormatLocal(Current.OccurredAtUtc, Formatter.DateTimeSecondsFormat)
         : AppText.Get(
             "{0} To {1}, {2}",
-            Formatter.FormatLocal(Current.OccurredAtUtc, TimeFormat),
+            Formatter.FormatLocal(Current.OccurredAtUtc, Formatter.DateTimeSecondsFormat),
             Formatter.FormatLocal(endedAtUtc, "HH:mm:ss"),
             Formatter.FormatDuration(endedAtUtc - Current.OccurredAtUtc)
         );

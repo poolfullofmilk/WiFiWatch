@@ -230,8 +230,8 @@
     <data name="Version {0} Available" xml:space="preserve"><value>Version {0} Available</value></data>
     <data name="Update Failed {0}" xml:space="preserve"><value>Update Failed {0}</value></data>
     <data name="{0}, Still Going" xml:space="preserve"><value>{0}, Still Going</value></data>
-    <data name="{0} To {1}, {2}" xml:space="preserve"><value>{0} To {1}, {2}</value></data>
-    <data name="{0} To {1}" xml:space="preserve"><value>{0} To {1}</value></data>
+    <data name="{0} To {1}, {2}" xml:space="preserve"><value>{0} to {1}, {2}</value></data>
+    <data name="{0} To {1}" xml:space="preserve"><value>{0} to {1}</value></data>
     <data name=", Internet {0}" xml:space="preserve"><value>, Internet {0}</value></data>
     <data name="Channel {0}{1}" xml:space="preserve"><value>Channel {0}{1}</value></data>
     <data name="{0}, {1} dBm{2}" xml:space="preserve"><value>{0}, {1} dBm{2}</value></data>
