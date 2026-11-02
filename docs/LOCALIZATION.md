@@ -33,7 +33,7 @@ updates and closing summaries use the current language.
   tasks see the same selection. Its change event refreshes the navigation and
   recreates the current page, updates the tray, HTML language and error text.
   Page selection is retained. Settings save before broadcasting the change.
-- English is neutral `Strings.resx`; the five satellites have 385 translated
+- English is neutral `Strings.resx`; the five satellites have 388 translated
   entries each. Missing keys inherit English. `AppName` is deliberately neutral
   only and tests this fallback.
 - Numeric values retain the Windows number format. Human month/day names follow
@@ -110,30 +110,32 @@ deduplication, resource-key references and hardcoded Razor labels/text.
 
 ## Observed Results
 
-Local Ubuntu, .NET SDK 10.0.403:
+Version 2, Windows 11 (en-GB), .NET SDK 10.0.401:
 
-- Debug regression checks: passed, 9,621 assertions, including 48 rendering cases.
+- Debug and Release regression checks: passed, 9,730 assertions, including 48
+  rendering cases (v1.10 had 9,621).
 - Full solution Debug build: passed, 0 warnings and 0 errors.
-- Release regression checks: passed, 9,621 assertions.
 - Release publication: passed; `Verified localization bundle: nl;tr;de;es;ru`.
-  Output is the Windows single-file `WiFiWatch_v1.10.exe`.
-- CSharpier 1.3.0 verification: passed. `git diff --check`: passed.
-- Analyzer/style verification was attempted for all three application projects
-  and failed before analysis because this
-  host cannot open the build-host named pipe (`SocketException (13): Permission
-  denied`). No analyzer/style success is claimed.
+  Output is the Windows single-file `WiFiWatch_v2.0.exe`.
+- CSharpier 1.3.0 verification: passed.
+- Analyzer/style verification for all three projects: passed, apart from two
+  info-level suggestions already on v1.10 (`IDE0032` in `WiFiDbContext`,
+  `IDE0305` in `ChartTheme`).
+- Every `SelfTestPasses` passes headless with Russian selected.
 
-## Windows Checks Not Run Locally
+## Windows Checks
 
-Headless component rendering does not validate WPF/WebView2 interaction, native
-tray menus, real toast delivery, visual wrapping, screenshots, installed EXE
-startup/extraction, Windows culture discovery or the installed self-updater.
-Those require a Windows runtime. This Linux host only cross-builds/publishes the
-Windows EXE; it does not execute it.
+Run in the Debug app over the DevTools protocol: all four pages, the incident
+dialog opened with Enter and closed with Escape, the update dialog from the
+popup and from Settings with the blue Settings dot, the channel legend tooltip,
+and Turkish and Russian, where Nunito's Latin Extended and Cyrillic files load
+and the channel reading stays filled. Not run: real toast delivery, the native
+tray menu, the installed EXE's first start and the self-updater end to end,
+which needs a published v2.0 release.
 
 ## Translation Review
 
-All 385 Russian entries remain provisional and need wporgru's review, especially
+All 388 Russian entries remain provisional and need wporgru's review, especially
 technical terminology, advice, grammatical case and plural forms. They have not
 been supplied or approved by wporgru. Dutch, Turkish, German and Spanish likewise
 need native-speaker review. Coverage and runnable checks are complete for the
