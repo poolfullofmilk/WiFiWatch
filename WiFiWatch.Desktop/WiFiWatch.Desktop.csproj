@@ -9,6 +9,9 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <RootNamespace>WiFiWatch.Desktop</RootNamespace>
         <ApplicationIcon>Icon.ico</ApplicationIcon>
+        <!-- WPF Reads Per Monitor DPI From The Manifest, The WinForms Analyzer Only Knows Its Own API -->
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <NoWarn>$(NoWarn);WFO0003</NoWarn>
         <SatelliteResourceLanguages>en;nl;tr;de;es;ru</SatelliteResourceLanguages>
         <DebugType>embedded</DebugType>
         <Description>Watches Wi-Fi Channel, Signal And Ping And Logs Every Change</Description>

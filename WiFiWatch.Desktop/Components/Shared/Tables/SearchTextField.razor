@@ -1,12 +1,13 @@
-@* Search Field *@
-<Tooltip Text="@AppText.Get("Start Typing To Search")">
-    <MudTextField T="string"
-                  Value="_value"
-                  ValueChanged="HandleValueChangedAsync"
-                  Placeholder="@PlaceHolder"
-                  Adornment="Adornment.End"
-                  AdornmentIcon="@Icons.Material.Rounded.Search"
-                  DebounceInterval="500"
-                  Style="max-width:clamp(0px, 250px, 100%)"
-                  OnDebounceIntervalElapsed="HandleDebounceIntervalElapsedAsync" />
-</Tooltip>
+@* Search Field, Inset Like Every Field, Its Value Arrives Once Typing Pauses *@
+<MudTextField T="string"
+              Value="Value"
+              ValueChanged="ValueChanged"
+              Variant="Variant.Outlined"
+              Margin="Margin.Dense"
+              Placeholder="@PlaceHolder"
+              Adornment="Adornment.Start"
+              AdornmentIcon="@Icons.Material.Rounded.Search"
+              DebounceInterval="300"
+              Clearable
+              ClearIcon="@Icons.Material.Rounded.Clear"
+              Class="fixed-width my-0" />

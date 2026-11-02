@@ -272,7 +272,7 @@ public sealed class NetworkMonitor
         var gap = lastDataUtc is { } last
             ? AppText.Get(
                 ", Off Since {0} ({1})",
-                Formatter.FormatLocal(last, "yyyy-MM-dd HH:mm"),
+                Formatter.FormatLocal(last, Formatter.DateTimeFormat),
                 Formatter.FormatDuration(DateTime.UtcNow - last)
             )
             : AppText.Get(", First Run");
@@ -283,7 +283,7 @@ public sealed class NetworkMonitor
                 "{0}{1}, PC Booted {2}",
                 start,
                 gap,
-                Formatter.FormatLocal(bootUtc, "yyyy-MM-dd HH:mm")
+                Formatter.FormatLocal(bootUtc, Formatter.DateTimeFormat)
             )
         );
     }

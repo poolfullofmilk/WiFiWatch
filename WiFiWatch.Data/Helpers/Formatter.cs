@@ -7,6 +7,11 @@ namespace WiFiWatch.Data.Helpers;
 
 public static class Formatter
 {
+    // Shown Dates Are Day First, Files And Exports Keep yyyy-MM-dd So They Sort
+    public const string DateFormat = "dd-MM-yyyy";
+    public const string DateTimeFormat = "dd-MM-yyyy HH:mm";
+    public const string DateTimeSecondsFormat = "dd-MM-yyyy HH:mm:ss";
+
     static Formatter() => Debug.Assert(SelfTestPasses());
 
     public static string FormatDuration(TimeSpan duration) =>
@@ -63,7 +68,7 @@ public static class Formatter
         var dayLabel =
             localTime.Date == DateTime.Today ? AppText.Get("Today")
             : localTime.Date == DateTime.Today.AddDays(-1) ? AppText.Get("Yesterday")
-            : localTime.ToString("yyyy-MM-dd", CultureInfo.CurrentCulture);
+            : localTime.ToString(DateFormat, CultureInfo.InvariantCulture);
         return $"{dayLabel} {localTime:HH:mm}";
     }
 

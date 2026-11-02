@@ -13,7 +13,7 @@ namespace WiFiWatch.Desktop.Components.Shared.Dialogs;
 
 public partial class IncidentDialog : IDisposable
 {
-    private const string TimeFormat = "yyyy-MM-dd HH:mm:ss";
+    private const string TimeFormat = Formatter.DateTimeSecondsFormat;
 
     [Inject]
     public required NetworkMonitor Monitor { get; set; }

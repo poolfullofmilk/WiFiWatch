@@ -850,6 +850,27 @@ internal static class Program
                 await context.Events.CountAsync(row => row.Kind == EventKind.DailySummary) == 1,
                 "Daily summary deduplication survives a language change"
             );
+        await using (var context = new WiFiDbContext())
+        {
+            // A Summary From Before v2 Leads With yyyy-MM-dd
+            var summary = await context.Events.SingleAsync(row =>
+                row.Kind == EventKind.DailySummary
+            );
+            Check(
+                summary.Message.StartsWith(
+                    DateTime.Today.AddDays(-1).ToString("dd-MM-yyyy", CultureInfo.InvariantCulture)
+                ),
+                "Daily summary leads with a day first date"
+            );
+            summary.Message = DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd") + " Monday: old";
+            await context.SaveChangesAsync();
+        }
+        await SummaryWriter.WriteMissingAsync(journal, false);
+        await using (var context = new WiFiDbContext())
+            Check(
+                await context.Events.CountAsync(row => row.Kind == EventKind.DailySummary) == 1,
+                "Daily summary deduplication reads summaries from before v2"
+            );
         var tracker = new ConditionTracker(journal);
         var minute = DateTime.UtcNow;
         var signal = new ConditionTracker.Check(

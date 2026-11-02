@@ -34,7 +34,7 @@
     <data name="CheckUpdates" xml:space="preserve"><value>Проверить обновления</value></data>
     <data name="GitHubUnavailable" xml:space="preserve"><value>Не удалось связаться с GitHub</value></data>
     <data name="VersionLatest" xml:space="preserve"><value>Версия {0} — последняя</value></data>
-    <data name="DriverFrom" xml:space="preserve"><value>Драйвер {0} от {1:yyyy-MM-dd}</value></data>
+    <data name="DriverFrom" xml:space="preserve"><value>Драйвер {0} от {1:dd-MM-yyyy}</value></data>
     <data name="Driver" xml:space="preserve"><value>Драйвер {0}</value></data>
     <data name="Language" xml:space="preserve"><value>Язык</value></data>
     <data name="SystemLanguage" xml:space="preserve"><value>Язык Windows (автоматически)</value></data>
@@ -182,8 +182,8 @@
     <data name="Reference DNS ms" xml:space="preserve"><value>Эталонный DNS мс</value></data>
     <data name="Yes" xml:space="preserve"><value>Да</value></data>
     <data name="No" xml:space="preserve"><value>Нет</value></data>
-    <data name="Peak" xml:space="preserve"><value>Пик</value></data>
-    <data name="Lowest" xml:space="preserve"><value>Минимум</value></data>
+    <data name="Peak" xml:space="preserve"><value>пик</value></data>
+    <data name="Lowest" xml:space="preserve"><value>минимум</value></data>
     <data name="Weak Signal" xml:space="preserve"><value>Слабый Сигнал</value></data>
     <data name="Ping Spike At Internet Provider" xml:space="preserve"><value>Скачок Пинга У Провайдера</value></data>
     <data name="Packet Loss At Internet Provider" xml:space="preserve"><value>Потеря Пакетов У Провайдера</value></data>
@@ -283,7 +283,7 @@
     <data name="Could Not Connect To {0}, {1}" xml:space="preserve"><value>Не удалось подключиться к {0}, {1}</value></data>
     <data name="Could Not Connect To {0} For {1}, {2}, Then Connected" xml:space="preserve"><value>Не удавалось подключиться к {0} в течение {1}, {2}, затем подключение установлено</value></data>
     <data name="Wi-Fi Dropped Briefly On {0}" xml:space="preserve"><value>Кратковременный обрыв Wi-Fi в сети {0}</value></data>
-    <data name="Wi-Fi Driver {0} Dates From {1:yyyy-MM-dd}, Check Windows Update Or The Maker's Site" xml:space="preserve"><value>Драйвер Wi-Fi {0} от {1:yyyy-MM-dd}, проверьте Центр обновления Windows или сайт производителя</value></data>
+    <data name="Wi-Fi Driver {0} Dates From {1:yyyy-MM-dd}, Check Windows Update Or The Maker's Site" xml:space="preserve"><value>Драйвер Wi-Fi {0} от {1:dd-MM-yyyy}, проверьте Центр обновления Windows или сайт производителя</value></data>
     <data name="Version {0} Is Available" xml:space="preserve"><value>Доступна версия {0}</value></data>
     <data name="Speed Test {0:0} Mbps Down, {1:0} Mbps Up, Ping Under Load +{2:0} ms, Grade {3}" xml:space="preserve"><value>Тест скорости: загрузка {0:0} Мбит/с, отдача {1:0} Мбит/с, пинг под нагрузкой +{2:0} мс, оценка {3}</value></data>
     <data name="Speed Test Failed {0}" xml:space="preserve"><value>Тест скорости не удался: {0}</value></data>
@@ -384,7 +384,6 @@
     <data name="Edit row" xml:space="preserve"><value>Изменить строку</value></data>
     <data name="Cancel edit" xml:space="preserve"><value>Отменить изменение</value></data>
     <data name="Commit edit" xml:space="preserve"><value>Сохранить изменение</value></data>
-    <data name="Start Typing To Search" xml:space="preserve"><value>Начните ввод для поиска</value></data>
     <data name="{0} {1} {2} Exported {3:yyyy-MM-dd HH-mm-ss}.csv" xml:space="preserve"><value>{0} {1} {2} Экспорт {3:yyyy-MM-dd HH-mm-ss}.csv</value></data>
     <data name="No Measurements" xml:space="preserve"><value>Нет измерений</value></data>
     <data name="ConditionValue" xml:space="preserve"><value>{0} {1}</value></data>
@@ -392,4 +391,5 @@
     <data name="Nothing Found" xml:space="preserve"><value>Ничего не найдено</value></data>
     <data name="ChannelLegend" xml:space="preserve"><value>Синий: ваш канал&#10;Оранжевый: сосед с сигналом 30% или сильнее в вашем блоке 80 МГц, делит с вами эфир&#10;Серый: другие сети в зоне приёма&#10;Эфир занят: как часто ваша точка доступа сообщает, что канал занят</value></data>
     <data name="StartFailed" xml:space="preserve"><value>Не удалось запустить {0}: {1}</value></data>
+    <data name="Scroll To Top" xml:space="preserve"><value>Наверх</value></data>
 </root>

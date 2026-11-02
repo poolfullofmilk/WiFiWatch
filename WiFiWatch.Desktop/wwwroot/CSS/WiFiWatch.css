@@ -31,15 +31,103 @@
     --radius-panel: 20px;
     --radius-inner: 10px;
     --radius-cell: 6px;
-    --row-hover: color-mix(in srgb, var(--mud-palette-black) 12%, var(--mud-palette-surface));
+    --page-top: 80px;
+    --page-bottom: 28px;
+    --row-hover-amount: 12%;
+    --row-hover: color-mix(in srgb, var(--mud-palette-black) var(--row-hover-amount), var(--mud-palette-surface));
     --glass-opacity: 66%;
     --glass-blur: blur(12px);
+    --popover-opacity: 92%;
+    --inset-fill: color-mix(in srgb, var(--mud-palette-black) 22%, transparent);
+    --tonal-info: color-mix(in srgb, var(--mud-palette-info) 20%, transparent);
+    --tonal-info-hover: color-mix(in srgb, var(--mud-palette-info) 30%, transparent);
+    --tonal-info-text: color-mix(in srgb, var(--mud-palette-info) 40%, var(--mud-palette-white));
+    --tonal-error: color-mix(in srgb, var(--mud-palette-error) 20%, transparent);
+    --tonal-error-hover: color-mix(in srgb, var(--mud-palette-error) 30%, transparent);
+    --tonal-error-text: color-mix(in srgb, var(--mud-palette-error) 40%, var(--mud-palette-white));
+    --tooltip-surface: color-mix(in srgb, var(--mud-palette-white) 9%, var(--mud-palette-surface));
+    --scrollbar-thumb: color-mix(in srgb, var(--mud-palette-white) 18%, transparent);
+    --scrollbar-thumb-hover: color-mix(in srgb, var(--mud-palette-white) 32%, transparent);
+    --quick: 120ms ease-out;
 }
 
-/* App Bar Glass On Menus, Selects And Dropdowns */
+/* Menus, Selects And Dropdowns Frost Nearly Opaque, Text Behind Never Shows */
 .mud-popover.mud-paper {
-    background-color: color-mix(in srgb, var(--mud-palette-surface) var(--glass-opacity), transparent);
+    background-color: color-mix(in srgb, var(--mud-palette-surface) var(--popover-opacity), transparent);
     backdrop-filter: var(--glass-blur);
+}
+
+/* Thin Scrollbars With No Arrows, Like The Rest Of Windows */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+::-webkit-scrollbar-button {
+    display: none;
+}
+
+::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 10px;
+    background-clip: padding-box;
+    background-color: var(--scrollbar-thumb);
+}
+
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: var(--scrollbar-thumb-hover);
+    }
+
+/* Fill Pages End On The Bottom Gutter, Their Table Scrolls Inside */
+.page-fill {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - var(--page-top) - var(--page-bottom));
+    min-height: 0;
+}
+
+/* Fit Shrinks To Its Rows, Only Scrolling Once The Page Is Full */
+.mud-table.fit {
+    display: flex;
+    flex-direction: column;
+    flex: 0 1 auto;
+    min-height: 0;
+}
+
+    .mud-table.fit > .mud-table-container {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: auto;
+    }
+
+/* Header Actions Keep One Line, Only The Title Gives Way */
+.header-row > * {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+    .header-row > .header-title {
+        flex-shrink: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+/* Two Line Heights, Titles Tight And Prose Relaxed */
+.text-relaxed {
+    line-height: 1.6 !important;
+}
+
+/* Fields Keep One Width Instead Of Stretching With The Window */
+.fixed-width {
+    flex: none !important;
+    width: 250px;
+    max-width: 100%;
 }
 
 /* Dialogs Blur The Page Behind Them */
@@ -83,9 +171,12 @@ html, body {
     text-underline-offset: 3px;
 }
 
-/* Highlight */
+/* Search Highlights Are Tonal And Add No Padding */
 mark {
     padding: 0 !important;
+    border-radius: 3px;
+    background-color: var(--tonal-info-hover);
+    color: inherit;
 }
 
 /* Blazor Shows This Only After A Crash */
@@ -119,9 +210,33 @@ svg.apexcharts-svg {
     overflow-x: clip !important;
 }
 
+/* Dialogs Are Panels, So Their Tables Never Out Round Them */
+.mud-dialog {
+    border-radius: var(--radius-panel) !important;
+}
+
+    /* Content Ends Clear Of The Actions */
+    .mud-dialog .mud-dialog-content {
+        padding-bottom: 24px;
+    }
+
+    /* Actions Line Up With The Content's Edges */
+    .mud-dialog .mud-dialog-actions {
+        padding: 0 24px 20px;
+    }
+
 /* Chips Carry The Slightest Theme Shadow */
 .mud-chip {
     box-shadow: var(--mud-elevation-1);
+}
+
+/* No Material Ripple, Buttons Fade Their Colour Instead */
+.mud-ripple-effect {
+    display: none !important;
+}
+
+.mud-button-root {
+    transition: background-color var(--quick), color var(--quick), opacity var(--quick);
 }
 
 /* Filled Buttons Take The Theme Shadow Instead Of Material's Own */
@@ -130,6 +245,66 @@ svg.apexcharts-svg {
 .mud-button-filled:focus-visible,
 .mud-button-filled:active {
     box-shadow: var(--mud-elevation-1);
+}
+
+/* Every Blue Button And Info Alert Is Tonal Like The Open Page */
+.mud-button-filled.mud-button-filled-info:not(:disabled, .mud-disabled) {
+    background-color: var(--tonal-info);
+    color: var(--tonal-info-text);
+    box-shadow: none;
+}
+
+    .mud-button-filled.mud-button-filled-info:not(:disabled, .mud-disabled):is(:hover, :focus-visible, :active) {
+        background-color: var(--tonal-info-hover);
+    }
+
+.mud-alert-text-info {
+    background-color: var(--tonal-info);
+}
+
+    .mud-alert-text-info,
+    .mud-alert-text-info .mud-alert-icon {
+        color: var(--tonal-info-text);
+    }
+
+/* Fields Sit Inset, Their Edge Shows On Hover And Turns Blue On Focus */
+.mud-input.mud-input-outlined {
+    border-radius: var(--mud-default-borderradius);
+    background-color: var(--inset-fill);
+}
+
+    .mud-input.mud-input-outlined .mud-input-outlined-border,
+    .mud-input.mud-input-outlined.mud-disabled .mud-input-outlined-border {
+        border-color: transparent;
+    }
+
+    .mud-input.mud-input-outlined:focus-within .mud-input-outlined-border {
+        border-color: var(--mud-palette-info);
+    }
+
+.mud-input-control:focus-within .mud-input-label {
+    color: var(--mud-palette-info);
+}
+
+/* Icon Text Buttons Take Filled Padding, Clear Of The Edge */
+.mud-button-text-size-small:has(.mud-button-icon-start) {
+    padding-inline: 10px;
+}
+
+/* A Number At Its Limit Greys Out That Spin Button */
+.number-field {
+    display: contents;
+}
+
+    .number-field.at-max .mud-input-numeric-spin .mud-button-root:first-child,
+    .number-field.at-min .mud-input-numeric-spin .mud-button-root:last-child {
+        color: var(--mud-palette-action-disabled) !important;
+        pointer-events: none;
+    }
+
+/* Inside A Switch Label The Info Icon Follows The Text Line */
+.mud-switch .mud-tooltip-root {
+    vertical-align: middle;
 }
 
 /* Table */
@@ -167,6 +342,7 @@ svg.apexcharts-svg {
 /* Info Icons Explain, They Are Not Buttons */
 .info-icon {
     cursor: default;
+    color: var(--tonal-info-text);
 }
 
     .info-icon svg {
@@ -216,10 +392,30 @@ svg.apexcharts-svg {
 }
 /* #endregion */
 
-/* Tooltips Keep Their Line Breaks, Every Line Starting Left */
+/* Tooltips Rise On A Lighter Surface And Wrap, Keeping Their Line Breaks Left Aligned */
 .mud-tooltip {
     white-space: pre-line;
     text-align: left;
+}
+
+.mud-tooltip.mud-tooltip-default {
+    max-width: 320px !important;
+    padding: 6px 10px;
+    border-radius: var(--radius-inner);
+    background-color: var(--tooltip-surface);
+    color: var(--mud-palette-text-primary);
+    box-shadow: var(--mud-elevation-4);
+    font-size: 13px;
+    font-weight: 400;
+}
+
+    .mud-tooltip.mud-tooltip-default.mud-tooltip-arrow::after {
+        border-color: var(--tooltip-surface) transparent transparent transparent;
+    }
+
+/* A Button's Tooltip Steps Aside While Its Menu Is Open */
+.mud-popover-provider:has(.mud-popover-open .mud-menu-list) .mud-tooltip {
+    visibility: hidden;
 }
 
 /* #region Channel Strip */
@@ -252,8 +448,13 @@ svg.apexcharts-svg {
 /* #endregion */
 
 /* #region Cards */
-/* Cards Darken On Hover And Never Move */
-.hover-card:hover {
-    background-color: var(--row-hover);
+/* Cards Darken As One Surface In A Faint Blue Ring And Never Move */
+.hover-card {
+    transition: background-color var(--quick), box-shadow var(--quick);
 }
+
+    .hover-card:hover {
+        background-color: var(--row-hover);
+        box-shadow: 0 0 0 2px var(--tonal-info-hover), var(--mud-elevation-4);
+    }
 /* #endregion */

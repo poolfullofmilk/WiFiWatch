@@ -31,10 +31,10 @@
     <data name="VersionAvailable" xml:space="preserve"><value>Version {0} Available</value></data>
     <data name="Downloading" xml:space="preserve"><value>Downloading</value></data>
     <data name="UpdateNow" xml:space="preserve"><value>Update Now</value></data>
-    <data name="CheckUpdates" xml:space="preserve"><value>Check For Updates</value></data>
+    <data name="CheckUpdates" xml:space="preserve"><value>Check for Updates</value></data>
     <data name="GitHubUnavailable" xml:space="preserve"><value>Could not reach GitHub</value></data>
     <data name="VersionLatest" xml:space="preserve"><value>Version {0} is the latest</value></data>
-    <data name="DriverFrom" xml:space="preserve"><value>Driver {0} From {1:yyyy-MM-dd}</value></data>
+    <data name="DriverFrom" xml:space="preserve"><value>Driver {0} From {1:dd-MM-yyyy}</value></data>
     <data name="Driver" xml:space="preserve"><value>Driver {0}</value></data>
     <data name="Language" xml:space="preserve"><value>Language</value></data>
     <data name="SystemLanguage" xml:space="preserve"><value>Windows Language (Automatic)</value></data>
@@ -75,10 +75,10 @@
     <data name="30 Days" xml:space="preserve"><value>30 Days</value></data>
     <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
     <data name="OK" xml:space="preserve"><value>OK</value></data>
-    <data name="Day By Day" xml:space="preserve"><value>Day By Day</value></data>
-    <data name="Hour By Hour" xml:space="preserve"><value>Hour By Hour</value></data>
-    <data name="Ping Per Day" xml:space="preserve"><value>Ping Per Day</value></data>
-    <data name="Ping Per Hour" xml:space="preserve"><value>Ping Per Hour</value></data>
+    <data name="Day By Day" xml:space="preserve"><value>Day by Day</value></data>
+    <data name="Hour By Hour" xml:space="preserve"><value>Hour by Hour</value></data>
+    <data name="Ping Per Day" xml:space="preserve"><value>Ping per Day</value></data>
+    <data name="Ping Per Hour" xml:space="preserve"><value>Ping per Hour</value></data>
     <data name="Router" xml:space="preserve"><value>Router</value></data>
     <data name="Internet" xml:space="preserve"><value>Internet</value></data>
     <data name="DNS" xml:space="preserve"><value>DNS</value></data>
@@ -96,9 +96,9 @@
     <data name="Weak" xml:space="preserve"><value>Weak</value></data>
     <data name="Good" xml:space="preserve"><value>Good</value></data>
     <data name="Wi-Fi Speed" xml:space="preserve"><value>Wi-Fi Speed</value></data>
-    <data name="Link To The Router" xml:space="preserve"><value>Link To The Router</value></data>
+    <data name="Link To The Router" xml:space="preserve"><value>Link to the Router</value></data>
     <data name="Connection" xml:space="preserve"><value>Connection</value></data>
-    <data name="Cable Or Powerline" xml:space="preserve"><value>Cable Or Powerline</value></data>
+    <data name="Cable Or Powerline" xml:space="preserve"><value>Cable or Powerline</value></data>
     <data name="Not Connected" xml:space="preserve"><value>Not Connected</value></data>
     <data name="No Answer" xml:space="preserve"><value>No Answer</value></data>
     <data name="Home" xml:space="preserve"><value>Home</value></data>
@@ -109,7 +109,7 @@
     <data name="Wi-Fi" xml:space="preserve"><value>Wi-Fi</value></data>
     <data name="Home Network" xml:space="preserve"><value>Home Network</value></data>
     <data name="Internet Provider" xml:space="preserve"><value>Internet Provider</value></data>
-    <data name="No Wi-Fi Or Cable Connection" xml:space="preserve"><value>No Wi-Fi Or Cable Connection</value></data>
+    <data name="No Wi-Fi Or Cable Connection" xml:space="preserve"><value>No Wi-Fi or Cable Connection</value></data>
     <data name="Check The Router, Cables And Powerline Adapters" xml:space="preserve"><value>Check the router, cables and powerline adapters</value></data>
     <data name="All Good" xml:space="preserve"><value>All Good</value></data>
     <data name="Looks Fine Again, Clears After One More Good Minute" xml:space="preserve"><value>Looks fine again, clears after one more good minute</value></data>
@@ -117,9 +117,9 @@
     <data name="No Problems" xml:space="preserve"><value>No Problems</value></data>
     <data name="Online" xml:space="preserve"><value>Online</value></data>
     <data name="Not Watched" xml:space="preserve"><value>Not Watched</value></data>
-    <data name="Warnings And Outages" xml:space="preserve"><value>Warnings And Outages</value></data>
+    <data name="Warnings And Outages" xml:space="preserve"><value>Warnings and Outages</value></data>
     <data name="Longest Outage" xml:space="preserve"><value>Longest Outage</value></data>
-    <data name="Internet Or Connection Down" xml:space="preserve"><value>Internet Or Connection Down</value></data>
+    <data name="Internet Or Connection Down" xml:space="preserve"><value>Internet or Connection Down</value></data>
     <data name="Fastest Download" xml:space="preserve"><value>Fastest Download</value></data>
     <data name="From Speed Tests" xml:space="preserve"><value>From Speed Tests</value></data>
     <data name="None" xml:space="preserve"><value>None</value></data>
@@ -130,13 +130,13 @@
     <data name="Export Day" xml:space="preserve"><value>Export Day</value></data>
     <data name="Sort By" xml:space="preserve"><value>Sort By</value></data>
     <data name="Search" xml:space="preserve"><value>Search</value></data>
-    <data name="Rows Per Page" xml:space="preserve"><value>Rows Per Page</value></data>
+    <data name="Rows Per Page" xml:space="preserve"><value>Rows per Page</value></data>
     <data name="Hop" xml:space="preserve"><value>Hop</value></data>
     <data name="Address" xml:space="preserve"><value>Address</value></data>
     <data name="Name" xml:space="preserve"><value>Name</value></data>
     <data name="Loss" xml:space="preserve"><value>Loss</value></data>
     <data name="Average" xml:space="preserve"><value>Average</value></data>
-    <data name="What To Do" xml:space="preserve"><value>What To Do</value></data>
+    <data name="What To Do" xml:space="preserve"><value>What to Do</value></data>
     <data name="Windows Reason" xml:space="preserve"><value>Windows Reason</value></data>
     <data name="At That Moment" xml:space="preserve"><value>At That Moment</value></data>
     <data name="Trace" xml:space="preserve"><value>Trace</value></data>
@@ -183,11 +183,11 @@
     <data name="Reference DNS ms" xml:space="preserve"><value>Reference DNS ms</value></data>
     <data name="Yes" xml:space="preserve"><value>Yes</value></data>
     <data name="No" xml:space="preserve"><value>No</value></data>
-    <data name="Peak" xml:space="preserve"><value>Peak</value></data>
-    <data name="Lowest" xml:space="preserve"><value>Lowest</value></data>
+    <data name="Peak" xml:space="preserve"><value>peak</value></data>
+    <data name="Lowest" xml:space="preserve"><value>lowest</value></data>
     <data name="Weak Signal" xml:space="preserve"><value>Weak Signal</value></data>
-    <data name="Ping Spike At Internet Provider" xml:space="preserve"><value>Ping Spike At Internet Provider</value></data>
-    <data name="Packet Loss At Internet Provider" xml:space="preserve"><value>Packet Loss At Internet Provider</value></data>
+    <data name="Ping Spike At Internet Provider" xml:space="preserve"><value>Ping Spike at Internet Provider</value></data>
+    <data name="Packet Loss At Internet Provider" xml:space="preserve"><value>Packet Loss at Internet Provider</value></data>
     <data name="Slow DNS" xml:space="preserve"><value>Slow DNS</value></data>
     <data name="No Outages" xml:space="preserve"><value>No Outages</value></data>
     <data name="Move Closer To The Router Or Use A Cable" xml:space="preserve"><value>Move closer to the router or use A cable</value></data>
@@ -200,7 +200,7 @@
     <data name="Update The Wi-Fi Driver If This Keeps Happening" xml:space="preserve"><value>Update the Wi-Fi driver if this keeps happening</value></data>
     <data name="Set The Router To Channels 36 To 48 If This Repeats" xml:space="preserve"><value>Set the router to channels 36 to 48 if this repeats</value></data>
     <data name="Turn On Location For Desktop Apps" xml:space="preserve"><value>Turn on location for desktop apps</value></data>
-    <data name="Update The Wi-Fi Driver" xml:space="preserve"><value>Update The Wi-Fi Driver</value></data>
+    <data name="Update The Wi-Fi Driver" xml:space="preserve"><value>Update the Wi-Fi Driver</value></data>
     <data name="Open Location Settings" xml:space="preserve"><value>Open Location Settings</value></data>
     <data name="Open Wi-Fi Settings" xml:space="preserve"><value>Open Wi-Fi Settings</value></data>
     <data name="Open Ethernet Settings" xml:space="preserve"><value>Open Ethernet Settings</value></data>
@@ -237,34 +237,34 @@
     <data name="{0}, {1} dBm{2}" xml:space="preserve"><value>{0}, {1} dBm{2}</value></data>
     <data name=", Yours" xml:space="preserve"><value>, Yours</value></data>
     <data name=" Channel {0}{1}" xml:space="preserve"><value> Channel {0}{1}</value></data>
-    <data name="{0} To {1} Weather Radar" xml:space="preserve"><value>{0} To {1} Weather Radar</value></data>
-    <data name="{0} To {1} DFS" xml:space="preserve"><value>{0} To {1} DFS</value></data>
+    <data name="{0} To {1} Weather Radar" xml:space="preserve"><value>{0} to {1} Weather Radar</value></data>
+    <data name="{0} To {1} DFS" xml:space="preserve"><value>{0} to {1} DFS</value></data>
     <data name="Radar Moved You {0} Times, 36 To 48 Never Sees Radar" xml:space="preserve"><value>Radar moved you {0} times, 36 to 48 never sees radar</value></data>
     <data name="Channel {0} Sits On The Quietest Block, Stay" xml:space="preserve"><value>Channel {0} sits on the quietest block, stay</value></data>
     <data name="{0} Has {1}, Yours Has {2}" xml:space="preserve"><value>{0} has {1}, yours has {2}</value></data>
     <data name="{0:0.#}% Online" xml:space="preserve"><value>{0:0.#}% Online</value></data>
     <data name="Longest Outage {0}" xml:space="preserve"><value>Longest Outage {0}</value></data>
-    <data name="{0:0}% On DFS" xml:space="preserve"><value>{0:0}% On DFS</value></data>
+    <data name="{0:0}% On DFS" xml:space="preserve"><value>{0:0}% on DFS</value></data>
     <data name="Worst Hour {0:00}h At {1:0.#} ms" xml:space="preserve"><value>Worst hour {0:00}h at {1:0.#} ms</value></data>
     <data name="Path Clear To The Internet In {0} Hops" xml:space="preserve"><value>Path clear to the internet in {0} hops</value></data>
     <data name="No Hop Answered, This PC Is Offline" xml:space="preserve"><value>No hop answered, this PC is offline</value></data>
     <data name="Stops At Your Router, The Line To The Provider Is Down" xml:space="preserve"><value>Stops at your router, the line to the provider is down</value></data>
     <data name="Stops After Hop {0} {1}, Inside The Provider Network" xml:space="preserve"><value>Stops after hop {0} {1}, inside the provider network</value></data>
-    <data name="Resumed After Sleep Of {0}" xml:space="preserve"><value>Resumed After Sleep Of {0}</value></data>
+    <data name="Resumed After Sleep Of {0}" xml:space="preserve"><value>Resumed After Sleep of {0}</value></data>
     <data name="Monitor Failed {0}" xml:space="preserve"><value>Monitor Failed {0}</value></data>
     <data name="App Failed {0}" xml:space="preserve"><value>App Failed {0}</value></data>
-    <data name="Started At Sign In" xml:space="preserve"><value>Started At Sign In</value></data>
+    <data name="Started At Sign In" xml:space="preserve"><value>Started at Sign In</value></data>
     <data name="Started" xml:space="preserve"><value>Started</value></data>
     <data name=", Off Since {0} ({1})" xml:space="preserve"><value>, Off Since {0} ({1})</value></data>
     <data name=", First Run" xml:space="preserve"><value>, First Run</value></data>
     <data name="{0}{1}, PC Booted {2}" xml:space="preserve"><value>{0}{1}, PC Booted {2}</value></data>
-    <data name="Ping Spike On {0}" xml:space="preserve"><value>Ping Spike On {0}</value></data>
-    <data name="Packet Loss On {0}" xml:space="preserve"><value>Packet Loss On {0}</value></data>
+    <data name="Ping Spike On {0}" xml:space="preserve"><value>Ping Spike on {0}</value></data>
+    <data name="Packet Loss On {0}" xml:space="preserve"><value>Packet Loss on {0}</value></data>
     <data name="{0}, Reference 1.1.1.1 {1}" xml:space="preserve"><value>{0}, Reference 1.1.1.1 {1}</value></data>
     <data name="Link {0}" xml:space="preserve"><value>Link {0}</value></data>
     <data name="Signal {0} dBm" xml:space="preserve"><value>Signal {0} dBm</value></data>
     <data name="Rate {0} Mbps" xml:space="preserve"><value>Rate {0} Mbps</value></data>
-    <data name="Switched From {0} To {1}" xml:space="preserve"><value>Switched From {0} To {1}</value></data>
+    <data name="Switched From {0} To {1}" xml:space="preserve"><value>Switched From {0} to {1}</value></data>
     <data name="Wi-Fi Lost For {0}, Back On Ethernet" xml:space="preserve"><value>Wi-Fi lost for {0}, back on Ethernet</value></data>
     <data name="Location Access Was Off, Not Needed On Ethernet" xml:space="preserve"><value>Location access was off, not needed on Ethernet</value></data>
     <data name="Ethernet Lost, PC Offline" xml:space="preserve"><value>Ethernet Lost, PC Offline</value></data>
@@ -273,28 +273,28 @@
     <data name="Internet Down, Router Still Answers" xml:space="preserve"><value>Internet Down, Router Still Answers</value></data>
     <data name="Location Access Off So Wi-Fi Details Are Hidden" xml:space="preserve"><value>Location access off so Wi-Fi details are hidden</value></data>
     <data name="Location Access Was Off For {0}" xml:space="preserve"><value>Location access was off for {0}</value></data>
-    <data name="Wi-Fi Lost On {0}" xml:space="preserve"><value>Wi-Fi Lost On {0}</value></data>
+    <data name="Wi-Fi Lost On {0}" xml:space="preserve"><value>Wi-Fi Lost on {0}</value></data>
     <data name=", Router Was Checking The New DFS Channel For Radar" xml:space="preserve"><value>, router was checking the new DFS channel for radar</value></data>
     <data name="Wi-Fi Lost For {0}, Back On {1} Channel {2}{3}" xml:space="preserve"><value>Wi-Fi lost for {0}, back on {1} channel {2}{3}</value></data>
     <data name="Band {0} To {1} On {2}" xml:space="preserve"><value>Band {0} to {1} on {2}</value></data>
     <data name="{0}, Radar Heard On {1}, Router May Return From {2}" xml:space="preserve"><value>{0}, radar heard on {1}, router may return from {2}</value></data>
     <data name=" After {0} Away" xml:space="preserve"><value> After {0} Away</value></data>
     <data name="Channel {0} Shares The Weather Radar Band, Every Move Onto It Waits {1:0} Minutes Silent" xml:space="preserve"><value>Channel {0} shares the weather radar band, every move onto it waits {1:0} minutes silent</value></data>
-    <data name="Could Not Connect To {0}" xml:space="preserve"><value>Could Not Connect To {0}</value></data>
+    <data name="Could Not Connect To {0}" xml:space="preserve"><value>Could Not Connect to {0}</value></data>
     <data name="Could Not Connect To {0}, {1}" xml:space="preserve"><value>Could not connect to {0}, {1}</value></data>
     <data name="Could Not Connect To {0} For {1}, {2}, Then Connected" xml:space="preserve"><value>Could not connect to {0} for {1}, {2}, then connected</value></data>
-    <data name="Wi-Fi Dropped Briefly On {0}" xml:space="preserve"><value>Wi-Fi Dropped Briefly On {0}</value></data>
-    <data name="Wi-Fi Driver {0} Dates From {1:yyyy-MM-dd}, Check Windows Update Or The Maker's Site" xml:space="preserve"><value>Wi-Fi driver {0} dates from {1:yyyy-MM-dd}, check Windows Update or the maker's site</value></data>
+    <data name="Wi-Fi Dropped Briefly On {0}" xml:space="preserve"><value>Wi-Fi Dropped Briefly on {0}</value></data>
+    <data name="Wi-Fi Driver {0} Dates From {1:yyyy-MM-dd}, Check Windows Update Or The Maker's Site" xml:space="preserve"><value>Wi-Fi driver {0} dates from {1:dd-MM-yyyy}, check Windows Update or the maker's site</value></data>
     <data name="Version {0} Is Available" xml:space="preserve"><value>Version {0} Is Available</value></data>
     <data name="Speed Test {0:0} Mbps Down, {1:0} Mbps Up, Ping Under Load +{2:0} ms, Grade {3}" xml:space="preserve"><value>Speed test {0:0} Mbps down, {1:0} Mbps up, ping under load +{2:0} ms, grade {3}</value></data>
     <data name="Speed Test Failed {0}" xml:space="preserve"><value>Speed Test Failed {0}</value></data>
     <data name="{0} For {1}, {2} {3}, Average {4}" xml:space="preserve"><value>{0} for {1}, {2} {3}, average {4}</value></data>
-    <data name="{0}, Cut Short By Sleep" xml:space="preserve"><value>{0}, Cut Short By Sleep</value></data>
+    <data name="{0}, Cut Short By Sleep" xml:space="preserve"><value>{0}, Cut Short by Sleep</value></data>
     <data name="{0}, Still Going After {1}" xml:space="preserve"><value>{0}, Still Going After {1}</value></data>
     <data name=", Cut Short When Monitoring Stopped" xml:space="preserve"><value>, cut short when monitoring stopped</value></data>
     <data name="Channel {0} To {1} Left DFS" xml:space="preserve"><value>Channel {0} to {1} left DFS</value></data>
     <data name="Channel {0} To {1} Back On DFS" xml:space="preserve"><value>Channel {0} to {1} back on DFS</value></data>
-    <data name="Channel {0} To {1}" xml:space="preserve"><value>Channel {0} To {1}</value></data>
+    <data name="Channel {0} To {1}" xml:space="preserve"><value>Channel {0} to {1}</value></data>
     <data name="Maximum Performance" xml:space="preserve"><value>Maximum Performance</value></data>
     <data name="Low Power Saving" xml:space="preserve"><value>Low Power Saving</value></data>
     <data name="Medium Power Saving" xml:space="preserve"><value>Medium Power Saving</value></data>
@@ -385,7 +385,6 @@
     <data name="Edit row" xml:space="preserve"><value>Edit row</value></data>
     <data name="Cancel edit" xml:space="preserve"><value>Cancel edit</value></data>
     <data name="Commit edit" xml:space="preserve"><value>Commit edit</value></data>
-    <data name="Start Typing To Search" xml:space="preserve"><value>Start typing to search</value></data>
     <data name="{0} {1} {2} Exported {3:yyyy-MM-dd HH-mm-ss}.csv" xml:space="preserve"><value>{0} {1} {2} Exported {3:yyyy-MM-dd HH-mm-ss}.csv</value></data>
     <data name="No Measurements" xml:space="preserve"><value>No measurements</value></data>
     <data name="ConditionValue" xml:space="preserve"><value>{0} {1}</value></data>
@@ -393,4 +392,5 @@
     <data name="Nothing Found" xml:space="preserve"><value>Nothing found</value></data>
     <data name="ChannelLegend" xml:space="preserve"><value>Blue: your channel&#10;Amber: a neighbor at 30% signal or more on your 80 MHz block, sharing your airtime&#10;Grey: other networks in range&#10;Airtime busy: how often your access point reports the channel in use</value></data>
     <data name="StartFailed" xml:space="preserve"><value>{0} could not start: {1}</value></data>
+    <data name="Scroll To Top" xml:space="preserve"><value>Scroll to Top</value></data>
 </root>

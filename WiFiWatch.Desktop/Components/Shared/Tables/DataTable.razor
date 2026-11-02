@@ -10,8 +10,7 @@
           Elevation="4"
           RowsPerPage="@_rowsPerPage"
           FixedHeader
-          ContainerStyle="max-height:calc(100vh - 300px)"
-          Class="rounded-panel"
+          Class="rounded-panel fit"
           OnRowClick="OnRowClick"
           RowClass="@(OnRowClick.HasDelegate ? "cursor-pointer" : null)">
 
@@ -20,8 +19,7 @@
         @* Search *@
         <SearchTextField Value="@SearchTerm"
                          ValueChanged="OnSearchTermChangedAsync"
-                         PlaceHolder="@AppText.Get("Search")"
-                         OnDebounceIntervalElapsed="ReloadAsync" />
+                         PlaceHolder="@AppText.Get("Search")" />
 
         <MudSpacer />
 

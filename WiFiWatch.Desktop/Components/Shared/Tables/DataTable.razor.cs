@@ -61,7 +61,9 @@ public partial class DataTable<TItem>
 
     private async Task OnSearchTermChangedAsync(string? value)
     {
+        // The Field Debounces, So Every Change Reloads, Clearing Too
         SearchTerm = value ?? string.Empty;
         await SearchTermChanged.InvokeAsync(SearchTerm);
+        await ReloadAsync();
     }
 }

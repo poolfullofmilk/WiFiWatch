@@ -1,58 +1,64 @@
 @using Size = MudBlazor.Size
 
-@* Incidents Table *@
-<DataTable TItem="WiFiEvent"
-           @ref="_incidentTable"
-           ServerData="LoadIncidentsAsync"
-           @bind-SearchTerm="_searchTerm"
-           OnRowClick="OpenDetailsAsync">
+@* Incidents Table, The Page Ends On The Bottom Gutter And The Rows Scroll Inside *@
+<MudElement HtmlTag="div"
+            Class="page-fill">
+    <DataTable TItem="WiFiEvent"
+               @ref="_incidentTable"
+               ServerData="LoadIncidentsAsync"
+               @bind-SearchTerm="_searchTerm"
+               OnRowClick="OpenDetailsAsync">
 
-    <ToolBarExtra>
-        @* Scope Buttons *@
-        <SegmentedButtonGroup TValue="bool"
-                              Options="ScopeOptions"
-                              Value="_isEverything"
-                              ValueChanged="SelectScopeAsync" />
-        @* Export Menu *@
-        <ExportMenu OnExport="ExportAsync" />
-    </ToolBarExtra>
+        <ToolBarExtra>
+            @* Scope Buttons *@
+            <SegmentedButtonGroup TValue="bool"
+                                  Options="ScopeOptions"
+                                  Value="_isEverything"
+                                  ValueChanged="SelectScopeAsync" />
+            @* Export Menu *@
+            <ExportMenu OnExport="ExportAsync" />
+        </ToolBarExtra>
 
-    <HeaderContent>
-        <MudTh>
-            <MudTableSortLabel T="WiFiEvent"
-                               SortLabel="@nameof(WiFiEvent.OccurredAtUtc)"
-                               InitialDirection="SortDirection.Descending"
-                               SortIcon="@Icons.Material.Rounded.ArrowUpward">
-                @AppText.Get("When")
-            </MudTableSortLabel>
-        </MudTh>
-        <MudTh>@AppText.Get("What")</MudTh>
-        <MudTh>@AppText.Get("Where")</MudTh>
-        <MudTh>@AppText.Get("Length")</MudTh>
-        <MudTh>@AppText.Get("Details")</MudTh>
-    </HeaderContent>
+        <HeaderContent>
+            <MudTh>
+                <MudTableSortLabel T="WiFiEvent"
+                                   SortLabel="@nameof(WiFiEvent.OccurredAtUtc)"
+                                   InitialDirection="SortDirection.Descending"
+                                   SortIcon="@Icons.Material.Rounded.ArrowUpward">
+                    @AppText.Get("When")
+                </MudTableSortLabel>
+            </MudTh>
+            <MudTh>@AppText.Get("What")</MudTh>
+            <MudTh>@AppText.Get("Where")</MudTh>
+            <MudTh>@AppText.Get("Length")</MudTh>
+            <MudTh>@AppText.Get("Details")</MudTh>
+        </HeaderContent>
 
-    <RowTemplate>
-        <MudTd DataLabel="@AppText.Get("When")"
-               Class="selectable-text">
-            @Formatter.FormatLocal(context.OccurredAtUtc, "yyyy-MM-dd HH:mm")
-        </MudTd>
-        <MudTd DataLabel="@AppText.Get("What")">
-            <MudChip T="string"
-                     Icon="@EventKindColors.IconFor(context.Severity)"
-                     Color="@EventKindColors.For(context.Kind, context.Severity)"
-                     Size="Size.Small"
-                     Variant="Variant.Text">
-                @context.Kind.ToLabel()
-            </MudChip>
-        </MudTd>
-        <MudTd DataLabel="@AppText.Get("Where")">@(context.Scope is { } scope ? AppText.Get(scope) : "-")</MudTd>
-        <MudTd DataLabel="@AppText.Get("Length")">@(Formatter.FormatIncidentLength(context.OccurredAtUtc, context.EndedAtUtc) ?? "-")</MudTd>
-        <MudTd DataLabel="@AppText.Get("Details")"
-               Class="selectable-text">
-            <MudHighlighter Text="@context.Message"
-                            HighlightedText="@_searchTerm" />
-        </MudTd>
-    </RowTemplate>
+        <RowTemplate>
+            <MudTd DataLabel="@AppText.Get("When")"
+                   Class="selectable-text">
+                @Formatter.FormatLocal(context.OccurredAtUtc, Formatter.DateTimeFormat)
+            </MudTd>
+            <MudTd DataLabel="@AppText.Get("What")">
+                <MudChip T="string"
+                         Icon="@EventKindColors.IconFor(context.Severity)"
+                         Color="@EventKindColors.For(context.Kind, context.Severity)"
+                         Size="Size.Small"
+                         Variant="Variant.Text">
+                    @context.Kind.ToLabel()
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="@AppText.Get("Where")">
+                <MudHighlighter Text="@(context.Scope is { } scope ? AppText.Get(scope) : "-")"
+                                HighlightedText="@_searchTerm" />
+            </MudTd>
+            <MudTd DataLabel="@AppText.Get("Length")">@(Formatter.FormatIncidentLength(context.OccurredAtUtc, context.EndedAtUtc) ?? "-")</MudTd>
+            <MudTd DataLabel="@AppText.Get("Details")"
+                   Class="selectable-text">
+                <MudHighlighter Text="@context.Message"
+                                HighlightedText="@_searchTerm" />
+            </MudTd>
+        </RowTemplate>
 
-</DataTable>
+    </DataTable>
+</MudElement>

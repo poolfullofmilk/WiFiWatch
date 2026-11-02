@@ -24,21 +24,20 @@ public static class AppTheme
     private const string PageBackground = "#202020";
     private const string RaisedSurface = "#2a2a2a";
 
-    // One Accent Blue For Secondary And Info
+    // One Accent Blue For Secondary And Info, Darker On Hover
     private const string AccentBlue = "#3d8bfd";
+    private const string AccentBlueDarken = "#2b74e0";
 
     // Shared White Overlay Steps
     private const string TextStrong = "rgba(255,255,255, 0.85)";
-    private const string TextMuted = "rgba(255,255,255, 0.80)";
+    private const string TextMedium = "rgba(255,255,255, 0.60)";
     private const string TextFaint = "rgba(255,255,255, 0.35)";
     private const string LineStrong = "rgba(255,255,255, 0.15)";
     private const string LineFaint = "rgba(255,255,255, 0.10)";
-    private const string LineHairline = "rgba(255,255,255, 0.06)";
 
-    // Two Depths, A Slight Lift And A Ringed Panel Drop
+    // Two Depths, A Slight Lift And A Panel Drop
     private const string SlightShadow = "0 2px 8px rgba(0,0,0, 0.25)";
-    private const string PanelShadow =
-        $"0 0 0 1px {LineHairline}, 0 8px 24px -10px rgba(0,0,0, 0.6)";
+    private const string PanelShadow = "0 8px 24px -10px rgba(0,0,0, 0.6)";
 
     public static readonly MudTheme Custom = new()
     {
@@ -47,18 +46,19 @@ public static class AppTheme
             // Core Colors
             Primary = Colors.Gray.Lighten1,
             Secondary = AccentBlue,
-            Tertiary = Colors.Gray.Default,
+            Tertiary = TextMedium,
 
             // Status Colors
             Info = AccentBlue,
+            InfoDarken = AccentBlueDarken,
             Warning = "#f5b544",
 
             // UI Elements
             AppbarBackground = ChromeSurface,
             AppbarText = TextStrong,
             DrawerBackground = ChromeSurface,
-            DrawerText = TextMuted,
-            DrawerIcon = TextMuted,
+            DrawerText = TextStrong,
+            DrawerIcon = TextStrong,
 
             // Content Areas
             Background = PageBackground,
@@ -67,8 +67,12 @@ public static class AppTheme
 
             // Text Colors
             TextPrimary = TextStrong,
-            TextSecondary = "rgba(255,255,255, 0.60)",
+            TextSecondary = TextMedium,
             TextDisabled = TextFaint,
+
+            // Icons And Disabled Controls Share The Text Greys
+            ActionDefault = TextMedium,
+            ActionDisabled = TextFaint,
 
             // Link Colors
             HoverOpacity = 0.12,
@@ -76,7 +80,7 @@ public static class AppTheme
             // Form Elements
             PrimaryDarken = Colors.Gray.Darken2,
             PrimaryLighten = Colors.Gray.Lighten4,
-            SecondaryDarken = Colors.Gray.Darken1,
+            SecondaryDarken = AccentBlueDarken,
             SecondaryLighten = Colors.Shades.White,
             TertiaryDarken = Colors.Gray.Darken3,
             TertiaryLighten = Colors.Gray.Lighten2,
@@ -85,7 +89,7 @@ public static class AppTheme
             Divider = LineStrong,
             DividerLight = LineFaint,
             LinesDefault = LineStrong,
-            LinesInputs = TextFaint,
+            LinesInputs = LineStrong,
 
             // Focus States
             Dark = RaisedSurface,
@@ -95,7 +99,7 @@ public static class AppTheme
             // Tables
             TableLines = LineStrong,
             TableStriped = "rgba(255,255,255, 0.05)",
-            TableHover = LineFaint,
+            TableHover = "rgba(0,0,0, 0.12)",
 
             // System
             OverlayDark = "rgba(0, 0, 0, 0.5)",
@@ -121,6 +125,10 @@ public static class AppTheme
             {
                 FontFamily = FontFamily,
                 LetterSpacing = NormalLetterSpacing,
+
+                // Inherited Text Keeps A 16 Pixel Body
+                FontSize = "1rem",
+                LineHeight = "1.5",
             },
             H1 = new H1Typography
             {

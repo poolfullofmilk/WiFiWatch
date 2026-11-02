@@ -170,12 +170,16 @@ public static class SummaryWriter
     public static async Task WriteMissingAsync(EventJournal journal, bool isNotified)
     {
         var yesterday = DateTime.Today.AddDays(-1);
-        var label =
-            yesterday.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture)
-            + " "
-            + yesterday.ToString("dddd", AppText.Culture);
+        var date = yesterday.ToString(
+            Formatter.DateFormat,
+            System.Globalization.CultureInfo.InvariantCulture
+        );
+        var label = date + " " + yesterday.ToString("dddd", AppText.Culture);
+
+        // Summaries Before v2 Lead With yyyy-MM-dd
         if (
-            await EventJournal.HasMessageStartingWithAsync(
+            await EventJournal.HasMessageStartingWithAsync(EventKind.DailySummary, date)
+            || await EventJournal.HasMessageStartingWithAsync(
                 EventKind.DailySummary,
                 yesterday.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture)
             )

@@ -1,25 +1,20 @@
-@* Setting Switch *@
-<MudStack Row
-          AlignItems="AlignItems.Center"
-          Justify="Justify.SpaceBetween"
-          Wrap="Wrap.Wrap"
-          Spacing="2">
-    <MudStack Spacing="0"
-              Class="mx-4">
-        <MudText Typo="Typo.subtitle2">
-            <b>@Title</b>
+@* Setting Card, The Explanation In An Info Icon Rather Than A Caption *@
+<MudPaper Elevation="4"
+          Class="pa-4 rounded-panel mud-height-full d-flex align-center">
+    <MudSwitch T="bool"
+               Value="Value"
+               ValueChanged="ValueChanged"
+               Color="Color.Info"
+               Disabled="Disabled"
+               Class="ma-0">
+        <MudText Typo="Typo.subtitle2"
+                 HtmlTag="span"
+                 Class="d-inline-flex align-center">
+            @Title
+            @if (Description is not null)
+            {
+                <InfoIcon Text="@Description" />
+            }
         </MudText>
-        <MudText Typo="Typo.body2"
-                 Class="mud-text-secondary">
-            @Description
-        </MudText>
-    </MudStack>
-    @* Toggle *@
-    <MudCheckBox T="bool"
-                 Value="Value"
-                 ValueChanged="ValueChanged"
-                 Class="mx-4"
-                 Disabled="Disabled"
-                 CheckedIcon="@Icons.Material.Rounded.CheckBox"
-                 UncheckedIcon="@Icons.Material.Rounded.CheckBoxOutlineBlank" />
-</MudStack>
+    </MudSwitch>
+</MudPaper>

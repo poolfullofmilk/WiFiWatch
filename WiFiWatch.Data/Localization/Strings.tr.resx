@@ -34,7 +34,7 @@
     <data name="CheckUpdates" xml:space="preserve"><value>Güncellemeleri denetle</value></data>
     <data name="GitHubUnavailable" xml:space="preserve"><value>GitHub’a ulaşılamadı</value></data>
     <data name="VersionLatest" xml:space="preserve"><value>{0} en son sürümdür</value></data>
-    <data name="DriverFrom" xml:space="preserve"><value>Sürücü {0}, tarih {1:yyyy-MM-dd}</value></data>
+    <data name="DriverFrom" xml:space="preserve"><value>Sürücü {0}, tarih {1:dd-MM-yyyy}</value></data>
     <data name="Driver" xml:space="preserve"><value>Sürücü {0}</value></data>
     <data name="Language" xml:space="preserve"><value>Dil</value></data>
     <data name="SystemLanguage" xml:space="preserve"><value>Windows dili (otomatik)</value></data>
@@ -182,8 +182,8 @@
     <data name="Reference DNS ms" xml:space="preserve"><value>Referans DNS ms</value></data>
     <data name="Yes" xml:space="preserve"><value>Evet</value></data>
     <data name="No" xml:space="preserve"><value>Hayır</value></data>
-    <data name="Peak" xml:space="preserve"><value>En Yüksek</value></data>
-    <data name="Lowest" xml:space="preserve"><value>En Düşük</value></data>
+    <data name="Peak" xml:space="preserve"><value>en yüksek</value></data>
+    <data name="Lowest" xml:space="preserve"><value>en düşük</value></data>
     <data name="Weak Signal" xml:space="preserve"><value>Zayıf Sinyal</value></data>
     <data name="Ping Spike At Internet Provider" xml:space="preserve"><value>İnternet Sağlayıcısında Ping Sıçraması</value></data>
     <data name="Packet Loss At Internet Provider" xml:space="preserve"><value>İnternet Sağlayıcısında Paket Kaybı</value></data>
@@ -283,7 +283,7 @@
     <data name="Could Not Connect To {0}, {1}" xml:space="preserve"><value>{0} ağına bağlanılamadı, {1}</value></data>
     <data name="Could Not Connect To {0} For {1}, {2}, Then Connected" xml:space="preserve"><value>{0} ağına {1} boyunca bağlanılamadı, {2}, sonra bağlandı</value></data>
     <data name="Wi-Fi Dropped Briefly On {0}" xml:space="preserve"><value>{0} ağında Wi-Fi kısa süreli kesildi</value></data>
-    <data name="Wi-Fi Driver {0} Dates From {1:yyyy-MM-dd}, Check Windows Update Or The Maker's Site" xml:space="preserve"><value>Wi-Fi sürücüsü {0}, tarih {1:yyyy-MM-dd}; Windows Update’i veya üreticinin sitesini kontrol edin</value></data>
+    <data name="Wi-Fi Driver {0} Dates From {1:yyyy-MM-dd}, Check Windows Update Or The Maker's Site" xml:space="preserve"><value>Wi-Fi sürücüsü {0}, tarih {1:dd-MM-yyyy}; Windows Update’i veya üreticinin sitesini kontrol edin</value></data>
     <data name="Version {0} Is Available" xml:space="preserve"><value>{0} sürümü mevcut</value></data>
     <data name="Speed Test {0:0} Mbps Down, {1:0} Mbps Up, Ping Under Load +{2:0} ms, Grade {3}" xml:space="preserve"><value>Hız testi: {0:0} Mbps indirme, {1:0} Mbps yükleme, yük altında ping +{2:0} ms, not {3}</value></data>
     <data name="Speed Test Failed {0}" xml:space="preserve"><value>Hız testi başarısız: {0}</value></data>
@@ -384,7 +384,6 @@
     <data name="Edit row" xml:space="preserve"><value>Satırı düzenle</value></data>
     <data name="Cancel edit" xml:space="preserve"><value>Düzenlemeyi iptal et</value></data>
     <data name="Commit edit" xml:space="preserve"><value>Düzenlemeyi kaydet</value></data>
-    <data name="Start Typing To Search" xml:space="preserve"><value>Aramak için yazmaya başlayın</value></data>
     <data name="{0} {1} {2} Exported {3:yyyy-MM-dd HH-mm-ss}.csv" xml:space="preserve"><value>{0} {1} {2} Dışa Aktarıldı {3:yyyy-MM-dd HH-mm-ss}.csv</value></data>
     <data name="No Measurements" xml:space="preserve"><value>Ölçüm yok</value></data>
     <data name="ConditionValue" xml:space="preserve"><value>{0} {1}</value></data>
@@ -392,4 +391,5 @@
     <data name="Nothing Found" xml:space="preserve"><value>Hiçbir şey bulunamadı</value></data>
     <data name="ChannelLegend" xml:space="preserve"><value>Mavi: kanalınız&#10;Turuncu: 80 MHz bloğunuzda %30 veya daha güçlü sinyalli bir komşu, yayın süresini sizinle paylaşır&#10;Gri: menzildeki diğer ağlar&#10;Yayın süresi meşgul: erişim noktanızın kanalı ne sıklıkla dolu bildirdiği</value></data>
     <data name="StartFailed" xml:space="preserve"><value>{0} başlatılamadı: {1}</value></data>
+    <data name="Scroll To Top" xml:space="preserve"><value>Başa Dön</value></data>
 </root>

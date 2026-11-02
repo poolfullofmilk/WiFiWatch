@@ -31,6 +31,13 @@
             }
         });
 
+        // An Info Icon Inside A Switch Label Never Toggles The Switch
+        document.addEventListener('click', (event) => {
+            if (event.target instanceof Element && event.target.closest('.info-icon')) {
+                event.preventDefault();
+            }
+        });
+
         window.wifiwatch = {
             setLanguage: (language, errorMessage, reloadLabel) => {
                 document.documentElement.lang = language;

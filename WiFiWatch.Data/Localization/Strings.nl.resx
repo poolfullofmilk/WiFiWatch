@@ -34,7 +34,7 @@
     <data name="CheckUpdates" xml:space="preserve"><value>Controleren op updates</value></data>
     <data name="GitHubUnavailable" xml:space="preserve"><value>GitHub niet bereikbaar</value></data>
     <data name="VersionLatest" xml:space="preserve"><value>Versie {0} is de nieuwste</value></data>
-    <data name="DriverFrom" xml:space="preserve"><value>Stuurprogramma {0} van {1:yyyy-MM-dd}</value></data>
+    <data name="DriverFrom" xml:space="preserve"><value>Stuurprogramma {0} van {1:dd-MM-yyyy}</value></data>
     <data name="Driver" xml:space="preserve"><value>Stuurprogramma {0}</value></data>
     <data name="Language" xml:space="preserve"><value>Taal</value></data>
     <data name="SystemLanguage" xml:space="preserve"><value>Windows-taal (automatisch)</value></data>
@@ -182,8 +182,8 @@
     <data name="Reference DNS ms" xml:space="preserve"><value>Referentie-DNS ms</value></data>
     <data name="Yes" xml:space="preserve"><value>Ja</value></data>
     <data name="No" xml:space="preserve"><value>Nee</value></data>
-    <data name="Peak" xml:space="preserve"><value>Piek</value></data>
-    <data name="Lowest" xml:space="preserve"><value>Laagste</value></data>
+    <data name="Peak" xml:space="preserve"><value>piek</value></data>
+    <data name="Lowest" xml:space="preserve"><value>laagste</value></data>
     <data name="Weak Signal" xml:space="preserve"><value>Zwak signaal</value></data>
     <data name="Ping Spike At Internet Provider" xml:space="preserve"><value>Pingpiek bij internetprovider</value></data>
     <data name="Packet Loss At Internet Provider" xml:space="preserve"><value>Pakketverlies bij internetprovider</value></data>
@@ -283,7 +283,7 @@
     <data name="Could Not Connect To {0}, {1}" xml:space="preserve"><value>Kon geen verbinding maken met {0}, {1}</value></data>
     <data name="Could Not Connect To {0} For {1}, {2}, Then Connected" xml:space="preserve"><value>Kon {1} geen verbinding maken met {0}, {2}, daarna verbonden</value></data>
     <data name="Wi-Fi Dropped Briefly On {0}" xml:space="preserve"><value>Wifi viel kort weg op {0}</value></data>
-    <data name="Wi-Fi Driver {0} Dates From {1:yyyy-MM-dd}, Check Windows Update Or The Maker's Site" xml:space="preserve"><value>Wifi-stuurprogramma {0} dateert van {1:yyyy-MM-dd}, controleer Windows Update of de fabrikant</value></data>
+    <data name="Wi-Fi Driver {0} Dates From {1:yyyy-MM-dd}, Check Windows Update Or The Maker's Site" xml:space="preserve"><value>Wifi-stuurprogramma {0} dateert van {1:dd-MM-yyyy}, controleer Windows Update of de fabrikant</value></data>
     <data name="Version {0} Is Available" xml:space="preserve"><value>Versie {0} is beschikbaar</value></data>
     <data name="Speed Test {0:0} Mbps Down, {1:0} Mbps Up, Ping Under Load +{2:0} ms, Grade {3}" xml:space="preserve"><value>Snelheidstest {0:0} Mbps download, {1:0} Mbps upload, ping onder belasting +{2:0} ms, beoordeling {3}</value></data>
     <data name="Speed Test Failed {0}" xml:space="preserve"><value>Snelheidstest mislukt: {0}</value></data>
@@ -384,7 +384,6 @@
     <data name="Edit row" xml:space="preserve"><value>Rij bewerken</value></data>
     <data name="Cancel edit" xml:space="preserve"><value>Bewerken annuleren</value></data>
     <data name="Commit edit" xml:space="preserve"><value>Bewerking opslaan</value></data>
-    <data name="Start Typing To Search" xml:space="preserve"><value>Begin te typen om te zoeken</value></data>
     <data name="{0} {1} {2} Exported {3:yyyy-MM-dd HH-mm-ss}.csv" xml:space="preserve"><value>{0} {1} {2} Geëxporteerd {3:yyyy-MM-dd HH-mm-ss}.csv</value></data>
     <data name="No Measurements" xml:space="preserve"><value>Geen metingen</value></data>
     <data name="ConditionValue" xml:space="preserve"><value>{0} {1}</value></data>
@@ -392,4 +391,5 @@
     <data name="Nothing Found" xml:space="preserve"><value>Niets gevonden</value></data>
     <data name="ChannelLegend" xml:space="preserve"><value>Blauw: je kanaal&#10;Oranje: een buur met 30% signaal of meer in je 80 MHz-blok, die zendertijd met je deelt&#10;Grijs: andere netwerken binnen bereik&#10;Zendertijd bezet: hoe vaak je toegangspunt het kanaal als bezet meldt</value></data>
     <data name="StartFailed" xml:space="preserve"><value>{0} kon niet starten: {1}</value></data>
+    <data name="Scroll To Top" xml:space="preserve"><value>Naar boven</value></data>
 </root>

@@ -26,6 +26,9 @@ public partial class UpdateDialog
 
     private bool _isInstalling;
 
+    // Whole Percents, Null While The Length Is Unknown
+    private int? _percent;
+
     public static Task ShowAsync(IDialogService dialogService, Version version) =>
         dialogService.ShowAsync<UpdateDialog>(
             null,
@@ -57,7 +60,17 @@ public partial class UpdateDialog
         await SetClosableAsync(false);
         try
         {
-            Updater.Launch(await Updater.DownloadAsync(Version));
+            _percent = null;
+            Updater.Launch(
+                await Updater.DownloadAsync(
+                    Version,
+                    new Progress<int?>(percent =>
+                    {
+                        _percent = percent;
+                        _ = InvokeAsync(StateHasChanged);
+                    })
+                )
+            );
             Window.Exit();
         }
         catch (Exception exception)

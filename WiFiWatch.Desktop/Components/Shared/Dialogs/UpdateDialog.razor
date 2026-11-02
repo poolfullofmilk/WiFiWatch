@@ -40,6 +40,23 @@
                          Color="Color.Info"
                          CheckedIcon="@Icons.Material.Rounded.CheckBox"
                          UncheckedIcon="@Icons.Material.Rounded.CheckBoxOutlineBlank" />
+            @if (_isInstalling)
+            {
+                @* Download Progress *@
+                <MudStack Row
+                          AlignItems="AlignItems.Center"
+                          Spacing="2">
+                    <MudProgressLinear Color="Color.Info"
+                                       Value="@(_percent ?? 0)"
+                                       Indeterminate="@(_percent is null)"
+                                       Rounded
+                                       Size="Size.Medium" />
+                    <MudText Typo="Typo.caption"
+                             Class="mud-text-secondary">
+                        @(_percent is { } percent ? $"{percent}%" : "")
+                    </MudText>
+                </MudStack>
+            }
         </MudStack>
     </DialogContent>
     <DialogActions>

@@ -22,10 +22,10 @@ public static class Updater
             ?.StartsWith(ExecutablePrefix, StringComparison.OrdinalIgnoreCase) == true;
 
     // Off The Window's Thread, Writing And Hashing 80 MB Would Freeze It
-    public static Task<string> DownloadAsync(Version version) =>
-        Task.Run(() => DownloadOnPoolAsync(version));
+    public static Task<string> DownloadAsync(Version version, IProgress<int?> percent) =>
+        Task.Run(() => DownloadOnPoolAsync(version, percent));
 
-    private static async Task<string> DownloadOnPoolAsync(Version version)
+    private static async Task<string> DownloadOnPoolAsync(Version version, IProgress<int?> percent)
     {
         var versionText = AppInfo.ShortText(version);
         var fileName = $"{ExecutablePrefix}{versionText}.exe";
@@ -49,7 +49,21 @@ public static class Updater
             response.EnsureSuccessStatusCode();
             await using (var file = File.Create(partialPath))
             {
-                await response.Content.CopyToAsync(file);
+                // Once Per Percent, Null While GitHub Sends No Length
+                var total = response.Content.Headers.ContentLength;
+                await using var download = await response.Content.ReadAsStreamAsync();
+                var buffer = new byte[81920];
+                long received = 0;
+                int? reported = -1;
+                int read;
+                while ((read = await download.ReadAsync(buffer)) > 0)
+                {
+                    await file.WriteAsync(buffer.AsMemory(0, read));
+                    received += read;
+                    int? now = total > 0 ? (int)(received * 100 / total) : null;
+                    if (now != reported)
+                        percent.Report(reported = now);
+                }
             }
 
             await using (var file = File.OpenRead(partialPath))

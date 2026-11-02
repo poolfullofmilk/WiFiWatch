@@ -86,6 +86,19 @@ public partial class App : Application
             );
         };
 
+        // A Background Task Nobody Awaited Is Logged The Same Way
+        TaskScheduler.UnobservedTaskException += (_, exceptionArgs) =>
+        {
+            exceptionArgs.SetObserved();
+            _ = monitor.RecordFailureAsync(
+                AppText.Get(
+                    "App Failed {0}",
+                    exceptionArgs.Exception.InnerException?.GetType().Name
+                        ?? exceptionArgs.Exception.GetType().Name
+                )
+            );
+        };
+
         // The Page Resolves The Window Only After It Exists
         MainWindow? window = null;
         var services = new ServiceCollection();

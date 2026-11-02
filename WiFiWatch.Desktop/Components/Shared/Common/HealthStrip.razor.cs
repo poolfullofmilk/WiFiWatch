@@ -48,7 +48,7 @@ public partial class HealthStrip
     private string Describe(HealthBucket bucket)
     {
         var when = IsDaily
-            ? Formatter.FormatLocal(bucket.StartUtc, "yyyy-MM-dd dddd")
+            ? Formatter.FormatLocal(bucket.StartUtc, $"dddd {Formatter.DateFormat}")
             : AppText.Get(
                 "{0} To {1}",
                 Formatter.FormatWhen(bucket.StartUtc),

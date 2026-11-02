@@ -1,21 +1,16 @@
 <MudStack Spacing="2">
-    @* Header *@
+    @* Header, Actions Keep One Line While The Title Gives Way *@
     <MudStack Row
               AlignItems="AlignItems.Center"
-              Spacing="1">
+              Spacing="1"
+              Class="header-row">
         <MudText Typo="Typo.h5"
-                 Class="@(Info is null ? "mx-2" : "ml-2")">
+                 Class="@(Info is null ? "header-title mx-2" : "header-title ml-2")">
             @Title
         </MudText>
         @if (Info is not null)
         {
-            @* Info Icon *@
-            <Tooltip Text="@Info"
-                     RootClass="d-inline-flex ml-1 info-icon">
-                <MudIcon Icon="@Icons.Material.Rounded.Info"
-                         Color="Color.Info"
-                         Size="Size.Small" />
-            </Tooltip>
+            <InfoIcon Text="@Info" />
         }
         <MudSpacer />
         @TitleContent

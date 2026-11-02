@@ -2,14 +2,25 @@
 @using Size = MudBlazor.Size
 
 @* Providers *@
+@* DefaultScrollbar, Or MudBlazor's Injected Thin Scrollbar Brings The Arrows Back *@
 <MudThemeProvider Theme="AppTheme.Custom"
-                  IsDarkMode />
+                  IsDarkMode
+                  DefaultScrollbar />
 <MudPopoverProvider />
 <MudDialogProvider BackdropClick="false"
                    CloseButton="true"
                    CloseOnEscapeKey="true"
                    MaxWidth="MaxWidth.False" />
 <MudSnackbarProvider />
+
+@* Scroll To Top *@
+<MudScrollToTop>
+    <MudFab Color="Color.Info"
+            Size="Size.Small"
+            StartIcon="@Icons.Material.Rounded.ArrowUpward"
+            aria-label="@AppText.Get("Scroll To Top")"
+            title="@AppText.Get("Scroll To Top")" />
+</MudScrollToTop>
 
 @* Close Message Box *@
 <MudMessageBox @ref="_closeMessageBox"
@@ -19,7 +30,6 @@
     </MessageContent>
     <NoButton>
         <MudButton Variant="Variant.Filled"
-                   Size="Size.Small"
                    StartIcon="@Icons.Material.Rounded.PowerSettingsNew">
             @AppText.Get("Exit")
         </MudButton>
@@ -27,7 +37,6 @@
     <YesButton>
         <MudButton Variant="Variant.Filled"
                    Color="Color.Info"
-                   Size="Size.Small"
                    StartIcon="@Icons.Material.Rounded.Check">
             @AppText.Get("Keep Running")
         </MudButton>
@@ -48,14 +57,14 @@
             <MudSpacer />
             @foreach (var link in Pages)
             {
-                @* Page Button, d-flex Keeps The Badge From Lifting It *@
+                @* Page Button, The Open One Tonal Blue, d-flex Keeps The Badge From Lifting It *@
                 <MudBadge Dot
                           Overlap
                           Class="d-flex"
                           Visible="@(DotColor(link.Page) is not null)"
                           Color="@(DotColor(link.Page) ?? Color.Default)">
                     <MudButton StartIcon="@link.Icon"
-                               Color="@(link.Page == _page ? Color.Secondary : Color.Default)"
+                               Color="@(link.Page == _page ? Color.Info : Color.Default)"
                                Variant="@(link.Page == _page ? Variant.Filled : Variant.Text)"
                                Size="Size.Small"
                                Class="px-3"

@@ -34,7 +34,7 @@
     <data name="CheckUpdates" xml:space="preserve"><value>Buscar actualizaciones</value></data>
     <data name="GitHubUnavailable" xml:space="preserve"><value>No se pudo acceder a GitHub</value></data>
     <data name="VersionLatest" xml:space="preserve"><value>La versión {0} es la más reciente</value></data>
-    <data name="DriverFrom" xml:space="preserve"><value>Controlador {0} del {1:yyyy-MM-dd}</value></data>
+    <data name="DriverFrom" xml:space="preserve"><value>Controlador {0} del {1:dd-MM-yyyy}</value></data>
     <data name="Driver" xml:space="preserve"><value>Controlador {0}</value></data>
     <data name="Language" xml:space="preserve"><value>Idioma</value></data>
     <data name="SystemLanguage" xml:space="preserve"><value>Idioma de Windows (automático)</value></data>
@@ -182,8 +182,8 @@
     <data name="Reference DNS ms" xml:space="preserve"><value>DNS de Referencia ms</value></data>
     <data name="Yes" xml:space="preserve"><value>Sí</value></data>
     <data name="No" xml:space="preserve"><value>No</value></data>
-    <data name="Peak" xml:space="preserve"><value>Máximo</value></data>
-    <data name="Lowest" xml:space="preserve"><value>Mínimo</value></data>
+    <data name="Peak" xml:space="preserve"><value>máximo</value></data>
+    <data name="Lowest" xml:space="preserve"><value>mínimo</value></data>
     <data name="Weak Signal" xml:space="preserve"><value>Señal Débil</value></data>
     <data name="Ping Spike At Internet Provider" xml:space="preserve"><value>Pico de Ping en el Proveedor</value></data>
     <data name="Packet Loss At Internet Provider" xml:space="preserve"><value>Pérdida de Paquetes en el Proveedor</value></data>
@@ -283,7 +283,7 @@
     <data name="Could Not Connect To {0}, {1}" xml:space="preserve"><value>No se pudo conectar a {0}, {1}</value></data>
     <data name="Could Not Connect To {0} For {1}, {2}, Then Connected" xml:space="preserve"><value>No se pudo conectar a {0} durante {1}, {2}, después se conectó</value></data>
     <data name="Wi-Fi Dropped Briefly On {0}" xml:space="preserve"><value>El wifi se cortó brevemente en {0}</value></data>
-    <data name="Wi-Fi Driver {0} Dates From {1:yyyy-MM-dd}, Check Windows Update Or The Maker's Site" xml:space="preserve"><value>El controlador wifi {0} es del {1:yyyy-MM-dd}, revise Windows Update o la web del fabricante</value></data>
+    <data name="Wi-Fi Driver {0} Dates From {1:yyyy-MM-dd}, Check Windows Update Or The Maker's Site" xml:space="preserve"><value>El controlador wifi {0} es del {1:dd-MM-yyyy}, revise Windows Update o la web del fabricante</value></data>
     <data name="Version {0} Is Available" xml:space="preserve"><value>La versión {0} está disponible</value></data>
     <data name="Speed Test {0:0} Mbps Down, {1:0} Mbps Up, Ping Under Load +{2:0} ms, Grade {3}" xml:space="preserve"><value>Prueba de velocidad: {0:0} Mbps de descarga, {1:0} Mbps de subida, ping bajo carga +{2:0} ms, nota {3}</value></data>
     <data name="Speed Test Failed {0}" xml:space="preserve"><value>Falló la prueba de velocidad: {0}</value></data>
@@ -384,7 +384,6 @@
     <data name="Edit row" xml:space="preserve"><value>Editar fila</value></data>
     <data name="Cancel edit" xml:space="preserve"><value>Cancelar edición</value></data>
     <data name="Commit edit" xml:space="preserve"><value>Guardar edición</value></data>
-    <data name="Start Typing To Search" xml:space="preserve"><value>Empiece a escribir para buscar</value></data>
     <data name="{0} {1} {2} Exported {3:yyyy-MM-dd HH-mm-ss}.csv" xml:space="preserve"><value>{0} {1} {2} Exportado {3:yyyy-MM-dd HH-mm-ss}.csv</value></data>
     <data name="No Measurements" xml:space="preserve"><value>Sin mediciones</value></data>
     <data name="ConditionValue" xml:space="preserve"><value>{0} {1}</value></data>
@@ -392,4 +391,5 @@
     <data name="Nothing Found" xml:space="preserve"><value>No se encontró nada</value></data>
     <data name="ChannelLegend" xml:space="preserve"><value>Azul: su canal&#10;Naranja: un vecino con 30% de señal o más en su bloque de 80 MHz, que comparte su tiempo de emisión&#10;Gris: otras redes al alcance&#10;Tiempo de emisión ocupado: con qué frecuencia su punto de acceso indica el canal en uso</value></data>
     <data name="StartFailed" xml:space="preserve"><value>{0} no pudo iniciarse: {1}</value></data>
+    <data name="Scroll To Top" xml:space="preserve"><value>Volver Arriba</value></data>
 </root>
