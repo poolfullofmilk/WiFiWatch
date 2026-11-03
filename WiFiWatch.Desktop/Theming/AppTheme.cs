@@ -28,6 +28,9 @@ public static class AppTheme
     private const string AccentBlue = "#3d8bfd";
     private const string AccentBlueDarken = "#2b74e0";
 
+    // Accent Mixed 40% With White, Like --tonal-info-text
+    public const string TonalAccentText = "#b1d1fe";
+
     // Shared White Overlay Steps
     private const string TextStrong = "rgba(255,255,255, 0.85)";
     private const string TextMedium = "rgba(255,255,255, 0.60)";

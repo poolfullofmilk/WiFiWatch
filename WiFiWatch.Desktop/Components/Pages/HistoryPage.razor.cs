@@ -3,7 +3,6 @@ using ApexCharts;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
-using MudBlazor.Utilities;
 using WiFiWatch.Data;
 using WiFiWatch.Data.Enums;
 using WiFiWatch.Data.Helpers;
@@ -350,13 +349,8 @@ public partial class HistoryPage : IDisposable
         return new ApexChartOptions<ChartPoint>
         {
             Theme = new Theme { Mode = Mode.Dark },
-            // Router Grey, Internet In The App's Blue, DNS Violet
-            Colors =
-            [
-                "#BDBDBD",
-                AppTheme.Custom.PaletteDark.Info.ToString(MudColorOutputFormats.Hex),
-                "#B39DDB",
-            ],
+            // Router Grey, Internet In The Tonal Blue, DNS Violet
+            Colors = ["#BDBDBD", AppTheme.TonalAccentText, "#B39DDB"],
             Chart = new Chart
             {
                 FontFamily = string.Join(", ", AppTheme.FontFamily),

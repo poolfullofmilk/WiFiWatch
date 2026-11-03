@@ -1,0 +1,35 @@
+name: Authors
+
+# Only poolfullofmilk Writes Here, A Commit From Any Other Identity Turns This Red
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+
+jobs:
+  authors:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Check Commit Authors
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+          ALLOWED: "70652416+poolfullofmilk@users.noreply.github.com"
+        run: |
+          range="$AFTER"
+          if [ -n "$BEFORE" ] && ! printf '%s' "$BEFORE" | grep -q '^0*$' && git cat-file -e "$BEFORE" 2>/dev/null; then
+            range="$BEFORE..$AFTER"
+          else
+            range="$AFTER^!"
+          fi
+          strangers=$(git log --format="%h %ae %ce %s" "$range" | awk -v allowed="$ALLOWED" '$2 != allowed || ($3 != allowed && $3 != "noreply@github.com")')
+          if [ -n "$strangers" ]; then
+            echo "Found commits not made as poolfullofmilk:"
+            echo "$strangers"
+            exit 1
+          fi

@@ -287,6 +287,26 @@ svg.apexcharts-svg {
         background-color: var(--tonal-info-hover);
     }
 
+/* Picker Headers, Picked Days And The Scroll Button Are Tonal Too */
+.mud-theme-info,
+.mud-fab.mud-fab-filled-info {
+    background-color: var(--tonal-info) !important;
+    color: var(--tonal-info-text) !important;
+    box-shadow: none;
+}
+
+    .mud-fab.mud-fab-filled-info:is(:hover, :focus-visible, :active),
+    .mud-picker-calendar-day.mud-theme-info:is(:hover, :focus-visible) {
+        background-color: var(--tonal-info-hover) !important;
+    }
+
+/* Switches, Progress And Every Other Blue Mark Take The Tonal Text Blue */
+.mud-switch,
+.mud-progress-linear,
+.mud-progress-circular {
+    --mud-palette-info: var(--tonal-info-text);
+}
+
 /* Fields Sit Inset, Their Edge Shows On Hover And Turns Blue On Focus */
 .mud-input.mud-input-outlined {
     border-radius: var(--mud-default-borderradius);
@@ -299,7 +319,7 @@ svg.apexcharts-svg {
     }
 
     .mud-input.mud-input-outlined:focus-within .mud-input-outlined-border {
-        border-color: var(--mud-palette-info);
+        border-color: var(--tonal-info-text);
     }
 
 /* A Number At Its Limit Greys Out That Spin Button */
@@ -452,8 +472,8 @@ svg.apexcharts-svg {
 }
 
 .channel-yours {
-    background-color: var(--mud-palette-info);
-    color: var(--mud-palette-info-text);
+    background-color: var(--tonal-info);
+    color: var(--tonal-info-text);
 }
 
 .channel-shares {
