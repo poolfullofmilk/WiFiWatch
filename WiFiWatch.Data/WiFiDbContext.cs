@@ -8,18 +8,19 @@ namespace WiFiWatch.Data;
 public sealed class WiFiDbContext : DbContext
 {
     // Debug Builds Keep Apart From Real Data
-    private static readonly string s_defaultDataDirectory = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
 #if DEBUG
-        "WiFiWatch Debug"
+    private const string DataFolderName = "WiFiWatch Debug";
 #else
-        "WiFiWatch"
+    private const string DataFolderName = "WiFiWatch";
 #endif
-    );
 
     // Regression Tests Redirect Every Store Before Loading Any Settings Or Database
     public static string DataDirectory =>
-        AppContext.GetData("WiFiWatch.TestDirectory") as string ?? s_defaultDataDirectory;
+        AppContext.GetData("WiFiWatch.TestDirectory") as string
+        ?? Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            DataFolderName
+        );
 
     public DbSet<WiFiEvent> Events => Set<WiFiEvent>();
 

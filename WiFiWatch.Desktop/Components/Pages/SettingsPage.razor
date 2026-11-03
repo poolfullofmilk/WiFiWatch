@@ -3,10 +3,11 @@
 @using WiFiWatch.Data.Localization
 
 <MudStack Spacing="6">
-    @* General Section, One Card Per Setting Straight On The Page *@
+    @* General Section *@
     <Header Title="@AppText.Get("General")"
             Icon="@Icons.Material.Rounded.Tune">
         <MudGrid Spacing="3">
+
             @* Start Switch *@
             <MudItem xs="12"
                      md="4">
@@ -31,6 +32,7 @@
                                Value="Monitor.Settings.NightlySpeedTest"
                                ValueChanged="value => SaveSettings(Monitor.Settings with { NightlySpeedTest = value })" />
             </MudItem>
+
         </MudGrid>
     </Header>
 
@@ -39,6 +41,7 @@
             Icon="@Icons.Material.Rounded.Rule"
             Info="@AppText.Get("LimitsDescription")">
         <MudGrid Spacing="3">
+
             @foreach (var limit in Limits)
             {
                 @* Limit Card *@
@@ -63,6 +66,7 @@
                     </MudPaper>
                 </MudItem>
             }
+
         </MudGrid>
     </Header>
 

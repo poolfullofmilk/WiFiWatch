@@ -3,7 +3,6 @@
 @using WiFiWatch.Services.Integration
 
 @* Providers *@
-@* DefaultScrollbar, Or MudBlazor's Injected Thin Scrollbar Brings The Arrows Back *@
 <MudThemeProvider Theme="AppTheme.Custom"
                   IsDarkMode
                   DefaultScrollbar />
@@ -59,7 +58,7 @@
             @* Language Menu *@
             <LanguagePicker />
 
-            @* Help Menu, A Red Dot Until Restart Once An Update Is Found *@
+            @* Help Menu *@
             <Tooltip Text="@AppText.Get("Help")"
                      RootClass="d-flex">
                 <MudBadge Dot
@@ -94,7 +93,7 @@
             <MudSpacer />
             @foreach (var link in Pages)
             {
-                @* Page Button, The Open One Tonal Blue, d-flex Keeps The Badge From Lifting It *@
+                @* Page Button *@
                 <MudBadge Dot
                           Overlap
                           Class="d-flex"
@@ -114,7 +113,8 @@
     </MudAppBar>
 
     @* Main Content *@
-    <MudMainContent @key="_languageVersion" Class="px-7 pb-7 pt-20">
+    <MudMainContent @key="_languageVersion"
+                    Class="px-7 pb-7 pt-20">
         <MudContainer MaxWidth="MaxWidth.Large"
                       Gutters="false">
             <PageErrorBoundary @ref="_errorBoundary">

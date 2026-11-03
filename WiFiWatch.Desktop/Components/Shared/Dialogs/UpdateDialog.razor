@@ -14,7 +14,7 @@
             <MudText Typo="Typo.body2">
                 @AppText.Get("Installed Version Is {0}, Updating Restarts {1}", AppInfo.VersionText, AppInfo.DisplayName)
             </MudText>
-            @* What Changed, Commit Titles As GitHub Supplies Them *@
+            @* What Changed *@
             @if (Monitor.UpdateNotes.Count > 0)
             {
                 <MudText Typo="Typo.subtitle2">@AppText.Get("What Changed")</MudText>

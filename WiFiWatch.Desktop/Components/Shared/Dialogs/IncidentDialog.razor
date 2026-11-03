@@ -25,10 +25,11 @@
             </MudText>
             @if (DetailLines.Count > 0)
             {
-                @* Details, Label Over Value On An Inset Surface *@
+                @* Details *@
                 <MudPaper Elevation="0"
                           Class="inset rounded-panel pa-4">
                     <MudGrid Spacing="3">
+
                         @foreach (var (label, value) in DetailLines)
                         {
                             <MudItem xs="12"
@@ -43,6 +44,7 @@
                                 </MudText>
                             </MudItem>
                         }
+
                     </MudGrid>
                 </MudPaper>
             }

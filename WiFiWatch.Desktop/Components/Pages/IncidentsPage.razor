@@ -1,7 +1,7 @@
 @using Color = MudBlazor.Color
 @using Size = MudBlazor.Size
 
-@* Incidents, Actions Beside The Title, Filters Inside The Panel Above The List *@
+@* Incidents *@
 <Header Title="@AppText.Get("Incidents")"
         Class="page-fill">
     <TitleContent>
@@ -22,7 +22,7 @@
                       AlignItems="AlignItems.Center"
                       Spacing="4"
                       Class="pa-4 pb-2">
-                @* Search, Its Value Arrives Once Typing Pauses *@
+                @* Search *@
                 <MudTextField T="string"
                               Value="_searchTerm"
                               ValueChanged="SearchAsync"
@@ -36,7 +36,7 @@
                               ClearIcon="@Icons.Material.Rounded.Clear"
                               Class="fixed-width my-0" />
                 <MudSpacer />
-                @* Scope Buttons, The Picked One Blue *@
+                @* Scope Buttons *@
                 <MudButtonGroup OverrideStyles="false"
                                 Size="Size.Small">
                     @foreach (var isEverything in new[] { false, true })
@@ -83,7 +83,7 @@
                         @Formatter.FormatLocal(context.OccurredAtUtc, Formatter.DateTimeFormat)
                     </MudTd>
                     <MudTd Class="overflow-hidden">
-                        @* Kind On Its Tile, Where Under It *@
+                        @* Kind Tile *@
                         <MudStack Row
                                   AlignItems="AlignItems.Center"
                                   Spacing="3">

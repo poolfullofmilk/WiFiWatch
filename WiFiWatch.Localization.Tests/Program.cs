@@ -29,7 +29,7 @@ using WiFiWatch.Services.Storage;
 
 namespace WiFiWatch.Localization.Tests;
 
-internal static class Program
+internal static partial class Program
 {
     private static int s_checks;
 
@@ -146,28 +146,29 @@ internal static class Program
                     );
                 var template = resources.GetString(key, AppText.Culture)!;
                 Check(!string.IsNullOrEmpty(template), language + ": " + key);
-                var expectedIndices = Regex
-                    .Matches((string)entry.Value!, @"\{(\d+)")
+                var expectedIndices = PlaceholderPattern()
+                    .Matches((string)entry.Value!)
                     .Select(match => match.Groups[1].Value)
                     .Order();
-                var actualIndices = Regex
-                    .Matches(template, @"\{(\d+)")
+                var actualIndices = PlaceholderPattern()
+                    .Matches(template)
                     .Select(match => match.Groups[1].Value)
                     .Order();
                 Check(
                     expectedIndices.SequenceEqual(actualIndices),
                     "Placeholder parity: " + language + ": " + key
                 );
-                var indices = Regex
-                    .Matches((string)entry.Value!, @"\{(\d+)")
+                var indices = PlaceholderPattern()
+                    .Matches((string)entry.Value!)
                     .Select(match => int.Parse(match.Groups[1].Value))
                     .ToArray();
-                object[] arguments = Enumerable
-                    .Repeat<object>(
+                object[] arguments =
+                [
+                    .. Enumerable.Repeat<object>(
                         new FormattingProbe(),
                         indices.Length == 0 ? 0 : indices.Max() + 1
-                    )
-                    .ToArray();
+                    ),
+                ];
                 Check(!string.IsNullOrEmpty(AppText.Get(key, arguments)), "Format " + key);
             }
             Check(
@@ -490,12 +491,7 @@ internal static class Program
         )
         {
             var source = File.ReadAllText(file);
-            foreach (
-                Match match in Regex.Matches(
-                    source,
-                    @"AppText\.Get\(\s*""(?<key>(?:[^""\\]|\\.)*)"""
-                )
-            )
+            foreach (Match match in AppTextKeyPattern().Matches(source))
             {
                 var key = Regex.Unescape(match.Groups["key"].Value);
                 Check(
@@ -505,13 +501,10 @@ internal static class Program
             }
             if (!file.EndsWith(".razor"))
                 continue;
-            source = Regex.Replace(source, @"@\*.*?\*@", "", RegexOptions.Singleline);
-            var literalAttributes = Regex.Matches(
-                source,
-                "(?:Title|Label|Description|Text|DataLabel|PlaceHolder|SortLabel|RowsPerPageString|Name)=\"[A-Za-z][A-Za-z0-9 -]*\""
-            );
+            source = RazorCommentPattern().Replace(source, "");
+            var literalAttributes = LiteralAttributePattern().Matches(source);
             Check(literalAttributes.Count == 0, "No hardcoded human labels: " + file);
-            var literalText = Regex.Matches(source, @">\s*[A-Za-z][A-Za-z .,!?'-]{2,}\s*<");
+            var literalText = LiteralTextPattern().Matches(source);
             Check(literalText.Count == 0, "No hardcoded visible text: " + file);
         }
     }
@@ -584,10 +577,10 @@ internal static class Program
                     !string.IsNullOrEmpty(kind.ToLabel()),
                     "Event label: " + kind + " in " + language
                 );
-            var changed = WiFiChannels.DescribeChange(100, 36);
+            var (changedKind, changedMessage) = WiFiChannels.DescribeChange(100, 36);
             Check(
-                changed.Kind == EventKind.DfsEviction
-                    && changed.Message == AppText.Get("Channel {0} To {1} Left DFS", 100, 36),
+                changedKind == EventKind.DfsEviction
+                    && changedMessage == AppText.Get("Channel {0} To {1} Left DFS", 100, 36),
                 "Channel-change template " + language
             );
             Check(
@@ -900,6 +893,23 @@ internal static class Program
         protected override void NavigateToCore(string uri, bool forceLoad) =>
             throw new InvalidOperationException("Render tests must not navigate");
     }
+
+    [GeneratedRegex(@"\{(\d+)")]
+    private static partial Regex PlaceholderPattern();
+
+    [GeneratedRegex(@"AppText\.Get\(\s*""(?<key>(?:[^""\\]|\\.)*)""")]
+    private static partial Regex AppTextKeyPattern();
+
+    [GeneratedRegex(@"@\*.*?\*@", RegexOptions.Singleline)]
+    private static partial Regex RazorCommentPattern();
+
+    [GeneratedRegex(
+        "(?:Title|Label|Description|Text|DataLabel|PlaceHolder|SortLabel|RowsPerPageString|Name)=\"[A-Za-z][A-Za-z0-9 -]*\""
+    )]
+    private static partial Regex LiteralAttributePattern();
+
+    [GeneratedRegex(@">\s*[A-Za-z][A-Za-z .,!?'-]{2,}\s*<")]
+    private static partial Regex LiteralTextPattern();
 
     private sealed class NoJavaScript : IJSRuntime
     {

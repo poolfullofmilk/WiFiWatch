@@ -12,18 +12,18 @@
                     Style="width:320px">
             @* Range Picker *@
             <RangePicker @ref="_rangePicker"
-                                DateRange="_range"
-                                DateRangeChanged="SelectRangeAsync"
-                                MaxDate="DateTime.Today"
-                                DateFormat="@Formatter.DateFormat"
-                                Culture="@AppText.Culture"
-                                Color="Color.Info"
-                                Variant="Variant.Outlined"
-                                Margin="Margin.Dense"
-                                AdornmentIcon="@Icons.Material.Rounded.DateRange"
-                                PreviousIcon="@Icons.Material.Rounded.ChevronLeft"
-                                NextIcon="@Icons.Material.Rounded.ChevronRight"
-                                SeparatorIcon="@Icons.Material.Rounded.ArrowRightAlt">
+                         DateRange="_range"
+                         DateRangeChanged="SelectRangeAsync"
+                         MaxDate="DateTime.Today"
+                         DateFormat="@Formatter.DateFormat"
+                         Culture="@AppText.Culture"
+                         Color="Color.Info"
+                         Variant="Variant.Outlined"
+                         Margin="Margin.Dense"
+                         AdornmentIcon="@Icons.Material.Rounded.DateRange"
+                         PreviousIcon="@Icons.Material.Rounded.ChevronLeft"
+                         NextIcon="@Icons.Material.Rounded.ChevronRight"
+                         SeparatorIcon="@Icons.Material.Rounded.ArrowRightAlt">
                 <PickerActions>
                     @foreach (var (label, dayCount) in Presets)
                     {
@@ -212,7 +212,7 @@
                 }
                 else
                 {
-                    @* Speed Table, Flush In Its Panel *@
+                    @* Speed Table *@
                     <MudPaper Elevation="4"
                               Class="rounded-panel panel-flush">
                         <MudTable T="SpeedTest"

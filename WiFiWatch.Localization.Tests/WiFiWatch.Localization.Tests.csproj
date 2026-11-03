@@ -5,6 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>WiFiWatch.Desktop</RootNamespace>
+        <NoWarn>$(NoWarn);CA1822;IDE0130</NoWarn>
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="../WiFiWatch.Services/WiFiWatch.Services.csproj" />
